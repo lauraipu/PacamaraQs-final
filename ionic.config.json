@@ -1,0 +1,7 @@
+{
+  "name": "mi-app-migrada",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
