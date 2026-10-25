@@ -1,0 +1,80 @@
+:host {
+  display: block;
+}
+
+.register-content {
+  --background: var(--app-bg-screen);
+}
+
+.register-container {
+  width: min(100%, 460px);
+  min-height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 8px;
+}
+
+.logo-box {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  place-items: center;
+  margin: 0 auto 20px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--app-primary-dark);
+}
+
+.logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.back-link {
+  margin-bottom: 24px;
+  color: var(--app-primary-dark);
+  text-decoration: none;
+}
+
+.title {
+  margin: 0;
+  color: var(--app-text-main);
+}
+
+.subtitle {
+  margin: 8px 0 24px;
+  color: var(--app-text-muted);
+}
+
+.register-form {
+  display: grid;
+  gap: 18px;
+}
+
+.password-toggle {
+  justify-self: end;
+  min-height: 28px;
+  margin: -14px 0 -12px;
+  color: var(--app-text-muted);
+  text-transform: none;
+}
+
+.privacy-consent {
+  --background: transparent;
+  --padding-start: 0;
+  color: var(--app-text-muted);
+}
+
+.register-link {
+  margin-top: 20px;
+  color: var(--app-text-muted);
+  text-align: center;
+}
+
+.register-link a {
+  color: var(--app-primary-dark);
+  font-weight: 600;
+}

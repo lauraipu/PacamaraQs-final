@@ -1,0 +1,22 @@
+[
+  {
+    "id": "demo-sesion-001",
+    "titulo": "Cata de prueba — Colombia",
+    "tipo": "Combinado",
+    "estado": "En progreso",
+    "rol": "Catador",
+    "fecha": "21 oct 2026",
+    "cantMuestras": 6,
+    "cantCatadores": 5
+  },
+  {
+    "id": "demo-sesion-002",
+    "titulo": "Evaluación de muestra — Huila",
+    "tipo": "Afectivo",
+    "estado": "En espera",
+    "rol": "Organizador",
+    "fecha": "20 oct 2026",
+    "cantMuestras": 4,
+    "cantCatadores": 7
+  }
+]

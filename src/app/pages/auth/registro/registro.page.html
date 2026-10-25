@@ -1,0 +1,89 @@
+<ion-content class="ion-padding register-content">
+  <main class="register-container">
+    <div class="logo-box">
+      <img src="assets/icon/logopacamara.png" alt="Logo de Pacamara">
+    </div>
+    <a class="back-link" routerLink="/login">Volver al inicio de sesión</a>
+    <h1 class="title">Crear cuenta</h1>
+    <p class="subtitle">Regístrate para comenzar a catar.</p>
+
+    <form class="register-form" (ngSubmit)="registro()">
+      <ion-input
+        [(ngModel)]="nombre"
+        name="nombre"
+        label="Nombre"
+        labelPlacement="stacked"
+        autocomplete="name"
+        fill="outline"
+        class="custom-input"
+        required
+      ></ion-input>
+      <ion-input
+        [(ngModel)]="email"
+        name="email"
+        label="Correo"
+        labelPlacement="stacked"
+        type="email"
+        autocomplete="email"
+        inputmode="email"
+        fill="outline"
+        class="custom-input"
+        required
+      ></ion-input>
+      <ion-input
+        [(ngModel)]="password"
+        name="password"
+        label="Contraseña"
+        labelPlacement="stacked"
+        [type]="showPassword ? 'text' : 'password'"
+        autocomplete="new-password"
+        fill="outline"
+        class="custom-input"
+        required
+      ></ion-input>
+      <ion-button
+        type="button"
+        fill="clear"
+        class="password-toggle"
+        [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        (click)="showPassword = !showPassword"
+      >
+        {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+      </ion-button>
+      <ion-input
+        [(ngModel)]="confirmPassword"
+        name="confirmPassword"
+        label="Confirmar contraseña"
+        labelPlacement="stacked"
+        [type]="showPassword ? 'text' : 'password'"
+        autocomplete="new-password"
+        fill="outline"
+        class="custom-input"
+        required
+      ></ion-input>
+
+      <ion-item lines="none" class="privacy-consent">
+        <ion-checkbox
+          slot="start"
+          [(ngModel)]="politicaAceptada"
+          name="politicaAceptada"
+        ></ion-checkbox>
+        <ion-label class="ion-text-wrap">
+          Acepto los términos y la política de privacidad para crear y usar mi cuenta.
+        </ion-label>
+      </ion-item>
+
+      <ion-button expand="block" type="submit" class="primary-btn" [disabled]="isLoading">
+        @if (isLoading) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          <span>Crear cuenta</span>
+        }
+      </ion-button>
+    </form>
+    <p class="register-link">
+      ¿Ya tienes cuenta?
+      <a routerLink="/login">Inicia sesión</a>
+    </p>
+  </main>
+</ion-content>

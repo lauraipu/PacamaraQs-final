@@ -1,18 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="utf-8" />
-  <title>Ionic App</title>
+  <title>PacamaraSQ</title>
 
   <base href="/" />
 
+  <!-- ESTA ES LA LÍNEA MÁGICA QUE ARREGLA EL ERROR -->
+  <meta http-equiv="Content-Security-Policy" 
+        content="default-src 'self' data: gap: https://ssl.gstatic.com; 
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+                 font-src 'self' https://fonts.gstatic.com; 
+                 script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:4200; 
+                 connect-src 'self' http://localhost:4200 ws://localhost:4200 https://*.supabase.co;">
+  <!-- FIN DE LA LÍNEA MÁGICA -->
+
   <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#283840" />
   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="format-detection" content="telephone=no" />
   <meta name="msapplication-tap-highlight" content="no" />
 
-  <link rel="icon" type="image/png" href="assets/icon/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="assets/icon/logopacamara.png" />
+  
 
   <!-- add to homescreen for ios -->
   <meta name="mobile-web-app-capable" content="yes" />

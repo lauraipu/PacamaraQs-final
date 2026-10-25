@@ -1,0 +1,87 @@
+:host {
+  display: block;
+}
+
+ion-toolbar {
+  --background: var(--app-bg-card);
+}
+
+.waiting-content {
+  --background: var(--app-bg-screen);
+}
+
+.waiting-container {
+  width: min(100%, 760px);
+  margin: 0 auto;
+}
+
+.waiting-heading {
+  margin: 0;
+  color: var(--app-text-main);
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.session-code-card {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.session-code-card p {
+  margin: 0;
+  color: var(--app-text-muted);
+  font-size: 12px;
+}
+
+.session-code-value {
+  margin: 8px 0;
+  color: var(--app-text-main);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.session-code-card ion-button {
+  --border-color: var(--app-border);
+  --color: var(--app-primary-dark);
+  text-transform: none;
+}
+
+.session-code-card .session-target {
+  margin-top: 8px;
+}
+
+.waiting-session-name,
+.participant-count,
+.waiting-state {
+  color: var(--app-text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.waiting-session-name {
+  margin: 8px 0 16px;
+}
+
+.waiting-state {
+  padding: 24px 0;
+}
+
+.participant-count {
+  margin: 16px 0 0;
+}
+
+.waiting-error {
+  margin-bottom: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #ffe4e6;
+  color: #991b1b;
+  font-size: 13px;
+}
+
+.waiting-footer {
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--app-bg-card);
+}

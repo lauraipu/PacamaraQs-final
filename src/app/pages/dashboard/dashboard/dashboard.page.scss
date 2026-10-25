@@ -1,0 +1,169 @@
+:host {
+  display: block;
+}
+
+ion-toolbar {
+  --background: var(--app-bg-card);
+}
+
+.brand-title {
+  color: var(--app-text-main);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.brand-subtitle {
+  margin-top: 2px;
+  color: var(--app-text-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.dashboard-content {
+  --background: var(--app-bg-screen);
+}
+
+.dashboard-container {
+  width: min(100%, 900px);
+  margin: 0 auto;
+  padding-bottom: 24px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 8px 0 28px;
+}
+
+.metric-card {
+  margin: 0;
+  padding: 14px 8px;
+  text-align: center;
+}
+
+.metric-label {
+  color: var(--app-text-muted);
+  font-size: 12px;
+}
+
+.metric-value {
+  margin-top: 6px;
+  color: var(--app-text-main);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.section-heading h2,
+.join-card h2 {
+  margin: 0;
+  color: var(--app-text-main);
+  font-size: 16px;
+}
+
+.new-session-btn {
+  --background: var(--app-primary-dark);
+  --border-radius: 10px;
+  text-transform: none;
+}
+
+.empty-state {
+  padding: 20px;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  color: var(--app-text-muted);
+  font-size: 13px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px;
+  color: var(--app-text-main);
+  font-size: 15px;
+}
+
+.empty-state p,
+.join-card p {
+  margin: 0;
+  color: var(--app-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.session-card {
+  padding: 16px;
+}
+
+.session-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.chip {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--app-border);
+  color: var(--app-text-muted);
+  font-size: 11px;
+}
+
+.chip-active {
+  background: #f8fafc;
+  color: var(--app-primary-dark);
+}
+
+.chip-neutral {
+  background: var(--app-border);
+}
+
+.session-type {
+  margin: 4px 0;
+  color: var(--app-text-muted);
+  font-size: 12px;
+}
+
+.session-card h3 {
+  margin: 0;
+  color: var(--app-text-main);
+  font-size: 15px;
+}
+
+.session-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+  color: var(--app-text-muted);
+  font-size: 11px;
+}
+
+.join-card {
+  display: grid;
+  gap: 14px;
+  background: var(--app-border);
+}
+
+@media (max-width: 360px) {
+  .metrics {
+    gap: 8px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+  }
+}

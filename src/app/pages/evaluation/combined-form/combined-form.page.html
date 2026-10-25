@@ -1,0 +1,343 @@
+<ion-content class="cva-combined" [scrollY]="true">
+  
+  <!-- HEADER -->
+  <header class="cva-header">
+    <div class="cva-header__inner">
+      <div class="cva-header__left">
+        <button class="cva-header__back-btn" (click)="volver()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        <div class="cva-header__meta">
+          <p class="cva-header__session-name">Sesión en curso</p>
+          <p class="cva-header__sample-label">Muestra 1 <span>de 5</span></p>
+        </div>
+      </div>
+      <div class="cva-header__right">
+        <div class="cva-header__blind-badge">
+          <ion-icon name="lock-closed-outline"></ion-icon> Ciego
+        </div>
+        <span class="cva-header__format-badge">Combinado</span>
+        
+        <!-- Puntaje en vivo -->
+        <div class="cva-header__live-score" [style.border-color]="clasificacion.border" [style.background]="clasificacion.bg">
+          <span class="cva-header__live-score-label">CVA</span>
+          <span class="cva-header__live-score-value" [style.color]="clasificacion.color">{{ puntaje | number:'1.2-2' }}</span>
+        </div>
+        <button class="cva-header__next-btn">Siguiente →</button>
+      </div>
+    </div>
+    <div class="cva-header__progress-bar-wrap">
+      <div class="cva-header__progress-bar">
+        <div class="cva-header__progress-bar-fill" style="width: 20%;"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="cva-main">
+    <div class="cva-main__grid">
+      
+      <!-- COLUMNA IZQUIERDA (ATRIBUTOS) -->
+      <div class="cva-main__column">
+
+        <!-- FRAGANCIA -->
+        <article class="attr-card">
+          <h3 class="attr-card__title">Fragancia</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.fragancia.intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="1" max="15" step="0.5" [(ngModel)]="formulario.atributos.fragancia.intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+
+          <div class="hedonic-buttons">
+            <div class="hedonic-buttons__header">
+              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.fragancia.calidad }} — {{ etiquetas[formulario.atributos.fragancia.calidad] }}</span>
+            </div>
+            <div class="hedonic-buttons__grid">
+              <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" 
+                      class="hedonic-buttons__btn" 
+                      [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.fragancia.calidad === i}"
+                      (click)="formulario.atributos.fragancia.calidad = i">
+                {{ i }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Rueda de Sabores -->
+          <div class="flavor-tree">
+            <p class="flavor-tree__section-label">Descriptores aromáticos</p>
+            <div class="flavor-tree__category" *ngFor="let cat of ruedaKeys">
+              <button class="flavor-tree__category-btn" (click)="toggleCategoria(cat)">
+                <span class="flavor-tree__category-left">
+                  <ion-icon [name]="categoriasAbiertas[cat] ? 'chevron-down-outline' : 'chevron-forward-outline'" class="flavor-tree__chevron"></ion-icon>
+                  <span class="flavor-tree__swatch" [style.background]="ruedaSabores[cat].color"></span>
+                  {{ cat }}
+                </span>
+                <span class="flavor-tree__count-badge" *ngIf="formulario.atributos.fragancia.descriptores.length > 0 && categoriasAbiertas[cat]">
+                  {{ formulario.atributos.fragancia.descriptores.length }}
+                </span>
+              </button>
+              <div class="flavor-tree__sub-list" *ngIf="categoriasAbiertas[cat]">
+                <button *ngFor="let sub of ruedaSabores[cat].subdescriptores" 
+                        class="flavor-tree__descriptor-btn"
+                        [ngClass]="{'flavor-tree__descriptor-btn--selected': isDescriptorSelected('fragancia', sub)}"
+                        [style.background]="isDescriptorSelected('fragancia', sub) ? ruedaSabores[cat].color : ''"
+                        [style.color]="isDescriptorSelected('fragancia', sub) ? 'white' : ''"
+                        (click)="toggleDescriptor('fragancia', sub)">
+                  {{ sub }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- AROMA EN TAZA -->
+        <article class="attr-card">
+          <h3 class="attr-card__title">Aroma (en taza)</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.aroma.intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="1" max="15" step="0.5" [(ngModel)]="formulario.atributos.aroma.intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+          <div class="hedonic-buttons">
+            <div class="hedonic-buttons__header">
+              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.aroma.calidad }} — {{ etiquetas[formulario.atributos.aroma.calidad] }}</span>
+            </div>
+            <div class="hedonic-buttons__grid">
+              <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.aroma.calidad === i}" (click)="formulario.atributos.aroma.calidad = i">{{ i }}</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- SABOR -->
+        <article class="attr-card">
+          <h3 class="attr-card__title">Sabor</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.sabor.intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="1" max="15" step="0.5" [(ngModel)]="formulario.atributos.sabor.intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+          <div class="hedonic-buttons">
+            <div class="hedonic-buttons__header">
+              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.sabor.calidad }} — {{ etiquetas[formulario.atributos.sabor.calidad] }}</span>
+            </div>
+            <div class="hedonic-buttons__grid">
+              <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.sabor.calidad === i}" (click)="formulario.atributos.sabor.calidad = i">{{ i }}</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- SABOR RESIDUAL -->
+        <article class="attr-card">
+          <h3 class="attr-card__title">Sabor Residual</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.saborResidual.intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="1" max="15" step="0.5" [(ngModel)]="formulario.atributos.saborResidual.intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+          <div class="hedonic-buttons">
+            <div class="hedonic-buttons__header">
+              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.saborResidual.calidad }} — {{ etiquetas[formulario.atributos.saborResidual.calidad] }}</span>
+            </div>
+            <div class="hedonic-buttons__grid">
+              <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.saborResidual.calidad === i}" (click)="formulario.atributos.saborResidual.calidad = i">{{ i }}</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- ACIDEZ -->
+        <article class="attr-card">
+          <h3 class="attr-card__title">Acidez</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.acidez.intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="1" max="15" step="0.5" [(ngModel)]="formulario.atributos.acidez.intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+          <div class="hedonic-buttons">
+            <div class="hedonic-buttons__header">
+              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.acidez.calidad }} — {{ etiquetas[formulario.atributos.acidez.calidad] }}</span>
+            </div>
+            <div class="hedonic-buttons__grid">
+              <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.acidez.calidad === i}" (click)="formulario.atributos.acidez.calidad = i">{{ i }}</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- DULZOR -->
+        <article class="attr-card">
+          <h3 class="attr-card__title">Dulzor</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.dulzor.intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="1" max="15" step="0.5" [(ngModel)]="formulario.atributos.dulzor.intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+          <div class="hedonic-buttons">
+            <div class="hedonic-buttons__header">
+              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.dulzor.calidad }} — {{ etiquetas[formulario.atributos.dulzor.calidad] }}</span>
+            </div>
+            <div class="hedonic-buttons__grid">
+              <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.dulzor.calidad === i}" (click)="formulario.atributos.dulzor.calidad = i">{{ i }}</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- SENSACIÓN EN BOCA -->
+        <article class="attr-card">
+          <h3 class="attr-card__title">Sensación en Boca</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.sensacionEnBoca.intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="1" max="15" step="0.5" [(ngModel)]="formulario.atributos.sensacionEnBoca.intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+          <div class="hedonic-buttons">
+            <div class="hedonic-buttons__header">
+              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.sensacionEnBoca.calidad }} — {{ etiquetas[formulario.atributos.sensacionEnBoca.calidad] }}</span>
+            </div>
+            <div class="hedonic-buttons__grid">
+              <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.sensacionEnBoca.calidad === i}" (click)="formulario.atributos.sensacionEnBoca.calidad = i">{{ i }}</button>
+            </div>
+          </div>
+
+          <!-- Mouthfeel -->
+          <div class="mouthfeel">
+            <p class="flavor-tree__section-label">Descriptores táctiles</p>
+            <div class="mouthfeel__list">
+              <label class="mouthfeel__item" *ngFor="let opcion of mouthfeelOptions">
+                <input type="checkbox" [checked]="formulario.mouthfeel.includes(opcion)" (change)="toggleMouthfeel(opcion)">
+                {{ opcion }}
+              </label>
+            </div>
+          </div>
+        </article>
+
+        <!-- IMPRESIÓN GLOBAL -->
+        <article class="attr-card">
+          <h3 class="attr-card__title">Impresión Global</h3>
+          <p style="font-size:12px; color:var(--gray-500); margin-bottom:16px;">Evaluación hedónica general de la muestra</p>
+          <div class="hedonic-buttons">
+            <div class="hedonic-buttons__header">
+              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.impresionGlobal }} — {{ etiquetas[formulario.impresionGlobal] }}</span>
+            </div>
+            <div class="hedonic-buttons__grid">
+              <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.impresionGlobal === i}" (click)="formulario.impresionGlobal = i">{{ i }}</button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- BARRA LATERAL (SIDEBAR) -->
+      <aside class="cva-main__sidebar">
+        
+        <!-- PUNTAJE EN VIVO -->
+        <div class="score-panel" [style.background]="clasificacion.bg" [style.border-color]="clasificacion.border">
+          <span class="score-panel__label">Puntaje CVA</span>
+          <span class="score-panel__value" [style.color]="clasificacion.color">{{ puntaje | number:'1.2-2' }}</span>
+          <span class="score-panel__classification" [style.color]="clasificacion.color">{{ clasificacion.label }}</span>
+          <p class="score-panel__formula">S = 0.65625 × Σhᵢ + 52.75 − 2u − 4d</p>
+        </div>
+
+        <!-- DEFECTOS -->
+        <div class="defect-panel">
+          <span class="label-micro" style="display:block; margin-bottom:16px;">Defectos</span>
+          
+          <div class="defect-counter">
+            <div class="defect-counter__info">
+              <span class="defect-counter__label">Tazas no uniformes</span>
+              <span class="defect-counter__sublabel">−2 pts por taza</span>
+            </div>
+            <div class="defect-counter__controls">
+              <button class="defect-counter__btn" (click)="ajustarDefecto('uniformes', 'restar')">−</button>
+              <span class="defect-counter__value">{{ formulario.defectos.tazasNoUniformes }}</span>
+              <button class="defect-counter__btn" (click)="ajustarDefecto('uniformes', 'sumar')">+</button>
+            </div>
+          </div>
+
+          <div class="defect-counter" style="margin-top: 16px;">
+            <div class="defect-counter__info">
+              <span class="defect-counter__label">Tazas defectuosas</span>
+              <span class="defect-counter__sublabel">−4 pts por taza</span>
+            </div>
+            <div class="defect-counter__controls">
+              <button class="defect-counter__btn" (click)="ajustarDefecto('defectuosas', 'restar')">−</button>
+              <span class="defect-counter__value">{{ formulario.defectos.tazasDefectuosas }}</span>
+              <button class="defect-counter__btn" (click)="ajustarDefecto('defectuosas', 'sumar')">+</button>
+            </div>
+          </div>
+
+          <div class="defect-penalty">
+            <span class="defect-penalty__label">Penalización total</span>
+            <span class="defect-penalty__value">−{{ penalizacionTotal }} pts</span>
+          </div>
+
+          <div class="defect-types">
+            <span class="defect-types__label">Tipo de defecto</span>
+            <label class="defect-types__item" *ngFor="let tipo of defectosOptions">
+              <input type="checkbox" [checked]="formulario.tiposDefecto.includes(tipo)" (change)="toggleTipoDefecto(tipo)">
+              {{ tipo }}
+            </label>
+          </div>
+        </div>
+
+        <!-- NOTAS -->
+        <div class="notes-panel">
+          <div class="notes-panel__header">
+            <ion-icon name="document-text-outline"></ion-icon> Notas adicionales
+          </div>
+          <textarea class="notes-panel__textarea" rows="5" [(ngModel)]="formulario.notas" placeholder="Observaciones..."></textarea>
+        </div>
+
+        <button class="submit-btn">Siguiente muestra →</button>
+      </aside>
+    </div>
+  </main>
+</ion-content>

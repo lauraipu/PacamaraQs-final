@@ -1,0 +1,97 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>
+      <div class="brand-title">Pacamara</div>
+      <div class="brand-subtitle">Catador</div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="medium" (click)="cerrarSesion()" [disabled]="isSigningOut">
+        Cerrar sesión
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding dashboard-content">
+  <main class="dashboard-container">
+    <section class="metrics" aria-label="Resumen">
+      <article class="cupping-card metric-card">
+        <div class="metric-label">Sesiones</div>
+        <div class="metric-value">{{ sesiones.length }}</div>
+      </article>
+      <article class="cupping-card metric-card">
+        <div class="metric-label">Muestras</div>
+        <div class="metric-value">—</div>
+      </article>
+      <article class="cupping-card metric-card">
+        <div class="metric-label">Prom. personal</div>
+        <div class="metric-value">—</div>
+      </article>
+    </section>
+
+    <section class="section-heading">
+      <h2>Sesiones</h2>
+      <ion-button size="small" class="new-session-btn" (click)="nuevaSesion()">
+        <span aria-hidden="true">+</span>
+        Nueva sesión
+      </ion-button>
+    </section>
+
+    @if (cargando) {
+      <div class="loading-state" role="status">
+        <ion-spinner name="crescent"></ion-spinner>
+        <span>Cargando sesiones…</span>
+      </div>
+    }
+
+    @for (sesion of sesiones; track sesion.id) {
+      <article class="cupping-card session-card">
+        <div class="session-chips">
+          <span class="chip" [class.chip-active]="sesion.estado === 'En progreso'">
+            {{ sesion.estado }}
+          </span>
+          <span class="chip chip-neutral">{{ sesion.rol }}</span>
+        </div>
+        <div class="session-type">{{ sesion.tipo }}</div>
+        <h3>{{ sesion.titulo }}</h3>
+        <div class="session-meta">
+          <span>{{ sesion.fecha }}</span>
+          <span>{{ sesion.cantMuestras }} muestras</span>
+          <span>{{ sesion.cantCatadores }} catadores</span>
+        </div>
+      </article>
+    }
+
+    @if (!cargando && sesiones.length === 0) {
+      <article class="cupping-card empty-state">
+        <h3>Aún no hay sesiones</h3>
+        <p>Crea una sesión o únete con el código que te compartió el organizador.</p>
+      </article>
+    }
+
+    <section class="cupping-card join-card">
+      <h2>Unirme a sesión</h2>
+      <p>Ingresa el código de la sesión que el organizador compartió contigo.</p>
+      <ion-input
+        [(ngModel)]="codigoInput"
+        (ngModelChange)="codigoInput = $event.toUpperCase()"
+        placeholder="CVA-XXXX"
+        autocapitalize="characters"
+        fill="outline"
+        class="custom-input"
+      ></ion-input>
+      <ion-button
+        expand="block"
+        class="primary-btn"
+        [disabled]="isJoining || cargandoPerfil || !codigoInput.trim()"
+        (click)="unirseSesion()"
+      >
+        @if (isJoining) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          <span>Unirme como {{ nombreUsuario }} →</span>
+        }
+      </ion-button>
+    </section>
+  </main>
+</ion-content>

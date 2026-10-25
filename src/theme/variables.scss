@@ -1,2 +1,16 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+:root {
+  --app-bg-screen: #f8f9fa;
+  --app-bg-card: #ffffff;
+  --app-border: #e2e8f0;
+  --app-border-input: #ced4da;
+
+  --app-text-main: #0f172b;
+  --app-text-muted: #62748e;
+
+  --app-primary-dark: #283840;
+  --app-primary-hover: #1a2328;
+  --app-success: #009956;
+  --app-error: #e7000b;
+
+  --ion-font-family: 'Inter', -apple-system, sans-serif;
+}
