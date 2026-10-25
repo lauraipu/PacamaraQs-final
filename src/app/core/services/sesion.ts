@@ -33,19 +33,29 @@ export class SesionService {
 
   async insertarParticipanteDirecto(
     sesionId: string,
-    usuarioId: string,
+    usuarioId: string | null | undefined,
     nombre: string,
     esOrganizador: boolean
   ): Promise<void> {
+    if (!sesionId || !sesionId.trim()) {
+      throw new Error('El ID de sesión es inválido');
+    }
+
+    // Sanitización: un string vacío '' en un campo uuid provoca error 22P02 en PostgreSQL.
+    // Debe enviarse null si no hay un UUID válido.
+    const usuarioIdNormalizado = (usuarioId && usuarioId.trim()) ? usuarioId.trim() : null;
+
     const { error } = await this.supabase.client
       .from('participantes')
       .insert([{
-        sesion_id: sesionId,
-        usuario_id: usuarioId,
+        sesion_id: sesionId.trim(),
+        usuario_id: usuarioIdNormalizado,
         nombre: nombre.trim(),
         es_organizador: esOrganizador,
         listo: true,
         unido_en: new Date().toISOString()
+        // NUNCA enviar 'id' aquí: si se envía null viola NOT NULL (23502);
+        // sin el campo, PostgreSQL ejecuta DEFAULT gen_random_uuid() correctamente.
       }]);
 
     if (error) throw error;
@@ -88,14 +98,16 @@ export class SesionService {
     codigo: string,
     nombreCatador: string
   ): Promise<{ sesion: Sesion; participante: Participante }> {
-    const codigoNormalizado = codigo.trim();
+    const codigoNormalizado = codigo.trim().toUpperCase();
     const nombre = nombreCatador.trim();
     if (!codigoNormalizado || !nombre) {
       throw new Error('El código y el nombre son obligatorios');
     }
 
     const sesion = await this.obtenerSesionPorCodigo(codigoNormalizado);
-    if (!sesion) throw new Error('No se encontró ninguna sesión con ese código');
+    if (!sesion || !sesion.id) {
+      throw new Error('No se encontró ninguna sesión con ese código');
+    }
     if (sesion.estado !== EstadoSesion.EN_ESPERA) {
       throw new Error('La sesión ya ha iniciado o finalizado');
     }
@@ -103,11 +115,31 @@ export class SesionService {
     const { data: { user }, error: userError } = await this.supabase.client.auth.getUser();
     if (userError) throw userError;
 
+    // Sanitización estricta: string vacío '' en campo uuid genera error 22P02 en PostgreSQL.
+    const usuarioIdNormalizado = (user?.id && user.id.trim()) ? user.id.trim() : null;
+
+    // IDEMPOTENCIA: Si este usuario ya está registrado en la sesión, lo retornamos directamente.
+    // Evita la violación de la restricción UNIQUE (sesion_id, usuario_id) → error 23505.
+    if (usuarioIdNormalizado) {
+      const { data: existente } = await this.supabase.client
+        .from('participantes')
+        .select('*')
+        .eq('sesion_id', sesion.id)
+        .eq('usuario_id', usuarioIdNormalizado)
+        .maybeSingle();
+
+      if (existente) {
+        return { sesion, participante: participanteDtoToDomain(existente) };
+      }
+    }
+
+    // NUNCA enviar el campo 'id': si se envía null, PostgreSQL lanza NOT NULL violation (23502).
+    // Sin el campo, se ejecuta DEFAULT gen_random_uuid() automáticamente.
     const { data, error } = await this.supabase.client
       .from('participantes')
       .insert([{
         sesion_id: sesion.id,
-        usuario_id: user?.id ?? null,
+        usuario_id: usuarioIdNormalizado,
         nombre,
         es_organizador: false,
         listo: true,

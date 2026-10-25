@@ -90,7 +90,10 @@ export class DashboardPage implements OnInit {
   }
 
   async unirseSesion(): Promise<void> {
-    if (!this.codigoInput.trim()) {
+    // Normalizamos el código aquí también como doble garantía,
+    // aunque el servicio ya lo normaliza internamente.
+    const codigoLimpio = this.codigoInput.trim().toUpperCase();
+    if (!codigoLimpio) {
       await this.mostrarToast('Ingresa el código de la sesión.');
       return;
     }
@@ -98,11 +101,12 @@ export class DashboardPage implements OnInit {
     this.isJoining = true;
     try {
       const { sesion } = await this.sesionService.unirseASesion(
-        this.codigoInput,
+        codigoLimpio,
         this.nombreUsuario
       );
       await this.router.navigate(['/session/waiting', sesion.id]);
     } catch (error) {
+      console.error('Error al unirse a la sesión:', error);
       await this.mostrarToast(
         error instanceof Error ? error.message : 'No se pudo unir a la sesión.'
       );

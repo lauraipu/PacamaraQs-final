@@ -80,13 +80,22 @@ export function sesionToDto(domain: Sesion): SesionDto {
 }
 
 export function participanteToDto(domain: Participante): ParticipanteDto {
-  return {
-    id: domain.id.trim() ? domain.id : null,
+  const dto: ParticipanteDto = {
     sesion_id: domain.sesionId,
-    usuario_id: domain.usuarioId.trim() ? domain.usuarioId : null,
-    nombre: domain.nombre,
+    // Sanitización: string vacío produce error 22P02 en PostgreSQL (invalid uuid syntax)
+    usuario_id: domain.usuarioId && domain.usuarioId.trim() ? domain.usuarioId.trim() : null,
+    nombre: domain.nombre.trim(),
     es_organizador: domain.esOrganizador,
     listo: domain.listo,
-    unido_en: domain.unidoEn
+    unido_en: domain.unidoEn ?? new Date().toISOString()
   };
+
+  // Solo incluir 'id' si ya existe (flujo de actualización).
+  // En inserts NUNCA enviar 'id: null': PostgreSQL lo rechaza con NOT NULL violation (23502)
+  // en lugar de ejecutar el DEFAULT gen_random_uuid().
+  if (domain.id && domain.id.trim()) {
+    dto.id = domain.id.trim();
+  }
+
+  return dto;
 }

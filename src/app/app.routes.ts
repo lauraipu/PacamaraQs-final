@@ -17,19 +17,23 @@ export const routes: Routes = [
   },
   {
     path: 'affective-form',
-    loadComponent: () => import('./pages/evaluation/affective-form/affective-form.page').then( m => m.AffectiveFormPage)
+    loadComponent: () => import('./pages/evaluation/affective-form/affective-form.page').then(m => m.AffectiveFormPage),
+    canActivate: [authGuard]
   },
   {
     path: 'combined-form',
-    loadComponent: () => import('./pages/evaluation/combined-form/combined-form.page').then( m => m.CombinedFormPage)
+    loadComponent: () => import('./pages/evaluation/combined-form/combined-form.page').then(m => m.CombinedFormPage),
+    canActivate: [authGuard]
   },
   {
     path: 'descriptive-form',
-    loadComponent: () => import('./pages/evaluation/descriptive-form/descriptive-form.page').then( m => m.DescriptiveFormPage)
+    loadComponent: () => import('./pages/evaluation/descriptive-form/descriptive-form.page').then(m => m.DescriptiveFormPage),
+    canActivate: [authGuard]
   },
   {
     path: 'extrinsic-form',
-    loadComponent: () => import('./pages/evaluation/extrinsic-form/extrinsic-form.page').then( m => m.ExtrinsicFormPage)
+    loadComponent: () => import('./pages/evaluation/extrinsic-form/extrinsic-form.page').then(m => m.ExtrinsicFormPage),
+    canActivate: [authGuard]
   },
   {
     path: 'session/create',
@@ -47,9 +51,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    // Ruta huérfana corregida: redirige al dashboard en vez de cargar
+    // WaitingRoomPage sin sesionId (lo que causaba error inmediato en el componente).
     path: 'waiting-room',
-    loadComponent: () => import('./pages/session/waiting-room/waiting-room.page').then(m => m.WaitingRoomPage),
-    canActivate: [authGuard]
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
   },
   {
     path: '',
