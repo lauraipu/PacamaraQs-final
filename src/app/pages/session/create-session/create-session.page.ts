@@ -30,6 +30,7 @@ addIcons({ checkmarkCircle, informationCircleOutline });
 @Component({
   selector: 'app-create-session',
   templateUrl: './create-session.page.html',
+  styleUrls: ['./create-session.page.scss'],
   standalone: true,
   imports: [
     IonBackButton,

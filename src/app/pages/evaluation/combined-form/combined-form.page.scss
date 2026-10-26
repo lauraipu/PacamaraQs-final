@@ -44,7 +44,7 @@ app-combined-form {
   &__back-btn:hover { background: $gray-100; }
   &__meta { display: flex; flex-direction: column; }
   &__session-name { font-size: 11px; color: $gray-500; margin: 0; }
-  &__sample-label { font-size: 14px; font-weight: 600; margin: 0; span { color: $gray-400; font-weight: 400; } }
+  &__sample-label { font-size: 14px; font-weight: 600; margin: 0; color: $slate-gray; span { color: $slate-gray; font-weight: 400; } }
 
   &__right { display: flex; align-items: center; gap: 8px; }
   &__blind-badge { display: flex; align-items: center; gap: 4px; padding: 6px 12px; background: $slate-gray; color: $pure-white; border-radius: $radius-md; font-size: 11px; font-weight: 600; }

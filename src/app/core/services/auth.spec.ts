@@ -63,7 +63,7 @@ describe('AuthService', () => {
       password: 'secret',
       options: { data: { nombre: 'Ana' } }
     });
-    expect(from).toHaveBeenCalledWith('Usuarios');
+    expect(from).toHaveBeenCalledWith('usuarios');
     expect(insert).toHaveBeenCalledWith([
       expect.objectContaining({
         id: 'user-id',

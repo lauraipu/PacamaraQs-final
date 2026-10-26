@@ -3,73 +3,231 @@
 }
 
 ion-toolbar {
-  --background: var(--app-bg-card);
+  --background: #ffffff;
+}
+
+ion-back-button {
+  --color: #0f344c;
+}
+
+.blind-badge {
+  --background: #2f3e46;
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
 }
 
 .waiting-content {
-  --background: var(--app-bg-screen);
+  --background: #f8fafc;
 }
 
 .waiting-container {
-  width: min(100%, 760px);
+  width: min(100%, 500px);
   margin: 0 auto;
 }
 
-.waiting-heading {
-  margin: 0;
-  color: var(--app-text-main);
-  font-size: 18px;
-  font-weight: 700;
+.cupping-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.metrics-card {
+  display: flex;
+  justify-content: space-between;
   text-align: center;
 }
 
-.session-code-card {
-  margin-bottom: 20px;
-  text-align: center;
+.metric-item {
+  display: flex;
+  flex-direction: column;
 }
 
-.session-code-card p {
-  margin: 0;
-  color: var(--app-text-muted);
-  font-size: 12px;
+.metric-label {
+  font-size: 11px;
+  color: #62748e;
+  margin-bottom: 4px;
 }
 
-.session-code-value {
-  margin: 8px 0;
-  color: var(--app-text-main);
-  font-size: 24px;
-  font-weight: 700;
+.metric-value {
+  font-size: 15px;
+  font-weight: bold;
+  color: #0f172b;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #62748e;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.share-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.code-display {
+  font-size: 20px;
+  font-weight: bold;
   letter-spacing: 2px;
+  color: #0f172b;
 }
 
-.session-code-card ion-button {
-  --border-color: var(--app-border);
-  --color: var(--app-primary-dark);
-  text-transform: none;
+.share-hint {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 8px 0 0;
 }
 
-.session-code-card .session-target {
-  margin-top: 8px;
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
 }
 
-.waiting-session-name,
-.participant-count,
-.waiting-state {
-  color: var(--app-text-muted);
-  font-size: 13px;
+.list-header .section-title {
+  margin: 0;
+}
+
+.list-subtitle {
+  font-size: 11px;
+  color: #62748e;
+  text-align: right;
+  max-width: 100px;
+}
+
+.tasters-list {
+  padding: 0;
+  background: transparent;
+}
+
+.taster-item {
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --border-style: none;
+  margin-bottom: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #0f172b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  margin-right: 12px;
+}
+
+.taster-item h2 {
+  font-size: 14px;
+  font-weight: bold;
+  color: #0f172b;
+  margin: 0 0 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.org-tag {
+  font-size: 10px;
+  font-weight: normal;
+  color: #62748e;
+}
+
+.taster-item p {
+  font-size: 11px;
+  color: #62748e;
+  margin: 0;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #62748e;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+}
+
+.dot.ready {
+  background: #009956;
+}
+
+.empty-state {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 20px;
   text-align: center;
+  font-size: 12px;
+  color: #62748e;
 }
 
-.waiting-session-name {
-  margin: 8px 0 16px;
+.privacy-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
 }
 
-.waiting-state {
-  padding: 24px 0;
+.privacy-card ion-icon {
+  color: #62748e;
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
-.participant-count {
-  margin: 16px 0 0;
+.privacy-card p {
+  font-size: 11px;
+  color: #62748e;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.start-button-container {
+  margin-top: 24px;
+  padding-bottom: 24px;
+}
+
+.primary-btn {
+  --background: #283840;
+  --background-hover: #1a2328;
+  --background-activated: #1a2328;
+  --color: #ffffff;
+  --border-radius: 8px;
+  --box-shadow: none;
+  height: 50px;
+  margin: 0;
+  font-weight: 600;
+  text-transform: none;
 }
 
 .waiting-error {
@@ -79,9 +237,4 @@ ion-toolbar {
   background: #ffe4e6;
   color: #991b1b;
   font-size: 13px;
-}
-
-.waiting-footer {
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  background: var(--app-bg-card);
 }

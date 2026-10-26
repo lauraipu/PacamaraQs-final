@@ -96,7 +96,7 @@ describe('SesionService', () => {
       usuario_id: 'user-id',
       nombre: 'Ana',
       es_organizador: true,
-      listo: true
+      listo: false
     });
     expect(Number.isNaN(Date.parse(participant.unido_en))).toBe(false);
   });

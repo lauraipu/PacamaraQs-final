@@ -45,7 +45,7 @@
     }
 
     @for (sesion of sesiones; track sesion.id) {
-      <article class="cupping-card session-card">
+      <article class="cupping-card session-card" (click)="entrarASesion(sesion)" style="cursor: pointer;">
         <div class="session-chips">
           <span class="chip" [class.chip-active]="sesion.estado === 'En progreso'">
             {{ sesion.estado }}

@@ -45,7 +45,7 @@ export class AuthService {
         version_politica_aceptada: '1.0'
       };
       const { error: dbError } = await this.supabase.client
-        .from('Usuarios')
+        .from('usuarios')
         .insert([nuevoUsuario]);
       if (dbError) throw dbError;
     }

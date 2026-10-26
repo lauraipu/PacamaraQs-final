@@ -81,7 +81,7 @@ describe('DashboardPage', () => {
 
   it('loads the registered profile name and uses it to join a session', async () => {
     await vi.waitFor(() => expect(component.nombreUsuario).toBe('Catherine Quimbaya'));
-    expect(from).toHaveBeenCalledWith('Usuarios');
+    expect(from).toHaveBeenCalledWith('usuarios');
 
     const sesion = {
       id: 'session-id',

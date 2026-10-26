@@ -85,6 +85,16 @@ export class DashboardPage implements OnInit {
     }
   }
 
+  entrarASesion(sesion: any): void {
+    // Si la sesión está en espera o en progreso, te lleva a la Sala de Espera
+    if (sesion.estado === 'En espera' || sesion.estado === 'En progreso') {
+      void this.router.navigateByUrl(`/session/waiting/${sesion.id}`);
+    } else {
+      // Si ya terminó, mostramos el aviso
+      void this.mostrarToast('Esta sesión ya ha finalizado.');
+    }
+  }
+
   async nuevaSesion(): Promise<void> {
     await this.router.navigateByUrl('/session/create');
   }
@@ -150,7 +160,7 @@ export class DashboardPage implements OnInit {
       }
 
       const { data, error } = await this.supabaseService.client
-        .from('Usuarios')
+        .from('usuarios')
         .select('nombre')
         .eq('id', user.id)
         .maybeSingle();

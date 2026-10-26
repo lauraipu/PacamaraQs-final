@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { participanteDtoToDomain, participanteToDto, sesionDtoToDomain, sesionToDto } from '../mappers/sesion.mapper';
-import { EstadoSesion, Participante, Sesion } from '../models/sesion.model';
+import { EstadoSesion, Participante, Sesion, SesionDto } from '../models/sesion.model';
 import { SupabaseService } from './supabase';
 
 @Injectable({ providedIn: 'root' })
 export class SesionService {
-  private readonly supabase = inject(SupabaseService);
+  public readonly supabase = inject(SupabaseService);
 
   async crearSesion(sesion: Sesion): Promise<Sesion> {
     if (!sesion.nombre || sesion.nombre.trim() === '') {
@@ -31,34 +31,78 @@ export class SesionService {
     return sesionDtoToDomain(data);
   }
 
-  async insertarParticipanteDirecto(
+   async insertarParticipanteDirecto(
     sesionId: string,
-    usuarioId: string | null | undefined,
-    nombre: string,
-    esOrganizador: boolean
-  ): Promise<void> {
+    usuarioId?: string | null,
+    nombre?: string,
+    esOrganizador = true,
+    listo = false
+  ): Promise<Participante | void> {
+    // 1. Validar que el ID de la sesión no esté vacío
     if (!sesionId || !sesionId.trim()) {
       throw new Error('El ID de sesión es inválido');
     }
 
-    // Sanitización: un string vacío '' en un campo uuid provoca error 22P02 en PostgreSQL.
-    // Debe enviarse null si no hay un UUID válido.
-    const usuarioIdNormalizado = (usuarioId && usuarioId.trim()) ? usuarioId.trim() : null;
+    // 2. Limpiar el usuarioId (evitar enviar strings vacíos "")
+    let usuarioIdNormalizado = (usuarioId && usuarioId.trim()) ? usuarioId.trim() : null;
+    let nombreFinal = (nombre && nombre.trim()) ? nombre.trim() : '';
 
-    const { error } = await this.supabase.client
+    // 3. Si no hay usuarioId, lo obtenemos de la sesión activa de Supabase
+    if (!usuarioIdNormalizado) {
+      try {
+        const { data: authData } = await this.supabase.client.auth.getUser();
+        if (authData?.user?.id) {
+          usuarioIdNormalizado = authData.user.id.trim();
+        }
+      } catch (error) {
+        console.warn("No se pudo obtener el usuario de Auth", error);
+      }
+    }
+
+    // 4. Si no hay nombre, lo buscamos en la tabla de usuarios
+    if (!nombreFinal && usuarioIdNormalizado) {
+      try {
+        const { data: perfil } = await this.supabase.client
+          .from('Usuarios') // <-- OJO: Tu tabla en Android se llama Usuarios (con mayúscula)
+          .select('nombre')
+          .eq('id', usuarioIdNormalizado)
+          .maybeSingle();
+
+        if (perfil?.nombre && typeof perfil.nombre === 'string') {
+          nombreFinal = perfil.nombre.trim();
+        }
+      } catch (error) {
+        console.warn("No se pudo obtener el nombre del perfil", error);
+      }
+    }
+
+    // 5. Si después de todo no hay nombre, usamos un default
+    if (!nombreFinal) {
+      nombreFinal = esOrganizador ? 'Organizador' : 'Catador';
+    }
+
+    // 6. Insertar en Supabase (SIN enviar el id, y con la fecha)
+    const nuevoParticipante = {
+      sesion_id: sesionId.trim(),
+      usuario_id: usuarioIdNormalizado,
+      nombre: nombreFinal,
+      es_organizador: esOrganizador,
+      listo: listo,
+      unido_en: new Date().toISOString()
+    };
+
+    const { data, error } = await this.supabase.client
       .from('participantes')
-      .insert([{
-        sesion_id: sesionId.trim(),
-        usuario_id: usuarioIdNormalizado,
-        nombre: nombre.trim(),
-        es_organizador: esOrganizador,
-        listo: true,
-        unido_en: new Date().toISOString()
-        // NUNCA enviar 'id' aquí: si se envía null viola NOT NULL (23502);
-        // sin el campo, PostgreSQL ejecuta DEFAULT gen_random_uuid() correctamente.
-      }]);
+      .insert([nuevoParticipante])
+      .select();
 
+    // 7. Manejo de errores
     if (error) throw error;
+
+    // 8. Si todo sale bien, convertimos la respuesta de Supabase a nuestro modelo y la devolvemos
+    if (data && data.length > 0) {
+      return participanteDtoToDomain(data[0]);
+    }
   }
 
   async obtenerSesionPorCodigo(codigo: string): Promise<Sesion | null> {
@@ -172,43 +216,124 @@ export class SesionService {
 
   observarParticipantes(sesionId: string): Observable<Participante[]> {
     return new Observable<Participante[]>(observer => {
-      let activo = true;
-      const cargarParticipantes = async () => {
-        const { data, error } = await this.supabase.client
-          .from('participantes')
-          .select('*')
-          .eq('sesion_id', sesionId);
+      const idLimpio = sesionId?.trim();
+      if (!idLimpio) {
+        observer.error(new Error('ID de sesión inválido'));
+        return;
+      }
 
-        if (error) {
-          if (activo) observer.error(error);
-          return;
+      let activo = true;
+
+      const cargarParticipantes = async () => {
+        try {
+          const { data, error } = await this.supabase.client
+            .from('participantes')
+            .select('*')
+            .eq('sesion_id', idLimpio);
+
+          if (error) {
+            console.error('Error al consultar participantes en Supabase:', error);
+            if (activo) observer.error(error);
+            return;
+          }
+
+          if (activo && data) {
+            observer.next(data.map(participanteDtoToDomain));
+          }
+        } catch (err) {
+          console.error('Error inesperado al cargar participantes:', err);
+          if (activo) observer.error(err);
         }
-        if (activo) observer.next(data.map(participanteDtoToDomain));
       };
 
-      void cargarParticipantes().catch(error => {
-        if (activo) observer.error(error);
-      });
+      // 1. Carga inicial inmediata por REST
+      void cargarParticipantes();
 
+      // 2. Sondeo de respaldo periódico (mitiga problemas si el canal Realtime falla con 'transport failure')
+      const intervalId = setInterval(() => {
+        if (activo) {
+          void cargarParticipantes();
+        }
+      }, 4000);
+
+      // 3. Canal Realtime con identificador único para evitar colisiones con suscripciones previas
+      const channelName = `sala_espera_${idLimpio}_${Date.now()}`;
       const channel = this.supabase.client
-        .channel(`sala_espera_${sesionId}`)
+        .channel(channelName)
         .on(
           'postgres_changes',
-          { event: '*', schema: 'public', table: 'participantes', filter: `sesion_id=eq.${sesionId}` },
+          { event: '*', schema: 'public', table: 'participantes', filter: `sesion_id=eq.${idLimpio}` },
           () => {
-            void cargarParticipantes().catch(error => {
-              if (activo) observer.error(error);
-            });
+            void cargarParticipantes();
           }
         )
         .subscribe((status, error) => {
           if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-            observer.error(error ?? new Error(`Falló la suscripción realtime: ${status}`));
+            console.warn(`[Realtime Supabase] Aviso en el canal (${status}):`, error);
+            // Reintentar vía REST sin romper el Observable
+            void cargarParticipantes();
           }
         });
 
       return () => {
         activo = false;
+        clearInterval(intervalId);
+        void this.supabase.client.removeChannel(channel);
+      };
+    });
+  }
+
+  observarSesion(sesionId: string): Observable<Sesion> {
+    return new Observable<Sesion>(observer => {
+      const idLimpio = sesionId?.trim();
+      if (!idLimpio) {
+        observer.error(new Error('ID de sesión inválido'));
+        return;
+      }
+
+      let activo = true;
+      const cargarSesion = async () => {
+        try {
+          const { data, error } = await this.supabase.client
+            .from('sesiones')
+            .select('*')
+            .eq('id', idLimpio)
+            .maybeSingle();
+
+          if (error) throw error;
+          if (!data) throw new Error('No se encontró la sesión solicitada.');
+          if (activo) observer.next(sesionDtoToDomain(data));
+        } catch (error) {
+          console.error('Error al consultar la sesión en Supabase:', error);
+          if (activo) observer.error(error);
+        }
+      };
+
+      void cargarSesion();
+
+      const intervalId = setInterval(() => {
+        if (activo) void cargarSesion();
+      }, 4000);
+
+      const channel = this.supabase.client
+        .channel(`sesion_estado_${idLimpio}_${Date.now()}`)
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'sesiones', filter: `id=eq.${idLimpio}` },
+          payload => {
+            if (activo) observer.next(sesionDtoToDomain(payload.new as SesionDto));
+          }
+        )
+        .subscribe((status, error) => {
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.warn(`[Realtime Supabase] Aviso en el canal de sesión (${status}):`, error);
+            void cargarSesion();
+          }
+        });
+
+      return () => {
+        activo = false;
+        clearInterval(intervalId);
         void this.supabase.client.removeChannel(channel);
       };
     });
