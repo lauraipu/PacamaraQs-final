@@ -44,10 +44,23 @@ export class AuthService {
         acepto_politica_en: new Date().toISOString(),
         version_politica_aceptada: '1.0'
       };
-      const { error: dbError } = await this.supabase.client
-        .from('usuarios')
-        .insert([nuevoUsuario]);
-      if (dbError) throw dbError;
+      try {
+        const { error: dbError } = await this.supabase.client
+          .from('usuarios')
+          .insert([nuevoUsuario]);
+
+        if (dbError) {
+          console.warn(
+            '[AuthService.registro] Usuario creado en Auth pero falló INSERT en usuarios:',
+            dbError
+          );
+        }
+      } catch (dbError) {
+        console.warn(
+          '[AuthService.registro] Excepción al crear perfil (se ignorará):',
+          dbError
+        );
+      }
     }
     return authData;
   }

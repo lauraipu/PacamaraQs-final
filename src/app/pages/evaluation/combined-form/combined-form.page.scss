@@ -17,10 +17,16 @@ $radius-sm: 6px;
 $radius-md: 8px;
 $radius-lg: 12px;
 
-app-combined-form {
+app-combined-form,
+app-affective-form,
+app-descriptive-form,
+app-extrinsic-form {
 
 .cva-combined {
+  --background: #{$gray-50};
+  --color: #{$slate-gray};
   background: $gray-50;
+  color-scheme: light;
   font-family: $font-family;
   color: $slate-gray;
   height: 100%;
@@ -54,8 +60,6 @@ app-combined-form {
   &__live-score-label { font-size: 9px; color: $gray-500; display: block; }
   &__live-score-value { font-size: 18px; font-weight: 700; display: block; line-height: 1; }
 
-  &__next-btn { padding: 8px 16px; background: $slate-gray; color: $pure-white; border-radius: $radius-md; font-size: 13px; font-weight: 600; border: none; }
-  
   &__progress-bar-wrap { max-width: 1280px; margin: 0 auto; }
   &__progress-bar { height: 2px; background: $gray-200; border-radius: 9999px; overflow: hidden; }
   &__progress-bar-fill { height: 100%; background: $slate-gray; border-radius: 9999px; transition: width 500ms ease; }
@@ -115,6 +119,21 @@ app-combined-form {
   &__sub-list { padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 6px; background: $pure-white; }
   &__descriptor-btn { font-size: 11px; padding: 4px 10px; border-radius: 9999px; border: 1px solid $gray-300; color: $gray-600; background: $pure-white; cursor: pointer; transition: all 150ms; }
   &__descriptor-btn--selected { color: white; border-color: transparent; }
+
+  .extra-descriptor {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 12px;
+    border: 1px solid $gray-300;
+    border-radius: $radius-md;
+    font-family: inherit;
+    font-size: 13px;
+
+    &:focus {
+      outline: none;
+      border-color: $accent-blue;
+    }
+  }
 }
 
 // Mouthfeel
@@ -156,6 +175,7 @@ app-combined-form {
 .defect-types {
   margin-top: 16px; padding-top: 12px; border-top: 1px solid $gray-100;
   &__label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: $gray-500; display: block; margin-bottom: 8px; }
+  &__hint { font-size: 11px; color: $gray-500; display: block; margin-bottom: 8px; }
   &__item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: $gray-700; padding: 4px 0; cursor: pointer; }
   &__item input { width: 15px; height: 15px; accent-color: $slate-gray; }
 }
@@ -166,9 +186,61 @@ app-combined-form {
   &__textarea { width: 100%; padding: 8px 12px; border-radius: $radius-md; border: 1px solid $gray-300; font-size: 13px; font-family: inherit; resize: none; &:focus { outline: none; border-color: $accent-blue; } }
 }
 
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .submit-btn {
   width: 100%; padding: 14px; background: $slate-gray; color: $pure-white; border-radius: $radius-lg; font-size: 14px; font-weight: 600; border: none; cursor: pointer;
   &:hover { background: $gray-900; }
+  &:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+
+    &:hover { background: $slate-gray; }
+  }
+}
+
+.sample-navigation {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+
+  .submit-btn {
+    flex: 1;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__previous {
+    background: #e2e8f0 !important;
+    color: $slate-gray !important;
+    font-weight: 600;
+
+    &:hover {
+      background: #cbd5e1 !important;
+    }
+  }
+}
+
+.evaluation-error {
+  margin: 16px;
+  padding: 12px;
+  border: 1px solid #fecaca;
+  border-radius: $radius-md;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 13px;
 }
 
 }

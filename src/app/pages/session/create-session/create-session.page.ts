@@ -124,16 +124,17 @@ export class CreateSessionPage {
         ? metadataNombre.trim()
         : user.email ?? 'Organizador';
 
+      const esExtrinseco = this.formatoSeleccionado === FormatoCva.EXTRINSECA.id;
       const nuevaSesion: Sesion = {
         id: '',
         codigoAcceso: '',
         nombre: this.nombreSesion.trim(),
         notas: this.notasSesion.trim(),
         formato: this.formatoSeleccionado,
-        numeroMuestras: this.numeroMuestras,
-        catadoresObjetivo: this.catadoresObjetivo,
+        numeroMuestras: esExtrinseco ? 1 : this.numeroMuestras,
+        catadoresObjetivo: esExtrinseco ? 3 : this.catadoresObjetivo,
         organizadorId: user.id,
-        organizadorParticipa: this.participaComoCatador,
+        organizadorParticipa: esExtrinseco ? false : this.participaComoCatador,
         estado: EstadoSesion.EN_ESPERA
       };
 
@@ -143,7 +144,7 @@ export class CreateSessionPage {
       this.pasoActual = 2;
       this.changeDetector.detectChanges();
 
-      if (this.participaComoCatador) {
+      if (nuevaSesion.organizadorParticipa) {
         this.organizadorPendiente = true;
         try {
           await this.registrarOrganizador();
@@ -208,6 +209,12 @@ export class CreateSessionPage {
       this.error = 'Agrega al organizador a la sesión antes de continuar.';
       return;
     }
+
+    if (this.formatoSeleccionado === FormatoCva.EXTRINSECA.id) {
+      await this.router.navigate(['/extrinsic-form', this.sesionIdGenerado]);
+      return;
+    }
+
     await this.router.navigate(['/session/waiting', this.sesionIdGenerado]);
   }
 

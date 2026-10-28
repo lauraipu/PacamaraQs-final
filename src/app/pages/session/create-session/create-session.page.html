@@ -74,7 +74,7 @@
         }
       </section>
 
-      <section class="cupping-card">
+      <section class="cupping-card" *ngIf="formatoSeleccionado !== 'extrinseca'">
         <h2 class="section-title">Parámetros del panel</h2>
 
         <div class="slider-header">
@@ -170,13 +170,19 @@
         <hr>
         <div class="summary-row"><span>Formato CVA</span><strong>{{ getTituloFormato() }}</strong></div>
         <hr>
-        <div class="summary-row"><span>Muestras</span><strong>{{ numeroMuestras }}</strong></div>
+        <div class="summary-row">
+          <span>Muestras</span>
+          <strong>{{ formatoSeleccionado === 'extrinseca' ? 1 : numeroMuestras }}</strong>
+        </div>
         <hr>
-        <div class="summary-row"><span>Catadores objetivo</span><strong>{{ catadoresObjetivo }}</strong></div>
+        <div class="summary-row">
+          <span>Catadores objetivo</span>
+          <strong>{{ formatoSeleccionado === 'extrinseca' ? 3 : catadoresObjetivo }}</strong>
+        </div>
         <hr>
         <div class="summary-row">
           <span>Organizador catador</span>
-          <strong>{{ participaComoCatador ? 'Sí' : 'No' }}</strong>
+          <strong>{{ formatoSeleccionado === 'extrinseca' ? 'No' : (participaComoCatador ? 'Sí' : 'No') }}</strong>
         </div>
       </section>
     }

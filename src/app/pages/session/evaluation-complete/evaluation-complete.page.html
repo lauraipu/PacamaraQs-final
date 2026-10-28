@@ -1,0 +1,17 @@
+<ion-content class="ion-padding">
+  <main>
+    <h1>¡Gracias por completar la evaluación!</h1>
+    <p>Tu participación ha sido registrada.</p>
+
+    @if (error) {
+      <p role="alert">{{ error }}</p>
+    }
+
+    <ion-button *ngIf="esOrganizador" (click)="irAResultados()">
+      Ver resultados del panel →
+    </ion-button>
+    <ion-button *ngIf="!esOrganizador" routerLink="/dashboard">
+      Volver al panel principal
+    </ion-button>
+  </main>
+</ion-content>

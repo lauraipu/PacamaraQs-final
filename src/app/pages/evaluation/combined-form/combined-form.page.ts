@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonIcon, NavController } from '@ionic/angular';
+import { AlertController, IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   arrowBackOutline,
@@ -10,6 +10,13 @@ import {
   documentTextOutline,
   lockClosedOutline
 } from 'ionicons/icons';
+import { BaseCataForm } from '../../../core/cva/base-cata-form';
+import {
+  DESCRIPTORES_MOUTHFEEL,
+  ETIQUETAS_HEDONICAS,
+  RUEDA_SABORES,
+  TIPOS_DEFECTO
+} from '../../../core/cva/cva';
 
 addIcons({
   arrowBackOutline,
@@ -24,6 +31,7 @@ export interface AtributoConDescriptores {
   intensidad: number;
   calidad: number;
   descriptores: string[];
+  extra: string;
 }
 export interface AtributoSimple {
   intensidad: number;
@@ -48,25 +56,14 @@ export interface FormularioCombinado {
   notas: string;
 }
 
-// --- CONSTANTES ---
-export const RUEDA_SABORES: Record<string, { color: string; subdescriptores: string[] }> = {
-  'Floral': { color: '#F4B8C8', subdescriptores: ['Flor de té', 'Jazmín', 'Rosa', 'Lavanda'] },
-  'Afrutado': { color: '#F4A636', subdescriptores: ['Bayas', 'Frutas deshidratadas', 'Cítricos', 'Fruta de hueso', 'Coco', 'Melón'] },
-  'Ácido / Fermentado': { color: '#EDD84A', subdescriptores: ['Ácido acético', 'Fermentado', 'Vinoso', 'Agrio'] },
-  'Verde / Vegetal': { color: '#72B74A', subdescriptores: ['Oliva', 'Pepino', 'Hierba', 'Heno', 'Crudo'] },
-  'Otro': { color: '#A08060', subdescriptores: ['Químico', 'Humedad / Tierra', 'Madera', 'Papel / Mohoso'] },
-  'Tostado': { color: '#7B4F2E', subdescriptores: ['Cereal', 'Quemado', 'Tabaco', 'Pipa'] },
-  'Nueces / Cacao': { color: '#C47A30', subdescriptores: ['Nueces', 'Cacao', 'Chocolate', 'Almendra'] },
-  'Especias': { color: '#E06040', subdescriptores: ['Anís', 'Pimienta', 'Canela', 'Clavo'] },
-  'Dulce': { color: '#D49AB8', subdescriptores: ['Vainilla', 'Azúcar morena', 'Miel', 'Caramelo'] },
-};
-
-export const DESCRIPTORES_MOUTHFEEL = ['Áspero (arenoso, rugoso)', 'Aceitoso', 'Suave (aterciopelado, sedoso)', 'Astringente (deja seca la boca)', 'Metálico'];
-export const TIPOS_DEFECTO = ['Mohoso / Terroso', 'Fenólico', 'Papa'];
-export const ETIQUETAS_HEDONICAS: Record<number, string> = {
-  1: 'Ext. baja', 2: 'Muy baja', 3: 'Mod. baja', 4: 'Lig. baja', 5: 'Neutro',
-  6: 'Lig. alta', 7: 'Mod. alta', 8: 'Muy alta', 9: 'Ext. alta',
-};
+export type AtributoCalificable =
+  | 'fragancia'
+  | 'aroma'
+  | 'sabor'
+  | 'saborResidual'
+  | 'acidez'
+  | 'dulzor'
+  | 'sensacionEnBoca';
 
 @Component({
   selector: 'app-combined-form',
@@ -74,26 +71,7 @@ export const ETIQUETAS_HEDONICAS: Record<number, string> = {
   standalone: true,
   imports: [IonContent, IonIcon, CommonModule, FormsModule]
 })
-export class CombinedFormPage {
-
-  // Estado del formulario (Igual que tu formularioInicial)
-  formulario: FormularioCombinado = {
-    atributos: {
-      fragancia: { intensidad: 8, calidad: 5, descriptores: [] },
-      aroma: { intensidad: 8, calidad: 5, descriptores: [] },
-      sabor: { intensidad: 8, calidad: 5, descriptores: [] },
-      saborResidual: { intensidad: 8, calidad: 5, descriptores: [] },
-      acidez: { intensidad: 8, calidad: 5 },
-      dulzor: { intensidad: 8, calidad: 5 },
-      sensacionEnBoca: { intensidad: 8, calidad: 5 },
-    },
-    impresionGlobal: 5,
-    mouthfeel: [],
-    notasMouthfeel: '',
-    defectos: { tazasNoUniformes: 0, tazasDefectuosas: 0 },
-    tiposDefecto: [],
-    notas: '',
-  };
+export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
 
   // Variables de UI
   categoriasAbiertas: { [key: string]: boolean } = { 'Floral': true, 'Nueces / Cacao': true };
@@ -103,23 +81,67 @@ export class CombinedFormPage {
   defectosOptions = TIPOS_DEFECTO;
   etiquetas = ETIQUETAS_HEDONICAS;
 
-  // Getters (Se recalculan automáticamente al cambiar algo en el formulario)
-  get puntaje(): number {
+  private readonly alertCtrl = inject(AlertController);
+
+  override formulario: FormularioCombinado = this.crearFormularioVacio();
+
+  override crearFormularioVacio(): FormularioCombinado {
+    return {
+      atributos: {
+        fragancia: { intensidad: 0, calidad: 0, descriptores: [], extra: '' },
+        aroma: { intensidad: 0, calidad: 0, descriptores: [], extra: '' },
+        sabor: { intensidad: 0, calidad: 0, descriptores: [], extra: '' },
+        saborResidual: { intensidad: 0, calidad: 0, descriptores: [], extra: '' },
+        acidez: { intensidad: 0, calidad: 0 },
+        dulzor: { intensidad: 0, calidad: 0 },
+        sensacionEnBoca: { intensidad: 0, calidad: 0 },
+      },
+      impresionGlobal: 0,
+      mouthfeel: [],
+      notasMouthfeel: '',
+      defectos: { tazasNoUniformes: 0, tazasDefectuosas: 0 },
+      tiposDefecto: [],
+      notas: '',
+    };
+  }
+
+  get puntaje(): number | null {
     const a = this.formulario.atributos;
+    const calidades = [
+      a.fragancia.calidad,
+      a.aroma.calidad,
+      a.sabor.calidad,
+      a.saborResidual.calidad,
+      a.acidez.calidad,
+      a.dulzor.calidad,
+      a.sensacionEnBoca.calidad,
+      this.formulario.impresionGlobal
+    ];
+    if (calidades.some(calidad => calidad < 1 || calidad > 9)) return null;
+
     const sumaHedonicos = a.fragancia.calidad + a.aroma.calidad + a.sabor.calidad + 
                           a.saborResidual.calidad + a.acidez.calidad + a.dulzor.calidad + 
                           a.sensacionEnBoca.calidad + this.formulario.impresionGlobal;
-    const penalizacion = (2 * this.formulario.defectos.tazasNoUniformes) + (4 * this.formulario.defectos.tazasDefectuosas);
+    const penalizacion = (2 * this.formulario.defectos.tazasNoUniformes) + (4 * this.totalTazasDefectuosas);
     const calculo = (0.65625 * sumaHedonicos) + 52.75 - penalizacion;
-    return Math.max(0, Math.min(100, calculo));
+    const redondeado = Math.round(calculo * 4) / 4;
+    return Math.max(0, Math.min(100, redondeado));
   }
 
   get penalizacionTotal(): number {
-    return (2 * this.formulario.defectos.tazasNoUniformes) + (4 * this.formulario.defectos.tazasDefectuosas);
+    return (2 * this.formulario.defectos.tazasNoUniformes) + (4 * this.totalTazasDefectuosas);
+  }
+
+  get totalTazasDefectuosas(): number {
+    return Math.max(
+      this.formulario.defectos.tazasDefectuosas,
+      this.formulario.tiposDefecto.length > 0 ? 1 : 0
+    );
   }
 
   get clasificacion() {
     const p = this.puntaje;
+    if (p === null) return { label: 'Pendiente', color: '#6c757d', bg: '#f8f9fa', border: '#dee2e6' };
     if (p >= 90) return { label: 'Excepcional', color: '#15803d', bg: '#f0fdf4', border: '#bbf7d0' };
     if (p >= 85) return { label: 'Excelente', color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' };
     if (p >= 80) return { label: 'Muy bueno', color: '#a16207', bg: '#fefce8', border: '#fef08a' };
@@ -127,9 +149,15 @@ export class CombinedFormPage {
     return { label: 'Regular', color: '#6c757d', bg: '#f8f9fa', border: '#dee2e6' };
   }
 
-  private readonly navCtrl = inject(NavController);
-
   // --- MÉTODOS DE INTERACCIÓN ---
+  seleccionarCalidad(atributo: AtributoCalificable | 'impresionGlobal', valor: number): void {
+    if (atributo === 'impresionGlobal') {
+      this.formulario.impresionGlobal = valor;
+    } else {
+      this.formulario.atributos[atributo].calidad = valor;
+    }
+  }
+
   toggleCategoria(cat: string) {
     this.categoriasAbiertas[cat] = !this.categoriasAbiertas[cat];
   }
@@ -173,7 +201,48 @@ export class CombinedFormPage {
     }
   }
 
-  volver() {
-    this.navCtrl.back();
+  override async finalizarCata(): Promise<void> {
+    const incompletas = this.respuestas.filter(respuesta => !this.esRespuestaCompleta(respuesta)).length;
+    if (incompletas > 0) {
+      const alert = await this.alertCtrl.create({
+        header: 'Cata incompleta',
+        message: `Aún tienes ${incompletas} muestra(s) sin calificar todos los atributos. Revisa todas las muestras antes de terminar.`,
+        buttons: ['Entendido']
+      });
+      await alert.present();
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Finalizar cata',
+      message: 'Las respuestas están completas, pero todavía no existe guardado en el servidor. Si sales, perderás esta evaluación.',
+      buttons: [
+        { text: 'Seguir evaluando', role: 'cancel' },
+        {
+          text: 'Salir sin guardar',
+          role: 'destructive',
+          handler: () => this.navCtrl.navigateRoot('/dashboard')
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  protected override esRespuestaCompleta(respuesta: FormularioCombinado): boolean {
+    const atributos = respuesta.atributos;
+    return ![
+      atributos.fragancia.calidad,
+      atributos.aroma.calidad,
+      atributos.sabor.calidad,
+      atributos.saborResidual.calidad,
+      atributos.acidez.calidad,
+      atributos.dulzor.calidad,
+      atributos.sensacionEnBoca.calidad,
+      respuesta.impresionGlobal
+    ].some(calidad => !Number.isInteger(calidad) || calidad < 1 || calidad > 9);
+  }
+
+  protected override async mostrarAvisoCalificacionIncompleta(): Promise<void> {
+    await this.mostrarToast('Por favor, califica todos los atributos de esta muestra antes de continuar.', 'warning');
   }
 }

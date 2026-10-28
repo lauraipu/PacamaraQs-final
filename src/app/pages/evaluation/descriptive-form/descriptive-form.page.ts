@@ -1,19 +1,88 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular';
+import { IonContent, IonIcon } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { arrowBackOutline, chevronDownOutline, chevronForwardOutline } from 'ionicons/icons';
+import { BaseCataForm } from '../../../core/cva/base-cata-form';
+import { RUEDA_SABORES } from '../../../core/cva/cva';
+
+addIcons({ arrowBackOutline, chevronDownOutline, chevronForwardOutline });
+
+type AtributoAromatico = 'fragancia' | 'aroma' | 'sabor' | 'saborResidual';
+
+interface AtributoConDescriptores {
+  intensidad: number;
+  descriptores: string[];
+  extra: string;
+}
+
+interface FormularioDescriptivo {
+  fragancia: AtributoConDescriptores;
+  aroma: AtributoConDescriptores;
+  sabor: AtributoConDescriptores;
+  saborResidual: AtributoConDescriptores;
+  acidez: { intensidad: number; nota: string };
+  dulzor: { intensidad: number; nota: string };
+  sensacionEnBoca: { intensidad: number; textura: string[] };
+  notas: string;
+}
 
 @Component({
   selector: 'app-descriptive-form',
   templateUrl: './descriptive-form.page.html',
-  styleUrls: ['./descriptive-form.page.scss'],
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  standalone: true,
+  imports: [IonContent, IonIcon, CommonModule, FormsModule]
 })
-export class DescriptiveFormPage implements OnInit {
+export class DescriptiveFormPage extends BaseCataForm<FormularioDescriptivo> {
+  override formulario: FormularioDescriptivo = this.crearFormularioVacio();
 
-  constructor() { }
+  readonly atributosAromaticos: { key: AtributoAromatico; label: string }[] = [
+    { key: 'fragancia', label: 'Fragancia' },
+    { key: 'aroma', label: 'Aroma (en taza)' },
+    { key: 'sabor', label: 'Sabor' },
+    { key: 'saborResidual', label: 'Sabor Residual' }
+  ];
+  readonly escalaIntensidad = { min: 0, max: 15, step: 0.5 };
+  readonly ruedaKeys = Object.keys(RUEDA_SABORES);
+  readonly ruedaSabores = RUEDA_SABORES;
+  readonly texturas = ['Áspero', 'Aceitoso', 'Suave', 'Astringente', 'Metálico'];
+  categoriasAbiertas: Record<string, boolean> = { Floral: true };
 
-  ngOnInit() {
+  override crearFormularioVacio(): FormularioDescriptivo {
+    const atributoVacio = (): AtributoConDescriptores => ({ intensidad: 0, descriptores: [], extra: '' });
+    return {
+      fragancia: atributoVacio(),
+      aroma: atributoVacio(),
+      sabor: atributoVacio(),
+      saborResidual: atributoVacio(),
+      acidez: { intensidad: 0, nota: '' },
+      dulzor: { intensidad: 0, nota: '' },
+      sensacionEnBoca: { intensidad: 0, textura: [] },
+      notas: ''
+    };
+  }
+
+  toggleCategoria(categoria: string): void {
+    this.categoriasAbiertas[categoria] = !this.categoriasAbiertas[categoria];
+  }
+
+  toggleDescriptor(atributo: AtributoAromatico, descriptor: string): void {
+    const lista = this.formulario[atributo].descriptores;
+    this.formulario[atributo].descriptores = lista.includes(descriptor)
+      ? lista.filter(item => item !== descriptor)
+      : [...lista, descriptor];
+  }
+
+  isDescriptorSelected(atributo: AtributoAromatico, descriptor: string): boolean {
+    return this.formulario[atributo].descriptores.includes(descriptor);
+  }
+
+  toggleTextura(textura: string): void {
+    const lista = this.formulario.sensacionEnBoca.textura;
+    this.formulario.sensacionEnBoca.textura = lista.includes(textura)
+      ? lista.filter(item => item !== textura)
+      : [...lista, textura];
   }
 
 }

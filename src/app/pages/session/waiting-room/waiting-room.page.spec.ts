@@ -80,7 +80,8 @@ describe('WaitingRoomPage', () => {
     await component.iniciarCata();
 
     expect(iniciarSesion).toHaveBeenCalledWith('session-id');
-    expect(navigateByUrl).toHaveBeenCalledWith('/combined-form');
+    expect(navigateByUrl).toHaveBeenCalledTimes(1);
+    expect(navigateByUrl).toHaveBeenCalledWith('/combined-form/session-id', { replaceUrl: true });
   });
 
   it('does not start the session for a non-organizer', async () => {
@@ -115,6 +116,7 @@ describe('WaitingRoomPage', () => {
     });
     await fixture.whenStable();
 
-    expect(navigateByUrl).toHaveBeenCalledWith('/affective-form');
+    expect(navigateByUrl).toHaveBeenCalledTimes(1);
+    expect(navigateByUrl).toHaveBeenCalledWith('/affective-form/session-id', { replaceUrl: true });
   });
 });

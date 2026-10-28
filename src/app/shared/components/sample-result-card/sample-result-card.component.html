@@ -1,0 +1,29 @@
+<div class="sample-card">
+  <div class="sample-header">
+    <h4 class="sample-title">Muestra {{ muestra.numeroMuestra }}</h4>
+    <!-- CAMBIO AQUÍ: Usamos @if en lugar de *ngIf -->
+    @if (muestra.nivelTueste) {
+      <span class="sample-roast">Tueste: {{ muestra.nivelTueste }}</span>
+    }
+  </div>
+  
+  <div class="sample-main-score">
+    <span class="score">{{ muestra.puntajePromedioPanel | number:'1.2-2' }}</span>
+    <span class="score-label">Promedio del Panel</span>
+  </div>
+
+  <div class="sample-details">
+    <div class="detail">
+      <span class="label">Mínimo</span>
+      <span class="value">{{ muestra.puntajeMin | number:'1.2-2' }}</span>
+    </div>
+    <div class="detail">
+      <span class="label">Máximo</span>
+      <span class="value">{{ muestra.puntajeMax | number:'1.2-2' }}</span>
+    </div>
+    <div class="detail">
+      <span class="label">Desviación Est.</span>
+      <span class="value">{{ muestra.desviacionEstandar | number:'1.2-2' }}</span>
+    </div>
+  </div>
+</div>

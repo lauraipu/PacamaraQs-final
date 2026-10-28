@@ -75,6 +75,24 @@ describe('AuthService', () => {
     ]);
   });
 
+  it('resolves registration when profile insertion fails', async () => {
+    const result = {
+      user: { id: 'user-id' },
+      session: { access_token: 'token' }
+    };
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    signUp.mockResolvedValue({ data: result, error: null });
+    insert.mockResolvedValue({ error: { message: 'RLS denied' } });
+    from.mockReturnValue({ insert });
+
+    await expect(service.registro('user@example.com', 'secret', 'Ana')).resolves.toEqual(result);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('falló INSERT en usuarios:'),
+      { message: 'RLS denied' }
+    );
+    warn.mockRestore();
+  });
+
   it('does not start registration when required fields are blank', async () => {
     await expect(service.registro(' ', 'secret', 'Ana')).rejects.toThrow(
       'El nombre, el correo y la contraseña son obligatorios.'

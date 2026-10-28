@@ -1,0 +1,42 @@
+<div class="cupper-card">
+  <div class="cupper-header">
+    <div class="cupper-info">
+      <div class="avatar">{{ catador.nombre.charAt(0).toUpperCase() }}</div>
+      <div>
+        <h4 class="cupper-name">{{ catador.nombre }}</h4>
+        <span class="cupper-role">{{ catador.esOrganizador ? 'Organizador' : 'Catador' }}</span>
+      </div>
+    </div>
+    <div class="cupper-score">
+      <span class="score-value">{{ catador.puntajePromedio | number:'1.2-2' }}</span>
+      <span class="score-label">Promedio</span>
+    </div>
+  </div>
+
+   <div class="calibration-badge" 
+       [ngClass]="{'generoso': esGeneroso, 'estricto': esEstricto, 'calibrado': estaCalibrado}">
+    @if (esGeneroso) {
+      <span>↑ +{{ catador.desviacionRespectoPanel }} (Generoso)</span>
+    }
+    @if (esEstricto) {
+      <span>↓ {{ catador.desviacionRespectoPanel }} (Estricto)</span>
+    }
+    @if (estaCalibrado) {
+      <span>✓ Calibrado con el panel</span>
+    }
+  
+  </div>
+
+  <div class="cupper-stats">
+    <div class="stat">
+      <span class="stat-label">Muestras Evaluadas</span>
+      <span class="stat-value">{{ catador.muestrasEvaluadas }} / {{ catador.muestrasAsignadas }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Estado</span>
+      <span class="stat-value" [class.success]="catador.estado === 'enviado'">
+        {{ catador.estado === 'enviado' ? 'Enviado' : 'Pendiente' }}
+      </span>
+    </div>
+  </div>
+</div>

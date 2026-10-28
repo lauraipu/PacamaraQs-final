@@ -32,6 +32,27 @@ describe('CreateSessionPage', () => {
     expect(component).toBeTruthy();
   });
 
+  it('hides panel parameters for extrinsic format', () => {
+    const getParametersSection = () => {
+      const sections = fixture.nativeElement.querySelectorAll('section.cupping-card') as NodeListOf<HTMLElement>;
+      return Array.from(sections).find(section => section.textContent?.includes('Parámetros del panel'));
+    };
+    const selectFormat = (format: string) => {
+      const buttons = fixture.nativeElement.querySelectorAll('button.formato-item') as NodeListOf<HTMLButtonElement>;
+      const button = Array.from(buttons).find(item => item.textContent?.includes(format));
+      button?.click();
+      fixture.detectChanges();
+    };
+
+    expect(getParametersSection()).toBeTruthy();
+
+    selectFormat('Extrínseca');
+    expect(getParametersSection()).toBeUndefined();
+
+    selectFormat('Combinado');
+    expect(getParametersSection()).toBeTruthy();
+  });
+
   it('creates a session and registers the organizer as a participant', async () => {
     getUser.mockResolvedValue({
       user: {
@@ -64,6 +85,38 @@ describe('CreateSessionPage', () => {
     expect(component.codigoGenerado).toBe('AB12-3C4');
     expect(component.pasoActual).toBe(2);
     expect(component.error).toBeNull();
+  });
+
+  it('creates extrinsic sessions with valid defaults and does not register the organizer', async () => {
+    getUser.mockResolvedValue({
+      user: {
+        id: 'user-id',
+        email: 'organizer@example.com',
+        user_metadata: {}
+      }
+    });
+    crearSesion.mockImplementation(async session => ({
+      ...session,
+      id: 'session-id',
+      codigoAcceso: 'AB12-3C4'
+    }));
+
+    component.nombreSesion = 'Cata extrínseca';
+    component.formatoSeleccionado = 'extrinseca';
+    component.numeroMuestras = 12;
+    component.catadoresObjetivo = 10;
+    component.participaComoCatador = true;
+
+    await component.generarCodigo();
+
+    expect(crearSesion).toHaveBeenCalledWith(expect.objectContaining({
+      formato: 'extrinseca',
+      numeroMuestras: 1,
+      catadoresObjetivo: 3,
+      organizadorParticipa: false
+    }));
+    expect(insertarParticipanteDirecto).not.toHaveBeenCalled();
+    expect(component.organizadorPendiente).toBe(false);
   });
 
   it('does not recreate a session when organizer registration fails', async () => {
@@ -112,5 +165,16 @@ describe('CreateSessionPage', () => {
     await component.irASalaDeEspera();
 
     expect(navigate).toHaveBeenCalledWith(['/session/waiting', 'session-id']);
+  });
+
+  it('routes extrinsic sessions directly to the evaluation form', async () => {
+    component.sesionIdGenerado = 'session-id';
+    component.formatoSeleccionado = 'extrinseca';
+    const router = TestBed.inject(Router);
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    await component.irASalaDeEspera();
+
+    expect(navigate).toHaveBeenCalledWith(['/extrinsic-form', 'session-id']);
   });
 });

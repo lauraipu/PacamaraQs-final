@@ -1,13 +1,135 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>affective-form</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="cva-combined" [scrollY]="true">
+  <header class="cva-header">
+    <div class="cva-header__inner">
+      <div class="cva-header__left">
+        <button type="button" class="cva-header__back-btn" aria-label="Volver" (click)="volver()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        <div class="cva-header__meta">
+          <p class="cva-header__session-name">Evaluación Afectiva</p>
+          <p class="cva-header__sample-label">Muestra {{ muestraActual }} <span>de {{ totalMuestras }}</span></p>
+        </div>
+      </div>
+      <div class="cva-header__right">
+        <div class="cva-header__live-score" [style.background]="clasificacion.bg">
+          <span class="cva-header__live-score-label">CVA</span>
+          <span class="cva-header__live-score-value" [style.color]="clasificacion.color">
+            {{ puntaje | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="cva-header__progress-bar-wrap">
+      <div class="cva-header__progress-bar">
+        <div class="cva-header__progress-bar-fill" [style.width]="(muestraActual / totalMuestras) * 100 + '%'"></div>
+      </div>
+    </div>
+  </header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">affective-form</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="cva-main">
+    <div class="cva-main__grid">
+      <div class="cva-main__column">
+        <article class="attr-card" *ngFor="let atributo of atributos">
+          <h3 class="attr-card__title">{{ atributo.label }}</h3>
+          <div class="hedonic-buttons">
+            <div class="hedonic-buttons__header">
+              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__descriptor">
+                {{ formulario[atributo.key] }} — {{ etiquetas[formulario[atributo.key]] }}
+              </span>
+            </div>
+            <div class="hedonic-buttons__grid">
+              <button
+                type="button"
+                *ngFor="let valor of escalaHedonica"
+                class="hedonic-buttons__btn"
+                [class.hedonic-buttons__btn--active]="formulario[atributo.key] === valor"
+                [attr.aria-pressed]="formulario[atributo.key] === valor"
+                (click)="formulario[atributo.key] = valor">
+                {{ valor }}
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="attr-card">
+          <h3 class="attr-card__title">Impresión Global</h3>
+          <div class="hedonic-buttons">
+            <div class="hedonic-buttons__header">
+              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__descriptor">
+                {{ formulario.impresionGlobal }} — {{ etiquetas[formulario.impresionGlobal] }}
+              </span>
+            </div>
+            <div class="hedonic-buttons__grid">
+              <button
+                type="button"
+                *ngFor="let valor of escalaHedonica"
+                class="hedonic-buttons__btn"
+                [class.hedonic-buttons__btn--active]="formulario.impresionGlobal === valor"
+                [attr.aria-pressed]="formulario.impresionGlobal === valor"
+                (click)="formulario.impresionGlobal = valor">
+                {{ valor }}
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <aside class="cva-main__sidebar">
+        <div class="score-panel" [style.background]="clasificacion.bg">
+          <span class="score-panel__label">Puntaje CVA</span>
+          <span class="score-panel__value" [style.color]="clasificacion.color">
+            {{ puntaje | number:'1.2-2' }}
+          </span>
+          <span class="score-panel__classification" [style.color]="clasificacion.color">
+            {{ clasificacion.label }}
+          </span>
+        </div>
+
+        <div class="defect-panel">
+          <span class="label-micro" style="display:block; margin-bottom:16px;">Defectos</span>
+          <div class="defect-counter">
+            <div class="defect-counter__info">
+              <span class="defect-counter__label">Tazas no uniformes</span>
+              <span class="defect-counter__sublabel">−2 pts por taza</span>
+            </div>
+            <div class="defect-counter__controls">
+              <button type="button" class="defect-counter__btn" aria-label="Restar taza no uniforme" (click)="ajustarDefecto('uniformes', 'restar')">−</button>
+              <span class="defect-counter__value">{{ formulario.defectos.tazasNoUniformes }}</span>
+              <button type="button" class="defect-counter__btn" aria-label="Sumar taza no uniforme" (click)="ajustarDefecto('uniformes', 'sumar')">+</button>
+            </div>
+          </div>
+          <div class="defect-counter" style="margin-top:16px;">
+            <div class="defect-counter__info">
+              <span class="defect-counter__label">Tazas defectuosas</span>
+              <span class="defect-counter__sublabel">−4 pts por taza</span>
+            </div>
+            <div class="defect-counter__controls">
+              <button type="button" class="defect-counter__btn" aria-label="Restar taza defectuosa" (click)="ajustarDefecto('defectuosas', 'restar')">−</button>
+              <span class="defect-counter__value">{{ formulario.defectos.tazasDefectuosas }}</span>
+              <button type="button" class="defect-counter__btn" aria-label="Sumar taza defectuosa" (click)="ajustarDefecto('defectuosas', 'sumar')">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="notes-panel">
+          <div class="notes-panel__header">Notas adicionales</div>
+          <textarea class="notes-panel__textarea" rows="4" [(ngModel)]="formulario.notas" placeholder="Observaciones..."></textarea>
+        </div>
+        <div class="sample-navigation">
+          <button
+            *ngIf="muestraActual > 1"
+            type="button"
+            class="submit-btn sample-navigation__previous"
+            (click)="irAMuestraAnterior()">
+            ← Anterior
+          </button>
+          <button type="button" class="submit-btn" (click)="irAMuestraSiguiente()">
+            {{ muestraActual === totalMuestras ? 'Terminar cata' : 'Siguiente muestra →' }}
+          </button>
+        </div>
+      </aside>
+    </div>
+  </main>
 </ion-content>

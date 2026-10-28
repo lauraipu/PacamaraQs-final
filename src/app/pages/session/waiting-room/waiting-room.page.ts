@@ -261,7 +261,10 @@ export class WaitingRoomPage implements OnInit, OnDestroy {
 
     this.redirigiendo = true;
     try {
-      await this.router.navigateByUrl(`/${rutasFormato[formatoId]}`);
+      await this.router.navigateByUrl(
+        `/${rutasFormato[formatoId]}/${sesion.id}`,
+        { replaceUrl: true }
+      );
     } catch (error) {
       this.redirigiendo = false;
       this.error = error instanceof Error ? error.message : 'No se pudo abrir el formulario de cata.';

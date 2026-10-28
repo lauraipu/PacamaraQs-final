@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { organizerGuard } from './core/guards/organizer.guard';
 
 export const routes: Routes = [
   {
@@ -16,22 +17,22 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: 'affective-form',
+    path: 'affective-form/:sesionId',
     loadComponent: () => import('./pages/evaluation/affective-form/affective-form.page').then(m => m.AffectiveFormPage),
     canActivate: [authGuard]
   },
   {
-    path: 'combined-form',
+    path: 'combined-form/:sesionId',
     loadComponent: () => import('./pages/evaluation/combined-form/combined-form.page').then(m => m.CombinedFormPage),
     canActivate: [authGuard]
   },
   {
-    path: 'descriptive-form',
+    path: 'descriptive-form/:sesionId',
     loadComponent: () => import('./pages/evaluation/descriptive-form/descriptive-form.page').then(m => m.DescriptiveFormPage),
     canActivate: [authGuard]
   },
   {
-    path: 'extrinsic-form',
+    path: 'extrinsic-form/:sesionId',
     loadComponent: () => import('./pages/evaluation/extrinsic-form/extrinsic-form.page').then(m => m.ExtrinsicFormPage),
     canActivate: [authGuard]
   },
@@ -49,6 +50,21 @@ export const routes: Routes = [
     path: 'session/waiting/:sesionId',
     loadComponent: () => import('./pages/session/waiting-room/waiting-room.page').then(m => m.WaitingRoomPage),
     canActivate: [authGuard]
+  },
+  {
+    path: 'session/:id/organizer-dashboard',
+    loadComponent: () => import('./pages/session/organizer-dashboard/organizer-dashboard.page').then(m => m.OrganizerDashboardPage),
+    canActivate: [authGuard, organizerGuard]
+  },
+  {
+    path: 'session/:id/evaluation-complete',
+    loadComponent: () => import('./pages/session/evaluation-complete/evaluation-complete.page').then(m => m.EvaluationCompletePage),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'session/:id/results',
+    loadComponent: () => import('./pages/session/results/results.page').then(m => m.ResultsPage),
+    canActivate: [authGuard, organizerGuard]
   },
   {
     // Ruta huérfana corregida: redirige al dashboard en vez de cargar

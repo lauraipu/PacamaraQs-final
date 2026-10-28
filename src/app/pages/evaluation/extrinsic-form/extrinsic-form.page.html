@@ -1,13 +1,149 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>extrinsic-form</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="cva-combined" [scrollY]="true">
+  <header class="cva-header">
+    <div class="cva-header__inner">
+      <div class="cva-header__left">
+        <button type="button" class="cva-header__back-btn" aria-label="Volver" (click)="volver()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        <div class="cva-header__meta">
+          <p class="cva-header__session-name">Evaluación Extrínseca</p>
+          <p class="cva-header__sample-label">Muestra {{ muestraActual }} <span>de {{ totalMuestras }}</span></p>
+        </div>
+      </div>
+      <div class="cva-header__right">
+        <span class="cva-header__format-badge">Extrínseca</span>
+      </div>
+    </div>
+    <div class="cva-header__progress-bar-wrap">
+      <div class="cva-header__progress-bar">
+        <div class="cva-header__progress-bar-fill" [style.width]="(muestraActual / totalMuestras) * 100 + '%'"></div>
+      </div>
+    </div>
+  </header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">extrinsic-form</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="cva-main">
+    <div class="cva-main__grid">
+      <div class="cva-main__column">
+        <article class="attr-card">
+          <h3 class="attr-card__title">1. Información de cultivo (Farming)</h3>
+          <div class="form-fields">
+            <label class="form-field">
+              <span class="intensity-slider__label">País</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.country" placeholder="Ej: Colombia">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Región / Departamento</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.region" placeholder="Ej: Huila">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Nombre de la finca o cooperativa</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.farmName" placeholder="Ej: Finca El Mirador">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Productor(es)</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.producers" placeholder="Nombre(s) de productores">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Especie</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.species" placeholder="Ej: Arábica">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Variedad</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.variety" placeholder="Ej: Geisha">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Fecha de cosecha</span>
+              <input class="notes-panel__textarea" type="date" [(ngModel)]="formulario.farming.harvestDate">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Otra información de cultivo</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.other">
+            </label>
+          </div>
+        </article>
+
+        <article class="attr-card">
+          <h3 class="attr-card__title">2. Información de procesamiento</h3>
+          <div class="form-fields">
+            <label class="form-field">
+              <span class="intensity-slider__label">Nombre del procesador</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.processorName">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Beneficio húmedo</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.wetMill">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Beneficio seco</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.dryMill">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Tipo de proceso</span>
+              <select class="notes-panel__textarea" [(ngModel)]="formulario.processing.processType">
+                <option value="">Seleccionar</option>
+                <option value="lavado">Lavado</option>
+                <option value="natural">Natural</option>
+                <option value="otro">Otro</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Otro proceso</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.other">
+            </label>
+          </div>
+        </article>
+
+        <article class="attr-card">
+          <h3 class="attr-card__title">3. Información de comercio (Trading)</h3>
+          <div class="form-fields">
+            <label class="form-field">
+              <span class="intensity-slider__label">Grado (Size Grade / Other Grade)</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.grade" placeholder="Ej: Supremo">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Número ICO</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.icoNumber">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Otra información comercial</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.other">
+            </label>
+          </div>
+        </article>
+
+        <article class="attr-card">
+          <h3 class="attr-card__title">4. Certificaciones</h3>
+          <div class="mouthfeel__list">
+            <label class="mouthfeel__item"><input type="checkbox" [(ngModel)]="formulario.certifications.c4"> 4C</label>
+            <label class="mouthfeel__item"><input type="checkbox" [(ngModel)]="formulario.certifications.fairTrade"> Fair Trade</label>
+            <label class="mouthfeel__item"><input type="checkbox" [(ngModel)]="formulario.certifications.organic"> Orgánico</label>
+            <label class="mouthfeel__item"><input type="checkbox" [(ngModel)]="formulario.certifications.rainforest"> Rainforest Alliance</label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Otra certificación</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.certifications.other" placeholder="Ej: Bird Friendly">
+            </label>
+          </div>
+        </article>
+      </div>
+
+      <aside class="cva-main__sidebar">
+        <div class="notes-panel">
+          <div class="notes-panel__header">Notas extrínsecas</div>
+          <textarea class="notes-panel__textarea" rows="5" [(ngModel)]="formulario.notes" placeholder="Otra información relevante..."></textarea>
+        </div>
+        <div class="sample-navigation">
+          <button
+            *ngIf="muestraActual > 1"
+            type="button"
+            class="submit-btn sample-navigation__previous"
+            (click)="irAMuestraAnterior()">
+            ← Anterior
+          </button>
+          <button type="button" class="submit-btn" (click)="irAMuestraSiguiente()">
+            {{ muestraActual === totalMuestras ? 'Terminar cata' : 'Siguiente muestra →' }}
+          </button>
+        </div>
+      </aside>
+    </div>
+  </main>
 </ion-content>
