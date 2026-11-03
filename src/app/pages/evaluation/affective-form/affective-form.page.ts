@@ -82,6 +82,16 @@ export class AffectiveFormPage extends BaseCataForm<FormularioAfectivo> {
     return Math.max(0, Math.min(100, Math.round(calculo * 4) / 4));
   }
 
+  protected override calcularPuntajeFinal(respuesta: FormularioAfectivo): number | null {
+    const suma = respuesta.fragancia + respuesta.aroma + respuesta.sabor +
+      respuesta.saborResidual + respuesta.acidez + respuesta.dulzor +
+      respuesta.sensacionEnBoca + respuesta.impresionGlobal;
+    const penalizacion = (2 * respuesta.defectos.tazasNoUniformes) +
+      (4 * respuesta.defectos.tazasDefectuosas);
+    const calculo = (0.65625 * suma) + 52.75 - penalizacion;
+    return Math.max(0, Math.min(100, Math.round(calculo * 4) / 4));
+  }
+
   get clasificacion() {
     const p = this.puntaje;
     if (p >= 90) return { label: 'Excepcional', color: '#15803d', bg: '#f0fdf4' };

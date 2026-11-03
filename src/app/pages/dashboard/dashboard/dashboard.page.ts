@@ -39,6 +39,7 @@ interface SesionItemUi {
   cantMuestras: number;
   cantCatadores: number;
   esOrganizador: boolean;
+  organizadorParticipa: boolean;
 }
 
 @Component({
@@ -87,6 +88,8 @@ export class DashboardPage implements OnInit {
   private readonly toastController = inject(ToastController);
   private readonly alertController = inject(AlertController);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private inicializando = false;
+  private primeraCargaCompleta = false;
 
   constructor() {
     addIcons({ keyOutline, addOutline });
@@ -94,6 +97,10 @@ export class DashboardPage implements OnInit {
 
   ngOnInit(): void {
     void this.inicializar();
+  }
+
+  ionViewWillEnter(): void {
+    if (this.primeraCargaCompleta) void this.inicializar();
   }
 
   get sesionesFiltradas(): SesionItemUi[] {
@@ -107,6 +114,8 @@ export class DashboardPage implements OnInit {
   }
 
   private async inicializar(): Promise<void> {
+    if (this.inicializando) return;
+    this.inicializando = true;
     try {
       const { data: { user }, error } = await this.supabaseService.client.auth.getUser();
       if (error) throw error;
@@ -121,6 +130,8 @@ export class DashboardPage implements OnInit {
       this.cargandoPerfil = false;
       await this.mostrarToast(error instanceof Error ? error.message : 'No se pudieron cargar tus sesiones.');
     } finally {
+      this.primeraCargaCompleta = true;
+      this.inicializando = false;
       this.changeDetector.markForCheck();
     }
   }
@@ -152,15 +163,35 @@ export class DashboardPage implements OnInit {
 
   entrarASesion(sesion: SesionItemUi): void {
     this.menuSesionAbiertoId = null;
-    if (sesion.formato.toLowerCase() === 'extrinseca') {
-      void this.router.navigateByUrl(`/extrinsic-form/${sesion.id}`);
+
+    if (sesion.estado === 'En espera' || sesion.estado === 'En progreso') {
+      if (sesion.esOrganizador && !sesion.organizadorParticipa) {
+        if (sesion.estado === 'En progreso') {
+          void this.router.navigateByUrl(
+            `/session/${sesion.id}/organizer-dashboard`,
+            { replaceUrl: true }
+          );
+          return;
+        }
+      }
+
+      if (sesion.formato.toLowerCase() === 'extrinseca') {
+        void this.router.navigateByUrl(`/extrinsic-form/${sesion.id}`, { replaceUrl: true });
+      } else {
+        void this.router.navigateByUrl(`/session/waiting/${sesion.id}`, { replaceUrl: true });
+      }
       return;
     }
 
-    if (sesion.estado === 'En espera' || sesion.estado === 'En progreso') {
-      void this.router.navigateByUrl(`/session/waiting/${sesion.id}`);
+    if (sesion.estado === 'Completada' && sesion.esOrganizador) {
+      void this.router.navigateByUrl(`/session/${sesion.id}/results`, { replaceUrl: true });
+    } else if (sesion.estado === 'Completada') {
+      void this.router.navigateByUrl(
+        `/session/${sesion.id}/evaluation-complete`,
+        { replaceUrl: true }
+      );
     } else {
-      void this.mostrarToast('Esta sesión ya ha finalizado.');
+      void this.mostrarToast('Esta sesión fue cancelada.');
     }
   }
 
@@ -192,7 +223,7 @@ export class DashboardPage implements OnInit {
   }
 
   async nuevaSesion(): Promise<void> {
-    await this.router.navigateByUrl('/session/create');
+    await this.router.navigateByUrl('/session/create', { replaceUrl: true });
   }
 
   async unirseSesion(): Promise<void> {
@@ -204,13 +235,13 @@ export class DashboardPage implements OnInit {
 
     this.isJoining = true;
     try {
-      const { sesion } = await this.sesionService.unirseASesion(
-        codigoLimpio,
-        this.nombreUsuario
-      );
+      const { sesion } = await this.sesionService.unirseASesion(codigoLimpio);
       this.isModalOpen = false;
       this.codigoInput = '';
-      await this.router.navigate(['/session/waiting', sesion.id]);
+      const destino = sesion.formato.toLowerCase() === 'extrinseca'
+        ? `/extrinsic-form/${sesion.id}`
+        : `/session/waiting/${sesion.id}`;
+      await this.router.navigateByUrl(destino, { replaceUrl: true });
     } catch (error) {
       console.error('Error al unirse a la sesión:', error);
       await this.mostrarToast(
@@ -265,15 +296,9 @@ export class DashboardPage implements OnInit {
 
   private async cargarNombreUsuario(user: {
     id: string;
-    is_anonymous?: boolean;
     email?: string;
     user_metadata?: Record<string, unknown>;
   }): Promise<void> {
-    if (user.is_anonymous) {
-      this.nombreUsuario = 'Catador Invitado';
-      return;
-    }
-
     try {
       const { data, error } = await this.supabaseService.client
         .from('usuarios')
@@ -317,7 +342,8 @@ export class DashboardPage implements OnInit {
       fecha: sesion.creadaEn ? new Date(sesion.creadaEn).toLocaleDateString() : '—',
       cantMuestras: sesion.numeroMuestras,
       cantCatadores: sesion.catadoresObjetivo,
-      esOrganizador: sesion.esOrganizador
+      esOrganizador: sesion.esOrganizador,
+      organizadorParticipa: sesion.organizadorParticipa
     };
   }
 }

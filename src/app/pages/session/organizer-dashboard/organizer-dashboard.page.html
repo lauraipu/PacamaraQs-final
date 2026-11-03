@@ -1,0 +1,40 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar style="--background: #FFF;">
+    <ion-title>
+      <div style="font-size: 15px; font-weight: bold; color: #0F172B;">Sala de Control</div>
+      <div style="font-size: 12px; color: #62748E;">{{ nombreSesion }}</div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" style="--background: #F8FAFC;">
+  <div class="cupping-card" style="background: #FFF; border-radius: 12px; padding: 16px; border: 1px solid #E2E8F0;">
+    <h2 style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 20px;">
+      Catadores en la sesión
+    </h2>
+
+    <ion-list>
+      @for (p of participantes; track p.id) {
+        <ion-item>
+          <ion-icon name="person-circle-outline" slot="start" size="large"></ion-icon>
+          <ion-label>
+            <h2>{{ p.nombre }}</h2>
+            <p>{{ p.esOrganizador ? 'Organizador' : 'Catador' }}</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+
+    @if (participantes.length === 0) {
+      <div style="text-align: center; color: gray; padding: 20px;">
+        Nadie se ha unido aún.
+      </div>
+    }
+  </div>
+
+  <div style="margin-top: 24px;">
+    <ion-button expand="block" color="dark" (click)="cerrarSesion()">
+      Cerrar sesión y ver resultados
+    </ion-button>
+  </div>
+</ion-content>

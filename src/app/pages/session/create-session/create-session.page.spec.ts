@@ -80,6 +80,7 @@ describe('CreateSessionPage', () => {
       'session-id',
       'user-id',
       'organizer@example.com',
+      true,
       true
     );
     expect(component.codigoGenerado).toBe('AB12-3C4');
@@ -157,24 +158,24 @@ describe('CreateSessionPage', () => {
     expect(component.isLoading).toBe(false);
   });
 
-  it('routes to the waiting room for the created session', async () => {
+  it('routes to the waiting room for non-extrinsic sessions', async () => {
     component.sesionIdGenerado = 'session-id';
     const router = TestBed.inject(Router);
-    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const navigateByUrl = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
 
     await component.irASalaDeEspera();
 
-    expect(navigate).toHaveBeenCalledWith(['/session/waiting', 'session-id']);
+    expect(navigateByUrl).toHaveBeenCalledWith('/session/waiting/session-id', { replaceUrl: true });
   });
 
-  it('routes extrinsic sessions directly to the evaluation form', async () => {
+  it('routes extrinsic sessions directly to their form', async () => {
     component.sesionIdGenerado = 'session-id';
     component.formatoSeleccionado = 'extrinseca';
     const router = TestBed.inject(Router);
-    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const navigateByUrl = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
 
     await component.irASalaDeEspera();
 
-    expect(navigate).toHaveBeenCalledWith(['/extrinsic-form', 'session-id']);
+    expect(navigateByUrl).toHaveBeenCalledWith('/extrinsic-form/session-id', { replaceUrl: true });
   });
 });

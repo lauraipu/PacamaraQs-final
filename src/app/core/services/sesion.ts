@@ -67,6 +67,17 @@ export class SesionService {
     return data ? sesionDtoToDomain(data) : null;
   }
 
+  async esOrganizadorDeSesion(sesionId: string, usuarioId: string): Promise<boolean> {
+    const { data, error } = await this.supabase.client
+      .from('sesiones')
+      .select('organizador_id')
+      .eq('id', sesionId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data?.organizador_id === usuarioId;
+  }
+
   async obtenerMisSesiones(usuarioId: string): Promise<SesionConRol[]> {
     if (!usuarioId.trim()) {
       throw new Error('El ID de usuario es inválido');
@@ -143,38 +154,22 @@ export class SesionService {
     if (!data) throw new Error('No se eliminó la sesión. Verifica que tengas permisos para eliminarla.');
   }
 
-  async unirseASesion(
-    codigo: string,
-    nombreCatador: string
-  ): Promise<{ sesion: Sesion; participante: Participante }> {
+  async unirseASesion(codigo: string): Promise<{ sesion: Sesion }> {
     const codigoNormalizado = codigo.trim().toUpperCase();
-    const nombre = nombreCatador.trim() || 'Catador Invitado';
     if (!codigoNormalizado) {
       throw new Error('El código es obligatorio');
     }
 
+    const { error: joinError } = await this.supabase.client.rpc('unirse_sesion', {
+      p_codigo: codigoNormalizado
+    });
+    if (joinError) throw joinError;
+
     const sesion = await this.obtenerSesionPorCodigo(codigoNormalizado);
     if (!sesion || !sesion.id) {
-      throw new Error('No se encontró ninguna sesión con ese código');
+      throw new Error('Te uniste, pero no se pudo cargar la sesión. Intenta actualizar el panel.');
     }
-    if (sesion.estado !== EstadoSesion.EN_ESPERA) {
-      throw new Error('La sesión ya ha iniciado o finalizado');
-    }
-
-    const { data: { user }, error: userError } = await this.supabase.client.auth.getUser();
-    if (userError) throw userError;
-    if (!user?.id?.trim()) {
-      throw new Error('No hay sesión de autenticación activa');
-    }
-
-    const participante = await this.insertarParticipanteSeguro({
-      sesionId: sesion.id,
-      usuarioId: user.id,
-      nombre,
-      esOrganizador: false,
-      listo: true
-    });
-    return { sesion, participante };
+    return { sesion };
   }
 
   async marcarComoListo(participanteId: string, listo = true): Promise<void> {
@@ -187,12 +182,26 @@ export class SesionService {
   }
 
   async iniciarSesion(sesionId: string): Promise<void> {
-    const { error } = await this.supabase.client
-      .from('sesiones')
-      .update({ estado: 'en_progreso' })
-      .eq('id', sesionId);
+    const { data, error } = await this.supabase.client.rpc('iniciar_sesion', {
+      p_sesion_id: sesionId
+    });
+    if (error) throw error;
+    if (data === false) throw new Error('Supabase rechazó el inicio de la sesión.');
+  }
+
+  async obtenerParticipantes(sesionId: string): Promise<Participante[]> {
+    const idLimpio = sesionId?.trim();
+    if (!idLimpio) {
+      throw new Error('ID de sesión inválido');
+    }
+
+    const { data, error } = await this.supabase.client
+      .from('participantes')
+      .select('*')
+      .eq('sesion_id', idLimpio);
 
     if (error) throw error;
+    return data.map(participanteDtoToDomain);
   }
 
   observarParticipantes(sesionId: string): Observable<Participante[]> {

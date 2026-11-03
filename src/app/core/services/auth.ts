@@ -15,10 +15,22 @@ export class AuthService {
     return data;
   }
 
-  async loginAnonimo() {
-    const { data, error } = await this.supabase.client.auth.signInAnonymously();
+  async obtenerRolGlobal(usuarioId: string): Promise<string> {
+    const id = usuarioId.trim();
+    if (!id) throw new Error('El ID del usuario es obligatorio.');
+
+    const { data, error } = await this.supabase.client
+      .from('usuarios')
+      .select('rol_global')
+      .eq('id', id)
+      .maybeSingle();
+
     if (error) throw error;
-    return data;
+    if (!data?.rol_global) {
+      throw new Error('La cuenta no tiene un rol asignado. Contacta al administrador.');
+    }
+
+    return data.rol_global;
   }
 
   async registro(email: string, password: string, nombre: string) {
@@ -44,23 +56,10 @@ export class AuthService {
         acepto_politica_en: new Date().toISOString(),
         version_politica_aceptada: '1.0'
       };
-      try {
-        const { error: dbError } = await this.supabase.client
-          .from('usuarios')
-          .insert([nuevoUsuario]);
-
-        if (dbError) {
-          console.warn(
-            '[AuthService.registro] Usuario creado en Auth pero falló INSERT en usuarios:',
-            dbError
-          );
-        }
-      } catch (dbError) {
-        console.warn(
-          '[AuthService.registro] Excepción al crear perfil (se ignorará):',
-          dbError
-        );
-      }
+      const { error: dbError } = await this.supabase.client
+        .from('usuarios')
+        .insert([nuevoUsuario]);
+      if (dbError) throw dbError;
     }
     return authData;
   }

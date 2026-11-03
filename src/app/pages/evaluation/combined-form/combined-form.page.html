@@ -360,8 +360,9 @@
           <button
             type="button"
             class="submit-btn"
-            (click)="irAMuestraSiguiente()">
-            {{ muestraActual === totalMuestras ? 'Terminar cata' : 'Siguiente muestra →' }}
+            (click)="irAMuestraSiguiente()"
+            [disabled]="guardando">
+            {{ guardando ? 'Guardando…' : (muestraActual === totalMuestras ? 'Terminar cata' : 'Siguiente muestra →') }}
           </button>
         </div>
       </aside>

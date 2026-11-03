@@ -215,17 +215,46 @@ export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
 
     const alert = await this.alertCtrl.create({
       header: 'Finalizar cata',
-      message: 'Las respuestas están completas, pero todavía no existe guardado en el servidor. Si sales, perderás esta evaluación.',
+      message: 'Se guardarán las respuestas de todas las muestras antes de finalizar.',
       buttons: [
         { text: 'Seguir evaluando', role: 'cancel' },
         {
-          text: 'Salir sin guardar',
-          role: 'destructive',
-          handler: () => this.navCtrl.navigateRoot('/dashboard')
+          text: 'Guardar y finalizar',
+          handler: () => this.finalizarYGuardar()
         }
       ]
     });
     await alert.present();
+  }
+
+  private async finalizarYGuardar(): Promise<void> {
+    await super.finalizarCata();
+  }
+
+  protected override calcularPuntajeFinal(respuesta: FormularioCombinado): number | null {
+    const atributos = respuesta.atributos;
+    const calidades = [
+      atributos.fragancia.calidad,
+      atributos.aroma.calidad,
+      atributos.sabor.calidad,
+      atributos.saborResidual.calidad,
+      atributos.acidez.calidad,
+      atributos.dulzor.calidad,
+      atributos.sensacionEnBoca.calidad,
+      respuesta.impresionGlobal
+    ];
+    if (calidades.some(calidad => !Number.isInteger(calidad) || calidad < 1 || calidad > 9)) {
+      return null;
+    }
+
+    const suma = calidades.reduce((total, calidad) => total + calidad, 0);
+    const tazasDefectuosas = Math.max(
+      respuesta.defectos.tazasDefectuosas,
+      respuesta.tiposDefecto.length > 0 ? 1 : 0
+    );
+    const puntaje = 0.65625 * suma + 52.75 -
+      (2 * respuesta.defectos.tazasNoUniformes) - (4 * tazasDefectuosas);
+    return Math.max(0, Math.min(100, Math.round(puntaje * 4) / 4));
   }
 
   protected override esRespuestaCompleta(respuesta: FormularioCombinado): boolean {

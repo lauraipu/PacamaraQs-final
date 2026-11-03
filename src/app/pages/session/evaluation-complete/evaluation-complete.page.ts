@@ -1,53 +1,95 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { IonButton, IonContent } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { checkmarkCircleOutline, lockClosedOutline } from 'ionicons/icons';
+
+import {
+  IonContent,
+  IonIcon,
+  IonButton,
+  NavController
+} from '@ionic/angular';
+
 import { SupabaseService } from '../../../core/services/supabase';
+
+addIcons({ checkmarkCircleOutline, lockClosedOutline });
 
 @Component({
   selector: 'app-evaluation-complete',
   templateUrl: './evaluation-complete.page.html',
   styleUrls: ['./evaluation-complete.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonButton, IonContent, RouterLink]
+  imports: [
+    CommonModule,
+    IonContent,
+    IonIcon,
+    IonButton
+  ]
 })
 export class EvaluationCompletePage implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private supabase = inject(SupabaseService).client;
+  private navCtrl = inject(NavController);
+
+  sesionId = '';
   esOrganizador = false;
-  sesionId: string | null = null;
+  nombreSesion = '';
+  codigoSesion = '';
   error: string | null = null;
+  cargando = true;
 
-  private readonly supabase = inject(SupabaseService);
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-
-  async ngOnInit(): Promise<void> {
-    this.sesionId = this.route.snapshot.paramMap.get('id');
+  async ngOnInit() {
+    this.sesionId = this.route.snapshot.paramMap.get('id')?.trim() ?? '';
     if (!this.sesionId) {
-      this.error = 'No se encontró la sesión.';
+      this.error = 'No se encontró el ID de la sesión.';
+      this.cargando = false;
       return;
     }
 
     try {
-      const { data: { user }, error: authError } = await this.supabase.client.auth.getUser();
-      if (authError) throw authError;
-      if (!user) return;
+      const { data: { user }, error: userError } = await this.supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!user) {
+        await this.router.navigateByUrl('/login', { replaceUrl: true });
+        return;
+      }
 
-      const { data, error: sessionError } = await this.supabase.client
+      const { data: sesion, error: sesionError } = await this.supabase
         .from('sesiones')
-        .select('organizador_id')
+        .select('nombre, organizador_id')
         .eq('id', this.sesionId)
-        .single();
-      if (sessionError) throw sessionError;
+        .maybeSingle();
+      if (sesionError) throw sesionError;
+      if (!sesion) throw new Error('No se encontró la sesión.');
 
-      this.esOrganizador = data?.organizador_id === user.id;
-    } catch {
-      this.error = 'No fue posible verificar tu rol en esta sesión.';
+      this.nombreSesion = sesion.nombre;
+      this.esOrganizador = sesion.organizador_id === user.id;
+
+      if (this.esOrganizador) {
+        const { data: codigo, error: codigoError } = await this.supabase
+          .from('sesiones')
+          .select('codigo_sesion')
+          .eq('id', this.sesionId)
+          .eq('organizador_id', user.id)
+          .maybeSingle();
+        if (codigoError) throw codigoError;
+        this.codigoSesion = codigo?.codigo_sesion ?? '';
+      }
+    } catch (error) {
+      this.error = error instanceof Error ? error.message : 'No se pudo cargar la sesión.';
+    } finally {
+      this.cargando = false;
     }
   }
 
-  irAResultados(): void {
-    if (this.sesionId) {
-      void this.router.navigate(['/session', this.sesionId, 'results']);
-    }
+  async irAResultados(): Promise<void> {
+    if (!this.esOrganizador || !this.sesionId) return;
+    await this.router.navigateByUrl(`/session/${this.sesionId}/results`);
+  }
+
+  volverAlPanel() {
+    this.navCtrl.navigateRoot('/dashboard');
   }
 }

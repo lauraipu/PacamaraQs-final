@@ -1,8 +1,8 @@
 export enum EstadoSesion {
-  EN_ESPERA = 'EN_ESPERA',
-  INICIADA = 'INICIADA',
-  FINALIZADA = 'FINALIZADA',
-  CANCELADA = 'CANCELADA'
+  EN_ESPERA = 'esperando',
+  INICIADA = 'en_progreso',
+  FINALIZADA = 'completada',
+  CANCELADA = 'cancelada'
 }
 
 export const FormatoCva = {

@@ -210,12 +210,10 @@ export class CreateSessionPage {
       return;
     }
 
-    if (this.formatoSeleccionado === FormatoCva.EXTRINSECA.id) {
-      await this.router.navigate(['/extrinsic-form', this.sesionIdGenerado]);
-      return;
-    }
-
-    await this.router.navigate(['/session/waiting', this.sesionIdGenerado]);
+    const ruta = this.formatoSeleccionado === FormatoCva.EXTRINSECA.id
+      ? `/extrinsic-form/${this.sesionIdGenerado}`
+      : `/session/waiting/${this.sesionIdGenerado}`;
+    await this.router.navigateByUrl(ruta, { replaceUrl: true });
   }
 
   private async registrarOrganizador(): Promise<void> {
@@ -223,6 +221,7 @@ export class CreateSessionPage {
       this.sesionIdGenerado,
       this.organizadorId,
       this.organizadorNombre,
+      true,
       true
     );
     this.organizadorPendiente = false;

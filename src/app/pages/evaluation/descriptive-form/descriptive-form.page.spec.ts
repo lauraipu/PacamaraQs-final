@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { SesionService } from '../../../core/services/sesion';
 import { DescriptiveFormPage } from './descriptive-form.page';
 
@@ -13,6 +13,7 @@ describe('DescriptiveFormPage', () => {
       providers: [
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: SesionService, useValue: { obtenerSesionPorId: vi.fn() } },
+        { provide: AlertController, useValue: { create: vi.fn() } },
         { provide: ToastController, useValue: { create: vi.fn() } }
       ]
     });

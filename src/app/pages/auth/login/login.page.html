@@ -42,7 +42,7 @@
         expand="block"
         type="submit"
         class="btn-login"
-        [disabled]="isLoading || isLoadingAnonimo"
+        [disabled]="isLoading"
       >
         @if (isLoading) {
           <ion-spinner name="crescent"></ion-spinner>
@@ -51,20 +51,6 @@
         }
       </ion-button>
 
-      <ion-button
-        expand="block"
-        fill="outline"
-        class="guest-btn"
-        type="button"
-        (click)="loginAnonimo()"
-        [disabled]="isLoading || isLoadingAnonimo"
-      >
-        @if (isLoadingAnonimo) {
-          <ion-spinner name="crescent"></ion-spinner>
-        } @else {
-          <span>Entrar como invitado (catador)</span>
-        }
-      </ion-button>
     </form>
 
     <p class="register-link">

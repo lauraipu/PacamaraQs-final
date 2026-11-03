@@ -1,0 +1,59 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar style="--background: #FFF;">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <div style="font-size: 15px; font-weight: bold; color: #0F172B;">Resultados Finales</div>
+      <div style="font-size: 12px; color: #62748E;">{{ resultados?.nombreSesion }}</div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" style="--background: #F8FAFC;">
+  @if (cargando) {
+    <div style="text-align: center; padding: 40px;">
+      <ion-spinner name="crescent" color="dark"></ion-spinner>
+    </div>
+  }
+
+  @if (!cargando && error) {
+    <div role="alert" style="text-align: center; padding: 24px;">
+      <p>{{ error }}</p>
+      <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
+    </div>
+  }
+
+  @if (!cargando && resultados) {
+    <div class="results-container">
+      <!-- 1. Progreso del Panel -->
+      <app-progress-tracker
+        [completados]="resultados.catadores.length"
+        [total]="resultados.totalCatadores">
+      </app-progress-tracker>
+
+      <!-- 2. Consolidado por Muestra -->
+      <h3 class="section-title">Consolidado por Muestra</h3>
+      @for (muestra of resultados.muestras; track muestra.numeroMuestra) {
+        <app-sample-result-card [muestra]="muestra"></app-sample-result-card>
+      }
+
+      <!-- 3. Consolidado por Catador -->
+      <h3 class="section-title">Análisis de Catadores</h3>
+      @for (catador of resultados.catadores; track catador.cupperId) {
+        <app-cupper-result-card [catador]="catador"></app-cupper-result-card>
+      }
+
+      <!-- Botones de Acción -->
+      <div class="action-buttons">
+        <ion-button expand="block" color="dark" (click)="exportarPDF()">
+          Exportar a PDF (Formato SCA)
+        </ion-button>
+        <ion-button expand="block" fill="outline" (click)="volverAlPanel()">
+          Volver al Panel
+        </ion-button>
+      </div>
+
+    </div>
+  }
+</ion-content>

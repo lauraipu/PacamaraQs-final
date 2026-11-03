@@ -98,10 +98,28 @@ describe('WaitingRoomPage', () => {
     expect(iniciarSesion).not.toHaveBeenCalled();
   });
 
+  it('requires three ready participants before enabling the start action', () => {
+    component.participantes = [
+      { id: '1', sesionId: 'session-id', usuarioId: 'user-1', nombre: 'Ana', esOrganizador: false, listo: true },
+      { id: '2', sesionId: 'session-id', usuarioId: 'user-2', nombre: 'Beto', esOrganizador: false, listo: true },
+      { id: '3', sesionId: 'session-id', usuarioId: 'user-3', nombre: 'Cami', esOrganizador: false, listo: false }
+    ];
+
+    expect(component.participantes.length).toBe(3);
+    expect(component.participantesListos).toBe(2);
+    expect(component.puedeIniciar).toBe(false);
+
+    component.participantes[2].listo = true;
+    expect(component.puedeIniciar).toBe(true);
+  });
+
   it('redirects all participants when the session starts', async () => {
     const router = TestBed.inject(Router);
     const navigateByUrl = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
     await fixture.whenStable();
+    component.participantes = [
+      { id: '1', sesionId: 'session-id', usuarioId: 'user-id', nombre: 'Ana', esOrganizador: true, listo: true }
+    ];
 
     sesionUpdates.next({
       id: 'session-id',
@@ -118,5 +136,33 @@ describe('WaitingRoomPage', () => {
 
     expect(navigateByUrl).toHaveBeenCalledTimes(1);
     expect(navigateByUrl).toHaveBeenCalledWith('/affective-form/session-id', { replaceUrl: true });
+  });
+
+  it('redirects an organizer who is not a taster to the monitoring dashboard', async () => {
+    const router = TestBed.inject(Router);
+    const navigateByUrl = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    await fixture.whenStable();
+    component.participantes = [
+      { id: '1', sesionId: 'session-id', usuarioId: 'user-2', nombre: 'Beto', esOrganizador: false, listo: true },
+      { id: '2', sesionId: 'session-id', usuarioId: 'user-3', nombre: 'Cami', esOrganizador: false, listo: true }
+    ];
+
+    sesionUpdates.next({
+      id: 'session-id',
+      codigoAcceso: 'AB12-3C4',
+      nombre: 'Cosecha',
+      formato: 'afectivo',
+      numeroMuestras: 6,
+      catadoresObjetivo: 5,
+      organizadorId: 'user-id',
+      organizadorParticipa: false,
+      estado: EstadoSesion.INICIADA
+    });
+    await fixture.whenStable();
+
+    expect(navigateByUrl).toHaveBeenCalledWith(
+      '/session/session-id/organizer-dashboard',
+      { replaceUrl: true }
+    );
   });
 });

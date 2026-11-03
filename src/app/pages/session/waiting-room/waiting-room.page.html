@@ -59,7 +59,7 @@
           <h3 class="section-title">
             <ion-icon name="people-outline"></ion-icon> CATADORES CONECTADOS
           </h3>
-          <span class="list-subtitle">{{ participantes.length }} listos · mín. 3 para iniciar</span>
+          <span class="list-subtitle">{{ participantesListos }} listos · mín. 3 para iniciar</span>
         </div>
 
         @if (participantes.length > 0) {
@@ -95,20 +95,22 @@
         <p>Evaluación 100% ciega. Puedes ver quién se ha unido, pero no verás ninguna evaluación ni puntaje hasta el cierre automático del panel.</p>
       </section>
 
-      @if (esOrganizador) {
+      @if (esOrganizador && sesion && sesion.estado === EstadoSesion.EN_ESPERA) {
         <div class="start-button-container">
           <ion-button
             expand="block"
             class="primary-btn"
             (click)="iniciarCata()"
-            [disabled]="iniciando || !sesion || participantes.length < 3"
+            [disabled]="!puedeIniciar"
           >
             @if (iniciando) {
               Iniciando…
-            } @else if (participantes.length < 3) {
-              Iniciar cata (mín. 3 catadores — faltan {{ 3 - participantes.length }})
+            } @else if (organizadorParticipaComoCatador) {
+              Iniciar cata · {{ participantesListos }} catadores listos
+            } @else if (participantesListos < 3) {
+              Iniciar y monitorear (mín. 3 — faltan {{ 3 - participantesListos }})
             } @else {
-              Iniciar cata · {{ participantes.length }} catadores listos
+              Iniciar y monitorear · {{ participantesListos }} catadores listos
             }
           </ion-button>
         </div>

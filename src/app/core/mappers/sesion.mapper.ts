@@ -8,7 +8,10 @@ import {
 
 export function sesionDtoToDomain(dto: SesionDto): Sesion {
   let estado: EstadoSesion;
-  switch (dto.estado) {
+  // Normalizamos el estado por si viene con mayúsculas o espacios
+  const estadoNormalizado = (dto.estado || '').toLowerCase().trim();
+
+  switch (estadoNormalizado) {
     case 'en_progreso':
       estado = EstadoSesion.INICIADA;
       break;
@@ -18,6 +21,7 @@ export function sesionDtoToDomain(dto: SesionDto): Sesion {
     case 'cancelada':
       estado = EstadoSesion.CANCELADA;
       break;
+    case 'esperando':
     default:
       estado = EstadoSesion.EN_ESPERA;
   }
@@ -62,7 +66,7 @@ export function sesionToDto(domain: Sesion): SesionDto {
       estado = 'cancelada';
       break;
     default:
-      estado = 'esperando';
+      estado = 'esperando'; // IMPORTANTE: en minúscula, como pide Supabase
   }
 
   return {
@@ -82,7 +86,6 @@ export function sesionToDto(domain: Sesion): SesionDto {
 export function participanteToDto(domain: Participante): ParticipanteDto {
   const dto: ParticipanteDto = {
     sesion_id: domain.sesionId,
-    // Sanitización: string vacío produce error 22P02 en PostgreSQL (invalid uuid syntax)
     usuario_id: domain.usuarioId && domain.usuarioId.trim() ? domain.usuarioId.trim() : null,
     nombre: domain.nombre.trim(),
     es_organizador: domain.esOrganizador,
@@ -90,9 +93,6 @@ export function participanteToDto(domain: Participante): ParticipanteDto {
     unido_en: domain.unidoEn ?? new Date().toISOString()
   };
 
-  // Solo incluir 'id' si ya existe (flujo de actualización).
-  // En inserts NUNCA enviar 'id: null': PostgreSQL lo rechaza con NOT NULL violation (23502)
-  // en lugar de ejecutar el DEFAULT gen_random_uuid().
   if (domain.id && domain.id.trim()) {
     dto.id = domain.id.trim();
   }

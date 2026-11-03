@@ -1,17 +1,47 @@
-<ion-content class="ion-padding">
-  <main>
-    <h1>¡Gracias por completar la evaluación!</h1>
-    <p>Tu participación ha sido registrada.</p>
+<ion-content class="ion-padding" style="--background: #F8FAFC;">
+  <div class="complete-container">
+
+    <div class="icon-wrapper">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+    </div>
+
+    <h1 class="title">Cata finalizada</h1>
+    <p class="subtitle">Gracias por completar la sesión. Consulta al organizador si necesitas confirmar el registro de tu evaluación.</p>
 
     @if (error) {
-      <p role="alert">{{ error }}</p>
+      <p class="subtitle" role="alert">{{ error }}</p>
     }
 
-    <ion-button *ngIf="esOrganizador" (click)="irAResultados()">
-      Ver resultados del panel →
-    </ion-button>
-    <ion-button *ngIf="!esOrganizador" routerLink="/dashboard">
+    <div class="info-card">
+      <div class="info-row">
+        <span class="info-label">Sesión</span>
+        <span class="info-value">{{ nombreSesion }}</span>
+      </div>
+      @if (esOrganizador && codigoSesion) {
+        <div class="info-row">
+          <span class="info-label">Código</span>
+          <span class="info-value">{{ codigoSesion }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="privacy-card">
+      <ion-icon name="lock-closed-outline"></ion-icon>
+      <div>
+        <h4>Los resultados permanecen reservados</h4>
+        <p>Para proteger la evaluación ciega, los catadores no tienen acceso a los puntajes hasta que el organizador consolide el panel.</p>
+      </div>
+    </div>
+
+    @if (esOrganizador) {
+      <ion-button expand="block" class="primary-btn" (click)="irAResultados()">
+        Ver resultados del panel →
+      </ion-button>
+    }
+
+    <ion-button expand="block" fill="outline" style="--border-color: #E2E8F0; --color: #0F172B;" (click)="volverAlPanel()">
       Volver al panel principal
     </ion-button>
-  </main>
+
+  </div>
 </ion-content>

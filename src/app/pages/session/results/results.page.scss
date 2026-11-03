@@ -1,0 +1,22 @@
+.results-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172B;
+  margin: 24px 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.action-buttons {
+  margin-top: 32px;
+  ion-button {
+    --border-radius: 8px;
+    height: 48px;
+    font-weight: 600;
+    text-transform: none;
+    margin-bottom: 12px;
+  }
+}

@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { RUEDA_SABORES, TIPOS_DEFECTO } from '../../../core/cva/cva';
+import { AuthService } from '../../../core/services/auth';
+import { EvaluationService } from '../../../core/services/evaluation';
 import { SesionService } from '../../../core/services/sesion';
 import { CombinedFormPage } from './combined-form.page';
 
@@ -11,9 +13,19 @@ describe('CombinedFormPage', () => {
   const obtenerSesionPorId = vi.fn();
   const createAlert = vi.fn();
   const createToast = vi.fn();
+  const navigateRoot = vi.fn();
+  const getUser = vi.fn();
+  const esOrganizadorDeSesion = vi.fn();
+  const crearEvaluacion = vi.fn();
+  const guardarAtributos = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+    navigateRoot.mockResolvedValue(true);
+    getUser.mockResolvedValue({ user: { id: 'user-id' } });
+    esOrganizadorDeSesion.mockResolvedValue(false);
+    crearEvaluacion.mockResolvedValue('evaluation-id');
+    guardarAtributos.mockResolvedValue(undefined);
     obtenerSesionPorId.mockResolvedValue({
       id: 'session-id',
       numeroMuestras: 3
@@ -24,11 +36,14 @@ describe('CombinedFormPage', () => {
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: { snapshot: { paramMap: { get: () => null } } }
+          useValue: { snapshot: { paramMap: { get: () => 'session-id' } } }
         },
-        { provide: SesionService, useValue: { obtenerSesionPorId } },
+        { provide: SesionService, useValue: { obtenerSesionPorId, esOrganizadorDeSesion } },
+        { provide: AuthService, useValue: { getUser } },
+        { provide: EvaluationService, useValue: { crearEvaluacion, guardarAtributos } },
         { provide: AlertController, useValue: { create: createAlert } },
-        { provide: ToastController, useValue: { create: createToast } }
+        { provide: ToastController, useValue: { create: createToast } },
+        { provide: NavController, useValue: { navigateRoot } }
       ]
     });
     fixture = TestBed.createComponent(CombinedFormPage);
@@ -155,7 +170,7 @@ describe('CombinedFormPage', () => {
     expect(createAlert).toHaveBeenCalledTimes(1);
   });
 
-  it('warns that results are not persisted when all samples are complete', async () => {
+  it('saves every sample before navigating to the completion page', async () => {
     for (const respuesta of component.respuestas) {
       respuesta.atributos.fragancia.calidad = 5;
       respuesta.atributos.aroma.calidad = 5;
@@ -170,12 +185,53 @@ describe('CombinedFormPage', () => {
     await component.finalizarCata();
 
     const alertOptions = createAlert.mock.calls[0][0];
-    expect(alertOptions.message).toContain('no existe guardado en el servidor');
+    expect(alertOptions.message).toContain('Se guardarán las respuestas');
     expect(alertOptions.buttons.map((button: { text: string }) => button.text))
-      .toContain('Salir sin guardar');
+      .toContain('Guardar y finalizar');
+
+    await alertOptions.buttons[1].handler();
+    expect(crearEvaluacion).toHaveBeenCalledTimes(3);
+    expect(crearEvaluacion).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      sesion_id: 'session-id',
+      catador_id: 'user-id',
+      numero_muestra: 1,
+      impresion_global: 5,
+      puntaje_final: 79
+    }));
+    expect(guardarAtributos).toHaveBeenCalledTimes(3);
+    expect(esOrganizadorDeSesion).toHaveBeenCalledWith('session-id', 'user-id');
+    expect(navigateRoot).toHaveBeenCalledWith(
+      '/session/session-id/evaluation-complete?organizador=0'
+    );
+  });
+
+  it('stays on the form and shows the database error when saving fails', async () => {
+    for (const respuesta of component.respuestas) {
+      respuesta.atributos.fragancia.calidad = 5;
+      respuesta.atributos.aroma.calidad = 5;
+      respuesta.atributos.sabor.calidad = 5;
+      respuesta.atributos.saborResidual.calidad = 5;
+      respuesta.atributos.acidez.calidad = 5;
+      respuesta.atributos.dulzor.calidad = 5;
+      respuesta.atributos.sensacionEnBoca.calidad = 5;
+      respuesta.impresionGlobal = 5;
+    }
+    crearEvaluacion.mockRejectedValueOnce(new Error('permission denied'));
+
+    await component.finalizarCata();
+    const alertOptions = createAlert.mock.calls[0][0];
+    await alertOptions.buttons[1].handler();
+
+    const saveErrorAlert = createAlert.mock.calls[1][0];
+    expect(saveErrorAlert.header).toBe('No se pudo guardar');
+    expect(saveErrorAlert.message).toContain('permission denied');
+    expect(navigateRoot).not.toHaveBeenCalled();
   });
 
   it('reports a missing session ID from the route', async () => {
+    const route = TestBed.inject(ActivatedRoute);
+    vi.spyOn(route.snapshot.paramMap, 'get').mockReturnValue(null);
+    obtenerSesionPorId.mockClear();
     await component.ngOnInit();
 
     expect(component.error).toBe('No se encontró el ID de la sesión.');
