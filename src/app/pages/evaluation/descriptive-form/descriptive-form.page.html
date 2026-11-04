@@ -82,6 +82,16 @@
           </div>
         </article>
 
+        <!-- GUSTOS PREDOMINANTES (2) — hoja SCA, bloque de Sabor / Sabor residual -->
+        <article class="attr-card">
+          <h3 class="attr-card__title">Gustos Predominantes (2)</h3>
+          <app-gustos-predominantes
+            [seleccion]="formulario.gustosPredominantes"
+            [deshabilitado]="muestraActualCerrada()"
+            (seleccionChange)="cambiarGustos($event)">
+          </app-gustos-predominantes>
+        </article>
+
         <article class="attr-card">
           <h3 class="attr-card__title">Acidez</h3>
           <div class="intensity-slider">

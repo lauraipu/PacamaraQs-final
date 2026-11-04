@@ -1,0 +1,164 @@
+<ion-content class="cva-combined" [scrollY]="true">
+  <app-estado-ficha
+    [pendientes]="pendientesLocales()"
+    [enLinea]="enLinea()"
+    [muestraCerrada]="muestraActualCerrada()"
+    [rechazo]="rechazoActual()"
+    [esperandoFinalizar]="esperandoSincronizacion()"
+    (reintentar)="reintentarSincronizacion()"
+    (salir)="salirConPendientes()">
+  </app-estado-ficha>
+  <header class="cva-header">
+    <div class="cva-header__inner">
+      <div class="cva-header__left">
+        <button type="button" class="cva-header__back-btn" aria-label="Volver" (click)="volver()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        <div class="cva-header__meta">
+          <p class="cva-header__session-name">Evaluación Descriptiva</p>
+          <p class="cva-header__sample-label">Muestra {{ muestraActual() }} <span>de {{ totalMuestras() }}</span></p>
+        </div>
+      </div>
+      <div class="cva-header__right">
+        <span class="cva-header__format-badge">Descriptivo</span>
+      </div>
+    </div>
+    <div class="cva-header__progress-bar-wrap">
+      <div class="cva-header__progress-bar">
+        <div class="cva-header__progress-bar-fill" [style.width]="(muestraActual() / totalMuestras()) * 100 + '%'"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="cva-main">
+    <div class="cva-main__grid">
+      <div class="cva-main__column">
+        <article class="attr-card" *ngFor="let atributo of atributosAromaticos">
+          <h3 class="attr-card__title">{{ atributo.label }}</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física (0-15)</span>
+              <span class="intensity-slider__value">{{ formulario[atributo.key].intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario[atributo.key].intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+
+          <div class="flavor-tree">
+            <p class="flavor-tree__section-label">Descriptores aromáticos</p>
+            <div class="flavor-tree__category" *ngFor="let categoria of ruedaKeys">
+              <button type="button" class="flavor-tree__category-btn" (click)="toggleCategoria(categoria)">
+                <span class="flavor-tree__category-left">
+                  <ion-icon
+                    [name]="categoriasAbiertas[categoria] ? 'chevron-down-outline' : 'chevron-forward-outline'"
+                    class="flavor-tree__chevron">
+                  </ion-icon>
+                  <span class="flavor-tree__swatch" [style.background]="ruedaSabores[categoria].color"></span>
+                  {{ categoria }}
+                </span>
+              </button>
+              <div class="flavor-tree__sub-list" *ngIf="categoriasAbiertas[categoria]">
+                <button
+                  type="button"
+                  *ngFor="let descriptor of ruedaSabores[categoria].subdescriptores"
+                  class="flavor-tree__descriptor-btn"
+                  [class.flavor-tree__descriptor-btn--selected]="isDescriptorSelected(atributo.key, descriptor)"
+                  [style.background]="isDescriptorSelected(atributo.key, descriptor) ? ruedaSabores[categoria].color : ''"
+                  [style.color]="isDescriptorSelected(atributo.key, descriptor) ? 'white' : ''"
+                  (click)="toggleDescriptor(atributo.key, descriptor)">
+                  {{ descriptor }}
+                </button>
+              </div>
+            </div>
+            <input
+              type="text"
+              class="extra-descriptor"
+              [attr.aria-label]="'Descriptor personalizado para ' + atributo.label"
+              placeholder="Agregar descriptor personalizado..."
+              [(ngModel)]="formulario[atributo.key].extra">
+          </div>
+        </article>
+
+        <article class="attr-card">
+          <h3 class="attr-card__title">Acidez</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física (0-15)</span>
+              <span class="intensity-slider__value">{{ formulario.acidez.intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario.acidez.intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+          <div class="notes-panel" style="margin-top:16px;">
+            <div class="notes-panel__header">Notas de acidez (ej. cítrica, málica)</div>
+            <textarea class="notes-panel__textarea" rows="2" [(ngModel)]="formulario.acidez.nota"></textarea>
+          </div>
+        </article>
+
+        <article class="attr-card">
+          <h3 class="attr-card__title">Dulzor</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física (0-15)</span>
+              <span class="intensity-slider__value">{{ formulario.dulzor.intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario.dulzor.intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="attr-card">
+          <h3 class="attr-card__title">Sensación en Boca</h3>
+          <div class="intensity-slider">
+            <div class="intensity-slider__header">
+              <span class="intensity-slider__label">Intensidad física (0-15)</span>
+              <span class="intensity-slider__value">{{ formulario.sensacionEnBoca.intensidad | number:'1.1-1' }}</span>
+            </div>
+            <div class="intensity-slider__track">
+              <span class="intensity-slider__endpoint">Baja</span>
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario.sensacionEnBoca.intensidad">
+              <span class="intensity-slider__endpoint">Alta</span>
+            </div>
+          </div>
+          <div class="mouthfeel">
+            <p class="flavor-tree__section-label">Texturas táctiles</p>
+            <div class="mouthfeel__list">
+              <label class="mouthfeel__item" *ngFor="let textura of texturas">
+                <input type="checkbox" [checked]="formulario.sensacionEnBoca.textura.includes(textura)" (change)="toggleTextura(textura)">
+                {{ textura }}
+              </label>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <aside class="cva-main__sidebar">
+        <div class="notes-panel">
+          <div class="notes-panel__header">Notas adicionales</div>
+          <textarea class="notes-panel__textarea" rows="5" [(ngModel)]="formulario.notas" placeholder="Observaciones descriptivas..."></textarea>
+        </div>
+        <div class="sample-navigation">
+          <button
+            *ngIf="muestraActual() > 1"
+            type="button"
+            class="submit-btn sample-navigation__previous"
+            (click)="irAMuestraAnterior()">
+            ← Anterior
+          </button>
+          <button type="button" class="submit-btn" (click)="irAMuestraSiguiente()" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : (muestraActual() === totalMuestras() ? 'Terminar cata' : 'Siguiente muestra →') }}
+          </button>
+        </div>
+      </aside>
+    </div>
+  </main>
+</ion-content>

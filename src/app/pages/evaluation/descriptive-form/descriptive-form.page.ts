@@ -6,6 +6,7 @@ import { addIcons } from 'ionicons';
 import { arrowBackOutline, chevronDownOutline, chevronForwardOutline } from 'ionicons/icons';
 import { BaseCataForm } from '../../../core/cva/base-cata-form';
 import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
+import { GustosPredominantesComponent } from '../../../shared/components/gustos-predominantes/gustos-predominantes.component';
 import { RUEDA_SABORES } from '../../../core/cva/cva';
 
 addIcons({ arrowBackOutline, chevronDownOutline, chevronForwardOutline });
@@ -26,6 +27,8 @@ interface FormularioDescriptivo {
   acidez: { intensidad: number; nota: string };
   dulzor: { intensidad: number; nota: string };
   sensacionEnBoca: { intensidad: number; textura: string[] };
+  /** Hoja SCA "Gustos Predominantes (2)": máximo 2 de salado/amargo/acido/umami/dulce. */
+  gustosPredominantes: string[];
   notas: string;
 }
 
@@ -33,7 +36,7 @@ interface FormularioDescriptivo {
   selector: 'app-descriptive-form',
   templateUrl: './descriptive-form.page.html',
   standalone: true,
-  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent]
+  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, GustosPredominantesComponent]
 })
 export class DescriptiveFormPage extends BaseCataForm<FormularioDescriptivo> {
   override formulario: FormularioDescriptivo = this.crearFormularioVacio();
@@ -60,8 +63,14 @@ export class DescriptiveFormPage extends BaseCataForm<FormularioDescriptivo> {
       acidez: { intensidad: 0, nota: '' },
       dulzor: { intensidad: 0, nota: '' },
       sensacionEnBoca: { intensidad: 0, textura: [] },
+      gustosPredominantes: [],
       notas: ''
     };
+  }
+
+  /** Guarda la selección (máx. 2) en el JSON del formulario. */
+  cambiarGustos(gustos: string[]): void {
+    this.formulario.gustosPredominantes = gustos.slice(0, 2);
   }
 
   toggleCategoria(categoria: string): void {

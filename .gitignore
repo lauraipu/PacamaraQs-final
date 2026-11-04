@@ -71,5 +71,3 @@ Thumbs.db
 
 
 
-# Environment variables (API Keys)
-src/environments/environment.ts

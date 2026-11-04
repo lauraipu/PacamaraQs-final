@@ -1,18 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import {
-  construirPrompt, extraerJson, FichaEscaneada, FormatoEscaneo, FORMATOS_ESCANEO, payloadFichaPersonal,
-  respuestaSimulada, sanearFicha
+  extraerJson, FichaEscaneada, FORMATOS_ESCANEO, payloadFichaPersonal, respuestaSimulada, sanearFicha
 } from '../scanner/ficha-escaneada';
 import { AuthService } from './auth';
 import { OfflineSyncService, ResultadoEnvio } from './offline-sync';
 import { SupabaseService } from './supabase';
 
-/** Valor de ejemplo del archivo de entorno: mientras esté así, se simula la IA. */
-export const LLAVE_DE_EJEMPLO = 'PONER_LLAVE_AQUI';
-
-const ENDPOINT_GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models';
-const TIEMPO_MAXIMO_IA_MS = 60_000;
+/** Edge Function de Supabase que guarda la llave de Gemini y arma el prompt. */
+const FUNCION_IA = 'analizar-ficha';
 const LADO_MAXIMO_PX = 1600;
 const TAMANO_MAXIMO_BYTES = 15 * 1024 * 1024;
 
@@ -27,19 +23,18 @@ export interface ImagenPreparada {
 /**
  * Escáner de fichas en papel con IA (Gemini).
  *
- * ⚠ MODO SIMULADO: si `environment.geminiApiKey` es 'PONER_LLAVE_AQUI' (o está
- *   vacía), `analizarFicha()` NO llama a la IA: espera ~1 s y devuelve una ficha
- *   de ejemplo del formato elegido (marcada `simulada: true`). Sirve para probar
- *   todo el flujo —modal, revisión, guardado y resultados— sin gastar cuota.
+ * La IA se llama SIEMPRE a través de la Edge Function `analizar-ficha`:
+ *  · La llave de Gemini es el secreto GEMINI_API_KEY de Supabase; nunca viaja
+ *    en el bundle ni en el APK (antes estaba en environment.ts y cualquiera
+ *    podía extraerla del JavaScript compilado).
+ *  · La función exige un usuario autenticado y arma el prompt en el servidor
+ *    según el formato, así que no sirve como proxy abierto hacia Gemini.
  *
- * ⚠ SEGURIDAD: con una llave real, la petición sale desde el navegador y la
- *   llave queda dentro del bundle JS (cualquiera puede extraerla y gastar tu
- *   cuota). Úsalo así solo en desarrollo. Para producción, mueve
- *   `llamarGemini()` a una Edge Function de Supabase que lea la llave de sus
- *   secretos y exija un usuario autenticado; aquí solo cambiaría la URL.
+ * MODO SIMULADO: con `environment.escanerSimulado = true`, `analizarFicha()`
+ *   no llama a la IA y devuelve una ficha de ejemplo (`simulada: true`).
  *
- * La respuesta de la IA nunca se guarda tal cual: `sanearFicha()` aplica los
- *   rangos SCA y el servidor vuelve a validar y recalcula el puntaje.
+ * La respuesta nunca se guarda tal cual: `sanearFicha()` aplica los rangos
+ *   SCA y el servidor vuelve a validar y recalcula el puntaje.
  */
 @Injectable({ providedIn: 'root' })
 export class ScannerService {
@@ -47,10 +42,9 @@ export class ScannerService {
   private readonly authService = inject(AuthService);
   private readonly offlineSync = inject(OfflineSyncService);
 
-  /** true mientras no haya una llave real configurada. */
+  /** true = respuestas simuladas, sin llamar a la IA. */
   get modoSimulado(): boolean {
-    const llave = (environment.geminiApiKey ?? '').trim();
-    return !llave || llave === LLAVE_DE_EJEMPLO;
+    return environment.escanerSimulado === true;
   }
 
   /**
@@ -63,13 +57,13 @@ export class ScannerService {
     if (!formatoValido) throw new Error(`Formato de ficha no soportado: ${formato}`);
     if (!base64Image) throw new Error('No hay imagen para analizar.');
 
-    // Sin llave → respuesta simulada (para pruebas).
+    // Modo simulado (pruebas sin gastar cuota).
     if (this.modoSimulado) {
       await new Promise(resolve => setTimeout(resolve, 1200));
       return sanearFicha(respuestaSimulada(formatoValido), formatoValido, true);
     }
 
-    const texto = await this.llamarGemini(base64Image, construirPrompt(formatoValido));
+    const texto = await this.llamarIa(base64Image, formatoValido);
     return sanearFicha(extraerJson(texto), formatoValido, false);
   }
 
@@ -147,51 +141,21 @@ export class ScannerService {
     }
   }
 
-  /** Llamada REST a Gemini con salida JSON forzada. */
-  private async llamarGemini(base64Image: string, prompt: string): Promise<string> {
-    const controlador = new AbortController();
-    const temporizador = setTimeout(() => controlador.abort(), TIEMPO_MAXIMO_IA_MS);
-    try {
-      const respuesta = await fetch(`${ENDPOINT_GEMINI}/${encodeURIComponent(environment.geminiModel)}:generateContent`, {
-        method: 'POST',
-        signal: controlador.signal,
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': environment.geminiApiKey },
-        body: JSON.stringify({
-          contents: [{
-            role: 'user',
-            parts: [
-              { text: prompt },
-              { inline_data: { mime_type: 'image/jpeg', data: base64Image } }
-            ]
-          }],
-          generationConfig: { responseMimeType: 'application/json', temperature: 0 }
-        })
-      });
-
-      if (!respuesta.ok) {
-        const detalle = await respuesta.text().catch(() => '');
-        if (respuesta.status === 400 && /api key/i.test(detalle)) throw new Error('La llave de Gemini no es válida.');
-        if (respuesta.status === 403) throw new Error('La llave de Gemini no tiene permiso para este modelo.');
-        if (respuesta.status === 404) throw new Error(`El modelo "${environment.geminiModel}" no existe o ya no está disponible.`);
-        if (respuesta.status === 429) throw new Error('Se agotó la cuota de Gemini. Intenta más tarde.');
-        throw new Error(`Gemini respondió ${respuesta.status}.`);
-      }
-
-      const datos = await respuesta.json() as {
-        candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
-        promptFeedback?: { blockReason?: string };
-      };
-      if (datos.promptFeedback?.blockReason) throw new Error('Gemini rechazó la imagen.');
-      const texto = (datos.candidates?.[0]?.content?.parts ?? []).map(p => p.text ?? '').join('').trim();
-      if (!texto) throw new Error('Gemini no devolvió datos. Prueba con una foto más nítida.');
-      return texto;
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        throw new Error('La IA tardó demasiado en responder. Intenta de nuevo.');
-      }
-      throw error;
-    } finally {
-      clearTimeout(temporizador);
+  /** Llama a la Edge Function (que llama a Gemini con la llave del servidor). */
+  private async llamarIa(base64Image: string, formato: string): Promise<string> {
+    const { data, error } = await this.supabase.client.functions.invoke<{ texto?: string; error?: string }>(FUNCION_IA, {
+      body: { formato, imagenBase64: base64Image }
+    });
+    if (error) {
+      // FunctionsHttpError trae la respuesta: se usa el mensaje en español de la función.
+      const contexto = (error as { context?: Response }).context;
+      const cuerpo = contexto && typeof contexto.json === 'function'
+        ? await contexto.json().catch(() => null) as { error?: string } | null
+        : null;
+      throw new Error(cuerpo?.error ?? 'No se pudo contactar al servicio de IA. Revisa tu conexión.');
     }
+    const texto = data?.texto?.trim();
+    if (!texto) throw new Error(data?.error ?? 'La IA no devolvió datos.');
+    return texto;
   }
 }

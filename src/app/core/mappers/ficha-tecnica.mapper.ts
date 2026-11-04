@@ -38,6 +38,11 @@ export function textoDeCampo(valor: unknown): string {
   return '';
 }
 
+/** 25000 → "$ 25.000 COP". */
+export function formatearCop(valor: number): string {
+  return `$ ${valor.toLocaleString('es-CO', { maximumFractionDigits: 2 })} COP`;
+}
+
 const capitalizar = (texto: string): string => texto ? texto.charAt(0).toUpperCase() + texto.slice(1) : texto;
 
 /**
@@ -81,7 +86,10 @@ function construirFicha(
   const valor = (claveTabla: string | null, valorFormulario?: unknown): string =>
     (claveTabla ? textoDeCampo(tabla[claveTabla]) : '') || textoDeCampo(valorFormulario) || SIN_DATO;
 
-  const precio = textoDeCampo(tabla['precio_finca']);
+  const precioNumero = typeof tabla['precio_finca'] === 'number' ? tabla['precio_finca']
+    : typeof comercio['farmPrice'] === 'number' ? comercio['farmPrice'] : null;
+  const precio = precioNumero === null ? '' : formatearCop(precioNumero);
+  const loteKg = typeof comercio['lotSizeKg'] === 'number' ? `${comercio['lotSizeKg'].toLocaleString('es-CO')} kg` : '';
   const secciones: FichaTecnicaSeccion[] = [
     {
       titulo: 'Origen y cultivo',
@@ -116,7 +124,7 @@ function construirFicha(
         { etiqueta: 'Importador', valor: valor('importador') },
         { etiqueta: 'Exportador', valor: valor('exportador') },
         { etiqueta: 'Precio en finca', valor: precio || SIN_DATO },
-        { etiqueta: 'Tamaño de lote', valor: valor('tamano_lote') },
+        { etiqueta: 'Tamaño de lote', valor: valor('tamano_lote', loteKg) },
         { etiqueta: 'Otros (comercial)', valor: valor('otro_comercial', comercio['other']) }
       ]
     }

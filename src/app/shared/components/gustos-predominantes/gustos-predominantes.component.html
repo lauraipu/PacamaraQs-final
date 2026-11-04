@@ -1,0 +1,15 @@
+<fieldset class="gustos" [disabled]="deshabilitado">
+  <legend class="gustos__header">
+    <span class="flavor-tree__section-label">Gustos predominantes</span>
+    <span class="gustos__count" [class.gustos__count--full]="actuales.length === maximo">{{ actuales.length }}/{{ maximo }}</span>
+  </legend>
+  <div class="gustos__list">
+    @for (o of opciones; track o.clave) {
+      <label class="gustos__item" [class.gustos__item--on]="estaMarcado(o.clave)" [class.gustos__item--off]="bloqueado(o.clave)">
+        <input type="checkbox" [checked]="estaMarcado(o.clave)" [disabled]="bloqueado(o.clave)" (change)="alternar(o.clave, $event)">
+        {{ o.etiqueta }}
+      </label>
+    }
+  </div>
+  <p class="gustos__hint">Elige máximo 2 gustos básicos.</p>
+</fieldset>

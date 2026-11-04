@@ -1,0 +1,45 @@
+/* Campos numéricos con formato de moneda / unidad (solo visual: se guarda el número). */
+.money-input {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--app-border-input, #ced4da);
+  border-radius: var(--app-radius-control, 8px);
+  background: var(--app-bg-card, #ffffff);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus-within {
+    border-color: var(--app-primary-dark, #2f3e46);
+    box-shadow: 0 0 0 3px rgb(47 62 70 / 12%);
+  }
+}
+.money-input--error,
+.money-input--error:focus-within {
+  border-color: var(--app-error, #e7000b);
+  box-shadow: 0 0 0 3px rgb(231 0 11 / 12%);
+}
+.money-input__prefix,
+.money-input__suffix {
+  padding: 0 10px;
+  color: var(--app-text-muted, #62748e);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.money-input__prefix { padding-right: 0; }
+.money-input__control {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 8px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--app-text-main, #0f172b);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.money-input__error {
+  margin: 6px 0 0;
+  color: var(--app-error-text, #991b1b);
+  font-size: 12px;
+}

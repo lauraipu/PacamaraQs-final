@@ -36,7 +36,7 @@ describe('construirFichasTecnicas', () => {
 
     expect(campos.find(c => c.etiqueta === 'País')?.valor).toBe('El Salvador');
     expect(campos.find(c => c.etiqueta === 'Región')?.valor).toBe('Huila');
-    expect(campos.find(c => c.etiqueta === 'Precio en finca')?.valor).toBe('4.5');
+    expect(campos.find(c => c.etiqueta === 'Precio en finca')?.valor).toBe('$ 4,5 COP');
     expect(ficha.secciones.at(-1)?.titulo).toBe('Información adicional');
     expect(ficha.certificaciones).toContain('Rainforest Alliance');
   });

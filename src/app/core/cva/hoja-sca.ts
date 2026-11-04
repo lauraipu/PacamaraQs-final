@@ -276,7 +276,7 @@ export function leerFichaSca(ficha: FichaCatador): FichaSca {
     impresionGlobal: ficha.impresionGlobal ?? numeroEn(formulario['impresionGlobal'], 1, 9),
     olfativo: casillasDeDescriptores(olfativos),
     gustativo: casillasDeDescriptores(gustativos),
-    gustos: new Set<string>(),
+    gustos: new Set(comoTextos(formulario['gustosPredominantes']).map(normalizar).filter(g => GUSTOS_SCA.some(c => c.clave === g))),
     boca: casillasDeBoca(boca),
     defectos: casillasDeDefectos(defectos),
     tazasNoUniformes: numeroEn(ficha.tazasNoUniformes ?? tazas['tazasNoUniformes'], 0, 5),

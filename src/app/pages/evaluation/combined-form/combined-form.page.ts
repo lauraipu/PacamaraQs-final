@@ -12,6 +12,7 @@ import {
 } from 'ionicons/icons';
 import { BaseCataForm } from '../../../core/cva/base-cata-form';
 import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
+import { GustosPredominantesComponent } from '../../../shared/components/gustos-predominantes/gustos-predominantes.component';
 import {
   DESCRIPTORES_MOUTHFEEL,
   ETIQUETAS_HEDONICAS,
@@ -49,6 +50,8 @@ export interface AtributosCombinado {
 }
 export interface FormularioCombinado {
   atributos: AtributosCombinado;
+  /** Hoja SCA "Gustos Predominantes (2)": máximo 2 de salado/amargo/acido/umami/dulce. */
+  gustosPredominantes: string[];
   impresionGlobal: number;
   mouthfeel: string[];
   notasMouthfeel: string;
@@ -70,7 +73,7 @@ export type AtributoCalificable =
   selector: 'app-combined-form',
   templateUrl: './combined-form.page.html',
   standalone: true,
-  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent]
+  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, GustosPredominantesComponent]
 })
 export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
 
@@ -97,6 +100,7 @@ export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
         dulzor: { intensidad: 0, calidad: 0 },
         sensacionEnBoca: { intensidad: 0, calidad: 0 },
       },
+      gustosPredominantes: [],
       impresionGlobal: 0,
       mouthfeel: [],
       notasMouthfeel: '',
@@ -161,6 +165,11 @@ export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
 
   toggleCategoria(cat: string) {
     this.categoriasAbiertas[cat] = !this.categoriasAbiertas[cat];
+  }
+
+  /** Guarda la selección (máx. 2) en el JSON del formulario. */
+  cambiarGustos(gustos: string[]): void {
+    this.formulario.gustosPredominantes = gustos.slice(0, 2);
   }
 
   toggleDescriptor(atributo: 'fragancia' | 'aroma' | 'sabor' | 'saborResidual', descriptor: string) {

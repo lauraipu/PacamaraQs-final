@@ -1,14 +1,23 @@
 import {
-  calcularPuntajeCva, canonizarDescriptores, construirPrompt, extraerJson, payloadFichaPersonal, respuestaSimulada,
-  sanearCalidad, sanearFicha, sanearIntensidad
+  calcularPuntajeCva, canonizarDescriptores, extraerJson, parsearNumeroEs, payloadFichaPersonal, respuestaSimulada,
+  sanearCalidad, sanearFicha, sanearGustos, sanearIntensidad, sanearNumeroPositivo
 } from './ficha-escaneada';
 
-describe('construirPrompt', () => {
-  it('names the format and requires strict JSON', () => {
-    const prompt = construirPrompt('descriptivo');
-    expect(prompt).toContain('Analiza esta imagen de una ficha SCA de tipo Descriptivo.');
-    expect(prompt).toContain('devuélvelos estrictamente en formato JSON');
-    expect(prompt).toContain('"sensacionEnBoca": { "intensidad": number|null, "textura": string[] }');
+describe('gustos predominantes y números', () => {
+  it('keeps at most two valid tastes, accent-insensitive', () => {
+    expect(sanearGustos(['Ácido', 'dulce', 'umami', 'picante'])).toEqual(['acido', 'dulce']);
+    expect(sanearGustos('dulce')).toEqual([]);
+  });
+
+  it('parses Colombian number formats and rejects letters', () => {
+    expect(parsearNumeroEs('25.000')).toBe(25000);
+    expect(parsearNumeroEs('$ 25.000,50')).toBe(25000.5);
+    expect(parsearNumeroEs('12,5')).toBe(12.5);
+    expect(parsearNumeroEs('12.5')).toBe(12.5);
+    expect(parsearNumeroEs('12a')).toBeNull();
+    expect(parsearNumeroEs('')).toBeNull();
+    expect(sanearNumeroPositivo(-3)).toBeNull();
+    expect(sanearNumeroPositivo('690')).toBe(690);
   });
 });
 

@@ -113,6 +113,54 @@
               <span class="intensity-slider__label">Número ICO</span>
               <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.icoNumber">
             </label>
+            <div class="form-field">
+              <label class="intensity-slider__label" for="campo-farmPrice">Precio en finca</label>
+              <div class="money-input" [class.money-input--error]="errorCampo('farmPrice')">
+                <span class="money-input__prefix" aria-hidden="true">$</span>
+                <input
+                  id="campo-farmPrice"
+                  class="money-input__control"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej: 25.000"
+                  [attr.aria-invalid]="!!errorCampo('farmPrice')"
+                  [attr.aria-describedby]="'error-farmPrice'"
+                  [value]="textoCampo('farmPrice')"
+                  (focus)="alEnfocarNumero('farmPrice')"
+                  (keydown)="alPresionarTeclaNumero('farmPrice', $event)"
+                  (input)="alEscribirNumero('farmPrice', $event)"
+                  (blur)="alSalirNumero('farmPrice')">
+                <span class="money-input__suffix" aria-hidden="true">COP</span>
+              </div>
+              @if (errorCampo('farmPrice'); as mensaje) {
+                <p id="error-farmPrice" class="money-input__error" role="alert">{{ mensaje }}</p>
+              }
+            </div>
+            <div class="form-field">
+              <label class="intensity-slider__label" for="campo-lotSizeKg">Tamaño del lote</label>
+              <div class="money-input" [class.money-input--error]="errorCampo('lotSizeKg')">
+                
+                <input
+                  id="campo-lotSizeKg"
+                  class="money-input__control"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej: 690"
+                  [attr.aria-invalid]="!!errorCampo('lotSizeKg')"
+                  [attr.aria-describedby]="'error-lotSizeKg'"
+                  [value]="textoCampo('lotSizeKg')"
+                  (focus)="alEnfocarNumero('lotSizeKg')"
+                  (keydown)="alPresionarTeclaNumero('lotSizeKg', $event)"
+                  (input)="alEscribirNumero('lotSizeKg', $event)"
+                  (blur)="alSalirNumero('lotSizeKg')">
+                <span class="money-input__suffix" aria-hidden="true">kg</span>
+              </div>
+              @if (errorCampo('lotSizeKg'); as mensaje) {
+                <p id="error-lotSizeKg" class="money-input__error" role="alert">{{ mensaje }}</p>
+              }
+            </div>
             <label class="form-field">
               <span class="intensity-slider__label">Otra información comercial</span>
               <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.other">
