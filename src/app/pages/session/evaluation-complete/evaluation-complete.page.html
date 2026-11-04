@@ -2,11 +2,16 @@
   <div class="complete-container">
 
     <div class="icon-wrapper">
-      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <ion-icon [name]="esExtrinseco() ? 'document-text-outline' : 'checkmark-circle-outline'"></ion-icon>
     </div>
 
-    <h1 class="title">Cata finalizada</h1>
-    <p class="subtitle">Gracias por completar la sesión. Consulta al organizador si necesitas confirmar el registro de tu evaluación.</p>
+    @if (esExtrinseco()) {
+      <h1 class="title">Ficha técnica registrada</h1>
+      <p class="subtitle">La evaluación extrínseca es individual: tus datos de origen, proceso y comercialización quedaron guardados.</p>
+    } @else {
+      <h1 class="title">Cata finalizada</h1>
+      <p class="subtitle">Gracias por completar la sesión. Consulta al organizador si necesitas confirmar el registro de tu evaluación.</p>
+    }
 
     @if (error(); as mensaje) {
       <p class="subtitle" role="alert">{{ mensaje }}</p>
@@ -17,25 +22,45 @@
         <span class="info-label">Sesión</span>
         <span class="info-value">{{ nombreSesion() }}</span>
       </div>
-      @if (esOrganizador() && codigoSesion()) {
+      @if (tituloFormato()) {
         <div class="info-row">
-          <span class="info-label">Código</span>
-          <span class="info-value">{{ codigoSesion() }}</span>
+          <span class="info-label">Formato</span>
+          <span class="info-value">{{ tituloFormato() }}</span>
+        </div>
+      }
+      @if (!cargando() && !esExtrinseco()) {
+        <div class="info-row">
+          <span class="info-label">Estado del panel</span>
+          <span class="info-value">{{ panelCerrado() ? 'Cerrado' : 'Abierto' }}</span>
         </div>
       }
     </div>
 
-    <div class="privacy-card">
-      <ion-icon name="lock-closed-outline"></ion-icon>
-      <div>
-        <h4>Los resultados permanecen reservados</h4>
-        <p>Para proteger la evaluación ciega, los catadores no tienen acceso a los puntajes hasta que el organizador consolide el panel.</p>
+    @if (debeFinalizarPanel()) {
+      <div class="privacy-card">
+        <ion-icon name="hourglass-outline"></ion-icon>
+        <div>
+          <h4>Aún hay catadores evaluando</h4>
+          <p>Los resultados se consolidan cuando todos envían sus fichas. Desde el monitoreo puedes ver el avance o finalizar el panel.</p>
+        </div>
       </div>
-    </div>
+    } @else if (!esExtrinseco()) {
+      <div class="privacy-card">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        <div>
+          <h4>Los resultados permanecen reservados</h4>
+          <p>Para proteger la evaluación ciega, los catadores no tienen acceso a los puntajes hasta que el organizador consolide el panel.</p>
+        </div>
+      </div>
+    }
 
-    @if (esOrganizador()) {
+    @if (puedeVerResultados()) {
       <ion-button expand="block" class="primary-btn" (click)="irAResultados()">
-        Ver resultados del panel →
+        {{ esExtrinseco() ? 'Ver ficha técnica →' : 'Ver resultados del panel →' }}
+      </ion-button>
+    } @else if (debeFinalizarPanel()) {
+      <ion-button expand="block" class="primary-btn" (click)="irAMonitoreo()">
+        Monitorear y finalizar panel →
       </ion-button>
     }
 

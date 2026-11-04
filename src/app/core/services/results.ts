@@ -43,6 +43,7 @@ interface ResumenPanelDto {
       tazas_defectuosas: number;
       impresion_global?: number | null;
       atributos?: Record<string, { intensidad: number | null; calidad: number | null }> | null;
+      formulario?: Record<string, unknown> | null;
     }[];
   }[];
   /* Claves agregadas en la migración 20261104150000_resultados_por_formato. */
@@ -149,7 +150,8 @@ export class ResultsService {
         tazasNoUniformes: num(p.tazas_no_uniformes),
         tazasDefectuosas: num(p.tazas_defectuosas),
         impresionGlobal: numONulo(p.impresion_global),
-        atributos: this.mapearAtributos(p.atributos)
+        atributos: this.mapearAtributos(p.atributos),
+        formulario: p.formulario && typeof p.formulario === 'object' && !Array.isArray(p.formulario) ? p.formulario : null
       }))
     };
   }

@@ -1,0 +1,199 @@
+.sc-toolbar { --background: var(--app-bg-card, #ffffff); }
+.sc-content { --background: var(--app-bg-screen, #f9fafb); }
+
+/* Pasos */
+.sc-steps {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  color: var(--app-text-muted, #6b7280);
+  font-size: 12px;
+
+  li { display: flex; flex: 1; align-items: center; gap: 6px; }
+
+  span {
+    display: grid;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+    border: 1px solid var(--app-border, #e5e7eb);
+    border-radius: 50%;
+    background: var(--app-bg-card, #ffffff);
+    font-size: 11px;
+    font-weight: 700;
+  }
+}
+.sc-steps__item--on {
+  color: var(--app-text-main, #111827);
+  font-weight: 600;
+
+  span { border-color: var(--app-primary-dark, #0f344c); background: var(--app-primary-dark, #0f344c); color: #ffffff; }
+}
+
+/* Avisos */
+.sc-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+
+  ion-icon { flex: none; margin-top: 1px; font-size: 16px; }
+}
+.sc-banner--info { background: #eff6ff; color: #1e40af; }
+.sc-banner--warn { background: #fffbeb; color: #92400e; }
+.sc-banner--error { background: var(--app-error-bg, #ffe4e6); color: var(--app-error-text, #991b1b); }
+
+/* Paso A */
+.sc-drop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 240px;
+  padding: 24px;
+  border: 2px dashed var(--app-border, #e5e7eb);
+  border-radius: 16px;
+  background: var(--app-bg-card, #ffffff);
+  color: var(--app-text-main, #111827);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover, &:focus-within { border-color: var(--app-primary-dark, #0f344c); box-shadow: 0 6px 18px rgb(15 52 76 / 10%); }
+
+  strong { font-size: 16px; }
+  small { color: var(--app-text-muted, #6b7280); font-size: 12px; }
+}
+.sc-drop--busy { cursor: progress; }
+.sc-drop__icon {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border-radius: 18px;
+  background: var(--app-primary-dark, #0f344c);
+  color: #ffffff;
+  font-size: 32px;
+}
+/* El input cubre toda la tarjeta: un toque abre cámara o galería. */
+.sc-file {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Tarjetas */
+.sc-card {
+  margin-bottom: 12px;
+  padding: 14px;
+  border: 1px solid var(--app-border, #e5e7eb);
+  border-radius: 12px;
+  background: var(--app-bg-card, #ffffff);
+
+  h2 { margin: 0; color: var(--app-text-main, #111827); font-size: 15px; font-weight: 700; }
+}
+.sc-label { margin-bottom: 10px !important; font-size: 13px !important; }
+.sc-muted { margin: 4px 0 0; color: var(--app-text-muted, #6b7280); font-size: 12px; }
+.sc-small { font-size: 11px; }
+.sc-inline { display: flex; align-items: center; gap: 8px; color: var(--app-text-muted, #6b7280); font-size: 13px; }
+
+/* Paso B */
+.sc-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  img { width: 100%; max-height: 42vh; border-radius: 8px; object-fit: contain; background: var(--app-bg-screen, #f9fafb); }
+}
+.sc-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--app-primary-dark, #0f344c);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sc-segment {
+  --background: var(--app-bg-screen, #f1f5f9);
+  margin-bottom: 12px;
+
+  ion-segment-button { min-width: 0; --padding-start: 4px; --padding-end: 4px; font-size: 12px; text-transform: none; }
+}
+.sc-select {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--app-border-input, #ced4da);
+  border-radius: var(--app-radius-control, 8px);
+  font-size: 14px;
+}
+.sc-row { display: flex; align-items: center; gap: 8px; .sc-select { flex: 1; margin-bottom: 0; } }
+.sc-input { --border-radius: 8px; margin-top: 4px; font-size: 14px; }
+.sc-badge { --background: var(--app-bg-screen, #f1f5f9); --color: var(--app-text-main, #111827); --padding-start: 10px; --padding-end: 10px; font-weight: 600; }
+.sc-badge--sim { --background: #eff6ff; --color: #1e40af; }
+.sc-analizar { margin-top: 4px; }
+
+/* Paso D */
+.sc-review__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.sc-review__head > div { min-width: 0; }
+.sc-review__head > ion-badge { flex: none; }
+.sc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th, td { padding: 7px 4px; border-bottom: 1px solid var(--app-border, #e5e7eb); text-align: left; }
+  th { color: var(--app-text-muted, #6b7280); font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  td { color: var(--app-text-main, #111827); }
+}
+.sc-num { text-align: right !important; font-variant-numeric: tabular-nums; }
+.sc-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+
+  div { padding: 8px; border-radius: 8px; background: var(--app-bg-screen, #f9fafb); text-align: center; }
+  strong { display: block; color: var(--app-text-main, #111827); font-size: 16px; }
+  span { color: var(--app-text-muted, #6b7280); font-size: 10px; text-transform: uppercase; }
+}
+.sc-kpis__score strong { color: var(--app-score, #c2410c); }
+.sc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+
+  span { padding: 3px 10px; border: 1px solid var(--app-border, #e5e7eb); border-radius: 999px; font-size: 12px; }
+}
+.sc-dl {
+  display: grid;
+  grid-template-columns: 40% 1fr;
+  margin: 0;
+  font-size: 13px;
+
+  dt, dd { margin: 0; padding: 6px 0; border-bottom: 1px solid var(--app-border, #e5e7eb); }
+  dt { color: var(--app-text-muted, #6b7280); }
+  dd { color: var(--app-text-main, #111827); font-weight: 500; }
+}
+.sc-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 8px;
+
+  ion-button { margin: 0; text-transform: none; }
+}

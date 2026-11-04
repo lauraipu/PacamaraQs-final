@@ -1,0 +1,295 @@
+
+
+ion-toolbar {
+  --background: var(--app-bg-card, #ffffff);
+}
+
+.brand-title {
+  color: var(--app-text-main, #111827);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.brand-subtitle {
+  margin-top: 2px;
+  color: var(--app-text-muted, #6b7280);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.dashboard-content {
+  --background: var(--app-bg-screen, #f9fafb);
+}
+
+.dashboard-container {
+  width: min(100%, 900px);
+  margin: 0 auto;
+  padding-bottom: 80px; /* Espacio extra para no tapar contenido con el FAB */
+}
+
+.filter-container {
+  margin-bottom: 1.25rem;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 8px 0 24px;
+}
+
+.metric-card {
+  margin: 0;
+  padding: 14px 8px;
+  text-align: center;
+}
+
+.metric-label {
+  color: var(--app-text-muted, #6b7280);
+  font-size: 12px;
+}
+
+.metric-value {
+  margin-top: 6px;
+  color: var(--app-text-main, #111827);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: var(--app-text-main, #111827);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.new-session-btn {
+  --background: #ffffff;
+  --color: #0f344c;
+  --border-radius: 10px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* LISTA Y TARJETAS DE SESIÓN */
+.sessions-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Separa adecuadamente cada tarjeta */
+}
+
+.session-card {
+  position: relative;
+  padding: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.session-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.session-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.session-card__menu {
+  position: relative;
+  flex: none;
+}
+
+.session-card__menu-trigger {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid var(--app-border, #e5e7eb);
+  border-radius: 8px;
+  background: var(--app-bg-card, #ffffff);
+  color: var(--app-text-main, #111827);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.session-card__menu-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 5;
+  min-width: 160px;
+  padding: 4px;
+  border: 1px solid var(--app-border, #e5e7eb);
+  border-radius: 8px;
+  background: var(--app-bg-card, #ffffff);
+  box-shadow: 0 8px 20px rgb(15 23 43 / 12%);
+}
+
+.session-card__menu-item {
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--app-text-main, #111827);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.session-card__menu-item--danger {
+  color: var(--app-error, #ef4444);
+}
+
+.session-card__menu-item:hover {
+  background: var(--app-bg-screen, #f9fafb);
+}
+
+.chip {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--app-border, #e5e7eb);
+  color: var(--app-text-muted, #6b7280);
+  font-size: 11px;
+}
+
+.chip-active {
+  background: #f8fafc;
+  color: var(--app-primary-dark, #0f344c);
+  font-weight: 600;
+}
+
+.chip-neutral {
+  background: var(--app-border, #e5e7eb);
+}
+
+.session-type {
+  margin: 4px 0;
+  color: var(--app-text-muted, #6b7280);
+  font-size: 12px;
+}
+
+.session-card h3 {
+  margin: 0;
+  color: var(--app-text-main, #111827);
+  font-size: 15px;
+}
+
+.session-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+  color: var(--app-text-muted, #6b7280);
+  font-size: 11px;
+}
+
+/* ESTADOS DE CARGA Y VACÍO */
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+
+  h3 {
+    margin: 0 0 8px;
+    color: var(--app-text-main, #111827);
+    font-size: 15px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--app-text-muted, #6b7280);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 16px;
+  color: var(--app-text-muted, #6b7280);
+  font-size: 13px;
+}
+
+/* ESTILOS DEL MODAL (BOTTOM SHEET) */
+ion-modal {
+  --background: var(--app-bg-card, #ffffff);
+  --border-radius: 16px;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 20px;
+  color: var(--app-text-main, #111827);
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    margin: 0 0 12px;
+    color: var(--app-text-muted, #6b7280);
+    font-size: 0.875rem;
+  }
+
+  ion-button.primary-btn {
+    margin-top: 16px;
+
+    &[disabled] {
+      opacity: 0.45;
+    }
+  }
+}
+
+.join-fab {
+  --background: var(--app-primary-dark, #0f344c);
+  --background-hover: var(--app-primary-hover, #0b2738);
+  --background-activated: var(--app-primary-hover, #0b2738);
+  --color: #ffffff;
+  --box-shadow: 0 6px 16px rgb(15 52 76 / 28%);
+}
+
+/* RESPONSIVE */
+@media (max-width: 360px) {
+  .metrics {
+    gap: 6px;
+  }
+
+  .metric-card {
+    padding: 10px 4px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+  }
+
+  .metric-value {
+    font-size: 16px;
+  }
+}

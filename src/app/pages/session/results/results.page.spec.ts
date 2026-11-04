@@ -45,7 +45,7 @@ const resultadosBase = (muestras: SampleConsolidatedResult[]): SessionResults =>
 });
 
 const ficha = (numeroMuestra: number, puntaje: number, atributos = {}) => ({
-  numeroMuestra, puntaje, defectos: [], tazasNoUniformes: 0, tazasDefectuosas: 0, impresionGlobal: null, atributos
+  numeroMuestra, puntaje, defectos: [], tazasNoUniformes: 0, tazasDefectuosas: 0, impresionGlobal: null, atributos, formulario: null
 });
 
 describe('clasificarPuntaje', () => {
@@ -72,6 +72,7 @@ describe('etiquetaHedonica', () => {
 describe('ResultsPage', () => {
   const obtenerResultadosSesion = vi.fn();
   const imprimir = vi.fn().mockResolvedValue(undefined);
+  const navigateForward = vi.fn();
   let sesionId: string | null = 'session-id';
 
   const crear = async (): Promise<ResultsPage> => {
@@ -88,7 +89,7 @@ describe('ResultsPage', () => {
       providers: [
         { provide: ResultsService, useValue: { obtenerResultadosSesion } },
         { provide: ImpresionService, useValue: { imprimir } },
-        { provide: NavController, useValue: { navigateRoot: vi.fn() } },
+        { provide: NavController, useValue: { navigateRoot: vi.fn(), navigateForward } },
         { provide: ToastController, useValue: { create: vi.fn().mockResolvedValue({ present: vi.fn() }) } },
         {
           provide: ActivatedRoute,
@@ -266,6 +267,47 @@ describe('ResultsPage', () => {
     expect(component.tituloReporte()).toBe('Reporte SCA - Cosecha - Combinado - Muestra 1 - Ana');
   });
 
+  it('builds the SCA panel sheet only from the selected tasters', async () => {
+    const base = resultadosBase([muestra(1, 84)]);
+    base.catadores[0].puntajesPorMuestra = [{ ...ficha(1, 86, { fragancia: { intensidad: 12, calidad: 8 } }), impresionGlobal: 8 }];
+    base.catadores[1].puntajesPorMuestra = [{ ...ficha(1, 70, { fragancia: { intensidad: 4, calidad: 3 } }), impresionGlobal: 3 }];
+    obtenerResultadosSesion.mockResolvedValue(base);
+
+    const component = await crear();
+    component.abrirExportar();
+    expect(component.modoExportacion()).toBe('panel');
+    expect([...component.catadoresPanelIds()].sort()).toEqual(['a', 'b']);
+    expect(component.hojaSca()?.ficha.intensidad.fragancia).toBe(8);
+
+    component.toggleCatadorPanel('b', false);
+    const hoja = component.hojaSca()!;
+    expect(hoja.nombre).toBe('Consolidado del Panel');
+    expect(hoja.titulo).toBe('Formato Combinado');
+    expect(hoja.ficha.intensidad.fragancia).toBe(12);
+    expect(hoja.resumenPanel).toMatchObject({ puntaje: 86, fichas: '1 / 2' });
+    expect(hoja.ficha.notas.otras).toContain('Excluidos por el organizador: Beto.');
+
+    component.toggleCatadorPanel('a', false);
+    expect(component.hojaSca()).toBeNull();
+    expect(component.puedeConfirmarExportar()).toBe(false);
+  });
+
+  it('builds the individual sheet with the taster name', async () => {
+    const base = resultadosBase([muestra(1, 84)]);
+    base.catadores[0].puntajesPorMuestra = [ficha(1, 86, { acidez: { intensidad: 9, calidad: 8 } })];
+    obtenerResultadosSesion.mockResolvedValue(base);
+
+    const component = await crear();
+    component.abrirExportar({ numeroMuestra: 1, cupperId: 'a' });
+
+    const hoja = component.hojaSca()!;
+    expect(hoja.esPanel).toBe(false);
+    expect(hoja.nombre).toBe('Ana');
+    expect(hoja.resumenPanel).toBeNull();
+    expect(hoja.ficha.intensidad.acidez).toBe(9);
+    expect(component.etiquetasAfectivas(hoja, ['acidez'])).toBe('Acidez: 8 · Muy alta');
+  });
+
   it('shows the reserved-results state when the server denies access (42501)', async () => {
     obtenerResultadosSesion.mockRejectedValue({ code: '42501', message: 'Solo el organizador puede ver los resultados.' });
 
@@ -274,6 +316,17 @@ describe('ResultsPage', () => {
     expect(component.accesoDenegado()).toBe(true);
     expect(component.error()).toBe('Solo el organizador puede ver los resultados.');
     expect(component.resultados()).toBeNull();
+  });
+
+  it('flags an open panel (22023) so the organizer can go finalize it', async () => {
+    obtenerResultadosSesion.mockRejectedValue({ code: '22023', message: 'Los resultados están disponibles cuando el panel se cierra.' });
+
+    const component = await crear();
+
+    expect(component.panelAbierto()).toBe(true);
+    expect(component.accesoDenegado()).toBe(false);
+    component.irAMonitoreo();
+    expect(navigateForward).toHaveBeenCalledWith('/session/session-id/organizer-dashboard');
   });
 
   it('shows a not-found message when the session has no results', async () => {

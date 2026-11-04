@@ -1,18 +1,24 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { checkmarkCircleOutline, lockClosedOutline } from 'ionicons/icons';
+import { checkmarkCircleOutline, documentTextOutline, hourglassOutline, lockClosedOutline } from 'ionicons/icons';
 import { IonButton, IonContent, IonIcon, NavController } from '@ionic/angular';
+import { EstadoSesion, FormatoCva, getFormatoById } from '../../../core/models/sesion.model';
 import { AuthService } from '../../../core/services/auth';
 import { SesionService } from '../../../core/services/sesion';
 
-addIcons({ checkmarkCircleOutline, lockClosedOutline });
+addIcons({ checkmarkCircleOutline, documentTextOutline, hourglassOutline, lockClosedOutline });
 
 /**
- * Antes: hablaba directo con Supabase (2 consultas a `sesiones`, la segunda
- * redundante) y usaba propiedades simples → en zoneless los datos no se
- * pintaban hasta el siguiente evento. Ahora usa SesionService + signals.
+ * Pantalla de cierre tras enviar la última ficha.
+ *
+ *  · Ya no muestra el código de acceso: caduca al iniciar la cata y el formato
+ *    extrínseco no usa código (es individual).
+ *  · "Ver resultados" solo aparece cuando la sesión está `completada`. Antes se
+ *    ofrecía siempre al organizador y, con fichas pendientes, la RPC
+ *    get_resumen_panel respondía 22023 ("…cuando el panel se cierra").
+ *    Con el panel aún abierto se ofrece ir al monitoreo para finalizarlo.
  */
 @Component({
   selector: 'app-evaluation-complete',
@@ -30,9 +36,20 @@ export class EvaluationCompletePage implements OnInit {
 
   readonly esOrganizador = signal(false);
   readonly nombreSesion = signal('');
-  readonly codigoSesion = signal('');
+  readonly formato = signal('');
+  readonly estado = signal<EstadoSesion | null>(null);
   readonly error = signal<string | null>(null);
   readonly cargando = signal(true);
+
+  readonly esExtrinseco = computed(() => this.formato() === FormatoCva.EXTRINSECA.id);
+  readonly tituloFormato = computed(() => (this.formato() ? getFormatoById(this.formato()).titulo : ''));
+  readonly panelCerrado = computed(() => this.estado() === EstadoSesion.FINALIZADA);
+  /** El organizador ve resultados solo con el panel cerrado. */
+  readonly puedeVerResultados = computed(() => this.esOrganizador() && this.panelCerrado());
+  /** Organizador con fichas pendientes de otros catadores → debe finalizar desde el monitoreo. */
+  readonly debeFinalizarPanel = computed(
+    () => this.esOrganizador() && !this.panelCerrado() && !this.esExtrinseco() && this.estado() === EstadoSesion.INICIADA
+  );
 
   private sesionId = '';
 
@@ -56,9 +73,9 @@ export class EvaluationCompletePage implements OnInit {
       if (!sesion) throw new Error('No se encontró la sesión.');
 
       this.nombreSesion.set(sesion.nombre);
-      const esOrganizador = sesion.organizadorId === user.id;
-      this.esOrganizador.set(esOrganizador);
-      this.codigoSesion.set(esOrganizador ? sesion.codigoAcceso : '');
+      this.formato.set(getFormatoById(sesion.formato).id);
+      this.estado.set(sesion.estado);
+      this.esOrganizador.set(sesion.organizadorId === user.id);
     } catch (error) {
       this.error.set(error instanceof Error ? error.message : 'No se pudo cargar la sesión.');
     } finally {
@@ -67,8 +84,13 @@ export class EvaluationCompletePage implements OnInit {
   }
 
   async irAResultados(): Promise<void> {
-    if (!this.esOrganizador() || !this.sesionId) return;
+    if (!this.puedeVerResultados() || !this.sesionId) return;
     await this.router.navigateByUrl(`/session/${this.sesionId}/results`);
+  }
+
+  async irAMonitoreo(): Promise<void> {
+    if (!this.esOrganizador() || !this.sesionId) return;
+    await this.router.navigateByUrl(`/session/${this.sesionId}/organizer-dashboard`);
   }
 
   volverAlPanel(): void {

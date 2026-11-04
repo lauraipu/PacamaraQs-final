@@ -5,15 +5,19 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import {
   IonAccordion, IonAccordionGroup, IonBackButton, IonBadge, IonButton, IonButtons, IonCard, IonCardContent,
-  IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonModal, IonRow, IonSegment,
+  IonCheckbox, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonModal, IonRow, IonSegment,
   IonSegmentButton, IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar, NavController, ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
-  checkmarkCircleOutline, closeOutline, documentTextOutline, downloadOutline, lockClosedOutline, medalOutline,
-  ribbonOutline, trophyOutline
+  checkmarkCircleOutline, closeOutline, documentTextOutline, downloadOutline, hourglassOutline, lockClosedOutline,
+  medalOutline, ribbonOutline, trophyOutline
 } from 'ionicons/icons';
 import { ETIQUETAS_HEDONICAS } from '../../../core/cva/cva';
+import {
+  BOCA_SCA, circuloMarcado, consolidarFichas, DEFECTOS_SCA, DESCRIPTORES_SCA, etiquetaCalidad, FormatoHoja,
+  AtributoHoja, GUSTOS_SCA, HojaSca, leerFichaSca, puntajePanel
+} from '../../../core/cva/hoja-sca';
 import { FormatoCva, getFormatoById } from '../../../core/models/sesion.model';
 import {
   AtributoCva, CupperResultSummary, SampleConsolidatedResult, SessionResults, ValorAtributo
@@ -114,6 +118,23 @@ export function etiquetaHedonica(promedio: number | null): string {
 }
 
 const redondear2 = (n: number): number => Math.round(n * 100) / 100;
+
+const ETIQUETA_ATRIBUTO: Readonly<Record<AtributoHoja, string>> = {
+  fragancia: 'Fragancia',
+  aroma: 'Aroma',
+  sabor: 'Sabor',
+  sabor_residual: 'Sabor residual',
+  acidez: 'Acidez',
+  dulzor: 'Dulzor',
+  sensacion_boca: 'Sensación en boca'
+};
+
+function formatearFecha(valor: string | Date): string {
+  const fecha = valor instanceof Date ? valor : new Date(valor);
+  return Number.isNaN(fecha.getTime())
+    ? ''
+    : fecha.toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' });
+}
 const porcentajeDe = (valor: number | null, maximo: number): number =>
   valor === null || maximo <= 0 ? 0 : Math.min(100, Math.max(0, Math.round((valor / maximo) * 1000) / 10));
 
@@ -171,7 +192,7 @@ function atributosDeFicha(atributos: Partial<Record<string, ValorAtributo>>): At
     IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonBackButton, IonButtons,
     IonIcon, IonSpinner, IonCard, IonCardContent, IonGrid, IonRow, IonCol, IonBadge, IonList,
     IonAccordionGroup, IonAccordion, IonItem, IonLabel, IonModal, IonSegment, IonSegmentButton,
-    IonSelect, IonSelectOption, CupperResultCardComponent, CommonModule
+    IonSelect, IonSelectOption, IonCheckbox, CupperResultCardComponent, CommonModule
   ]
 })
 export class ResultsPage implements OnInit {
@@ -181,11 +202,14 @@ export class ResultsPage implements OnInit {
   private readonly navCtrl = inject(NavController);
   private readonly toastCtrl = inject(ToastController);
   private readonly injector = inject(Injector);
+  private sesionId = '';
 
   readonly resultados = signal<SessionResults | null>(null);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   readonly accesoDenegado = signal(false);
+  /** La RPC respondió 22023: la sesión aún no está `completada` (fichas pendientes). */
+  readonly panelAbierto = signal(false);
   readonly imprimiendo = signal(false);
   readonly fechaReporte = signal(new Date());
 
@@ -366,35 +390,121 @@ export class ResultsPage implements OnInit {
     () => this.resultados()?.catadores.filter(c => c.muestrasEvaluadas > 0) ?? []
   );
 
-  /* ── Datos del reporte impreso (Combinado) ────────────────────────────── */
-  readonly muestraReporteCombinado = computed<FilaRanking | null>(() =>
-    this.ranking().find(f => f.numeroMuestra === this.muestraExportar()) ?? this.muestraEnMedidor()
+  /* ── Hoja SCA imprimible (Combinado / Descriptivo) ────────────────────── */
+
+  /** Formatos que se exportan con la hoja SCA (los demás usan su reporte propio). */
+  readonly formatoHoja = computed<FormatoHoja | null>(() =>
+    this.esCombinado() ? 'combinado' : this.esDescriptivo() ? 'descriptivo' : null
   );
 
-  readonly atributosPanelReporte = computed<AtributoFicha[]>(() => {
-    const numero = this.muestraReporteCombinado()?.numeroMuestra;
-    const filas = this.resultados()?.atributosPorMuestra.filter(a => a.numeroMuestra === numero) ?? [];
-    return atributosDeFicha(Object.fromEntries(
-      filas.map(f => [f.atributo, { intensidad: f.intensidadPromedio, calidad: f.calidadPromedio }])
-    ));
-  });
+  readonly escala9 = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+  readonly descriptoresSca = DESCRIPTORES_SCA;
+  readonly gustosSca = GUSTOS_SCA;
+  readonly bocaSca = BOCA_SCA;
+  readonly defectosSca = DEFECTOS_SCA;
+  readonly circuloMarcado = circuloMarcado;
+  readonly etiquetaCalidad = etiquetaCalidad;
+  readonly LEYENDA_HEDONICA = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => ({ n, etiqueta: ETIQUETAS_HEDONICAS[n] ?? '' }));
 
-  /** Puntaje de cada catador en la muestra exportada (modo Panel). */
-  readonly puntajesCatadoresReporte = computed(() => {
-    const numero = this.muestraReporteCombinado()?.numeroMuestra;
-    return (this.resultados()?.catadores ?? []).map(c => ({
-      nombre: c.nombre,
-      ficha: c.puntajesPorMuestra.find(p => p.numeroMuestra === numero) ?? null
-    }));
-  });
+  /** Catadores incluidos en el consolidado del panel (el organizador desmarca a los descalibrados). */
+  readonly catadoresPanelIds = signal<ReadonlySet<string>>(new Set());
+
+  /** Muestra elegida en el modal (por defecto, la del medidor o la primera). */
+  readonly muestraHoja = computed<number | null>(() =>
+    this.muestraExportar() ?? this.muestraEnMedidor()?.numeroMuestra ?? this.numerosMuestra()[0] ?? null
+  );
 
   readonly catadorExportar = computed<CupperResultSummary | null>(() =>
     this.resultados()?.catadores.find(c => c.cupperId === this.catadorExportarId()) ?? null
   );
 
-  readonly fichaCatadorReporte = computed<FichaReporte | null>(() => {
-    const numero = this.muestraReporteCombinado()?.numeroMuestra;
-    return this.fichasDe(this.catadorExportar()).find(f => f.numeroMuestra === numero) ?? null;
+  /** Opciones del modal en modo Panel: quién tiene ficha de la muestra y su calibración. */
+  readonly opcionesPanel = computed(() => {
+    const muestra = this.muestraHoja();
+    const seleccion = this.catadoresPanelIds();
+    return this.catadoresExportables().map(c => ({
+      id: c.cupperId,
+      nombre: c.nombre,
+      tieneFicha: c.puntajesPorMuestra.some(p => p.numeroMuestra === muestra),
+      seleccionado: seleccion.has(c.cupperId),
+      desviacion: c.desviacionRespectoPanel
+    }));
+  });
+
+  readonly puedeConfirmarExportar = computed(() => {
+    if (this.imprimiendo() || this.muestraHoja() === null) return false;
+    if (!this.formatoHoja()) return true;
+    if (this.modoExportacion() === 'catador') {
+      return this.catadorExportar()?.puntajesPorMuestra.some(p => p.numeroMuestra === this.muestraHoja()) ?? false;
+    }
+    return this.opcionesPanel().some(o => o.seleccionado && o.tieneFicha);
+  });
+
+  /**
+   * Datos de la hoja SCA según el modal:
+   *  · Por catador → su ficha tal cual (sliders, casillas, círculos, notas).
+   *  · Panel → solo catadores marcados: promedio de intensidades, mayoría
+   *    (> 50 %) en casillas y entero más cercano en los círculos 1–9.
+   */
+  readonly hojaSca = computed<HojaSca | null>(() => {
+    const r = this.resultados();
+    const formato = this.formatoHoja();
+    const numero = this.muestraHoja();
+    if (!r || !formato || numero === null) return null;
+
+    const muestra = r.muestras.find(m => m.numeroMuestra === numero);
+    const base = {
+      formato,
+      titulo: formato === 'combinado' ? 'Formato Combinado' : 'Formato Descriptivo',
+      objetivo: r.nombreSesion,
+      numeroMuestra: numero,
+      nivelTueste: muestra?.nivelTueste ?? null
+    };
+
+    if (this.modoExportacion() === 'catador') {
+      const catador = this.catadorExportar();
+      const ficha = catador?.puntajesPorMuestra.find(p => p.numeroMuestra === numero);
+      if (!catador || !ficha) return null;
+      return {
+        ...base,
+        esPanel: false,
+        nombre: catador.nombre,
+        fecha: formatearFecha(catador.submittedAt ?? this.fechaReporte()),
+        ficha: leerFichaSca(ficha),
+        resumenPanel: null
+      };
+    }
+
+    const seleccion = this.catadoresPanelIds();
+    const conFicha = r.catadores
+      .map(c => ({ catador: c, ficha: c.puntajesPorMuestra.find(p => p.numeroMuestra === numero) }))
+      .filter((x): x is { catador: CupperResultSummary; ficha: NonNullable<typeof x.ficha> } => !!x.ficha);
+    const incluidos = conFicha.filter(x => seleccion.has(x.catador.cupperId));
+    const excluidos = conFicha.filter(x => !seleccion.has(x.catador.cupperId));
+    if (incluidos.length === 0) return null;
+
+    const resumen = [
+      `Consolidado de ${incluidos.length} ficha(s): ${incluidos.map(x => x.catador.nombre).join(', ')}.`,
+      excluidos.length ? `Excluidos por el organizador: ${excluidos.map(x => x.catador.nombre).join(', ')}.` : '',
+      'Notas y descriptores libres: ver el reporte individual de cada catador.'
+    ].filter(Boolean).join(' ');
+
+    const puntajes = incluidos.map(x => x.ficha.puntaje).filter(p => p > 0);
+    const puntaje = formato === 'combinado' ? puntajePanel(puntajes) : null;
+    return {
+      ...base,
+      esPanel: true,
+      nombre: 'Consolidado del Panel',
+      fecha: formatearFecha(this.fechaReporte()),
+      ficha: consolidarFichas(incluidos.map(x => leerFichaSca(x.ficha)), resumen),
+      resumenPanel: {
+        puntaje,
+        clasificacion: puntaje === null ? '' : clasificarPuntaje(puntaje).etiqueta,
+        fichas: `${incluidos.length} / ${conFicha.length}`,
+        minMax: puntajes.length ? `${Math.min(...puntajes).toFixed(2)} – ${Math.max(...puntajes).toFixed(2)}` : '—',
+        recortado: puntajes.length >= 5
+      }
+    };
   });
 
   /** Nombre del documento: el navegador lo propone como nombre del PDF. */
@@ -402,23 +512,28 @@ export class ResultsPage implements OnInit {
     const r = this.resultados();
     if (!r) return 'Reporte PacamaraQs';
     const partes = [this.esExtrinseco() ? 'Ficha técnica' : 'Reporte SCA', r.nombreSesion, this.tituloFormato()];
-    if (this.esCombinado()) {
-      const muestra = this.muestraReporteCombinado()?.numeroMuestra;
+    if (this.formatoHoja()) {
+      const muestra = this.muestraHoja();
       if (muestra) partes.push(`Muestra ${muestra}`);
-      if (this.modoExportacion() === 'catador' && this.catadorExportar()) partes.push(this.catadorExportar()!.nombre);
+      if (this.modoExportacion() === 'catador') {
+        if (this.catadorExportar()) partes.push(this.catadorExportar()!.nombre);
+      } else {
+        partes.push('Panel');
+      }
     }
     return partes.filter(Boolean).join(' - ');
   });
 
   constructor() {
     addIcons({
-      checkmarkCircleOutline, closeOutline, documentTextOutline, downloadOutline, lockClosedOutline, medalOutline,
-      ribbonOutline, trophyOutline
+      checkmarkCircleOutline, closeOutline, documentTextOutline, downloadOutline, hourglassOutline, lockClosedOutline,
+      medalOutline, ribbonOutline, trophyOutline
     });
   }
 
   async ngOnInit(): Promise<void> {
     const sesionId = this.route.snapshot.paramMap.get('id')?.trim() ?? '';
+    this.sesionId = sesionId;
     if (!sesionId) {
       this.error.set('No se encontró el ID de la sesión.');
       this.cargando.set(false);
@@ -430,7 +545,9 @@ export class ResultsPage implements OnInit {
       this.resultados.set(resultados);
       if (!resultados) this.error.set('No se encontraron resultados para esta sesión.');
     } catch (error) {
-      if (codigoDeError(error) === '42501') this.accesoDenegado.set(true);
+      const codigo = codigoDeError(error);
+      if (codigo === '42501') this.accesoDenegado.set(true);
+      if (codigo === '22023') this.panelAbierto.set(true);
       this.error.set(mensajeDeError(error, 'No se pudieron cargar los resultados.'));
     } finally {
       this.cargando.set(false);
@@ -452,12 +569,16 @@ export class ResultsPage implements OnInit {
 
   /** Abre el modal; opcionalmente pre-seleccionado desde una ficha individual. */
   abrirExportar(opciones?: { numeroMuestra: number; cupperId: string }): void {
+    // Primera apertura: todos los catadores con fichas entran al consolidado.
+    if (this.catadoresPanelIds().size === 0) {
+      this.catadoresPanelIds.set(new Set(this.catadoresExportables().map(c => c.cupperId)));
+    }
     if (opciones) {
       this.muestraExportar.set(opciones.numeroMuestra);
       this.catadorExportarId.set(opciones.cupperId);
       this.modoExportacion.set('catador');
     } else {
-      this.muestraExportar.set(this.muestraExportar() ?? this.muestraEnMedidor()?.numeroMuestra ?? null);
+      this.muestraExportar.set(this.muestraHoja());
       this.catadorExportarId.set(this.catadorExportarId() ?? this.catadorReporte()?.cupperId ?? null);
     }
     this.modalExportarAbierto.set(true);
@@ -480,7 +601,33 @@ export class ResultsPage implements OnInit {
     this.catadorExportarId.set(typeof valor === 'string' ? valor : null);
   }
 
+  /** Texto de la columna afectiva: valor hedónico de cada atributo de la fila. */
+  etiquetasAfectivas(hoja: HojaSca, atributos: readonly AtributoHoja[]): string {
+    return atributos
+      .map(a => {
+        const valor = hoja.ficha.calidad[a];
+        if (valor === null) return '';
+        const prefijo = hoja.esPanel && !Number.isInteger(valor) ? `prom. ${valor.toFixed(2)} → ` : '';
+        return `${ETIQUETA_ATRIBUTO[a]}: ${prefijo}${etiquetaCalidad(valor)}`;
+      })
+      .filter(Boolean)
+      .join(' · ');
+  }
+
+  /** Cajas de tazas (0–5) que se marcan: entero más cercano. */
+  circuloMarcadoTazas(valor: number): number {
+    return Math.min(5, Math.max(0, Math.round(valor)));
+  }
+
+  toggleCatadorPanel(cupperId: string, incluir: boolean): void {
+    const siguiente = new Set(this.catadoresPanelIds());
+    if (incluir) siguiente.add(cupperId);
+    else siguiente.delete(cupperId);
+    this.catadoresPanelIds.set(siguiente);
+  }
+
   async confirmarExportar(): Promise<void> {
+    if (!this.puedeConfirmarExportar()) return;
     this.cerrarExportar();
     await this.exportarPDF();
   }
@@ -509,6 +656,11 @@ export class ResultsPage implements OnInit {
     } finally {
       this.imprimiendo.set(false);
     }
+  }
+
+  /** Con fichas pendientes, el organizador finaliza el panel desde el monitoreo. */
+  irAMonitoreo(): void {
+    if (this.sesionId) void this.navCtrl.navigateForward(`/session/${this.sesionId}/organizer-dashboard`);
   }
 
   volverAlPanel(): void {

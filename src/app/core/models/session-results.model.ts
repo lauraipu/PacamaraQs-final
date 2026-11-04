@@ -28,6 +28,8 @@ export interface CupperResultSummary {
     /** Impresión Global 1–9 (null si el formato no la usa). */
     impresionGlobal: number | null;
     atributos: Partial<Record<string, ValorAtributo>>;
+    /** JSON del formulario enviado (descriptores, notas, textura, defectos). */
+    formulario: Record<string, unknown> | null;
   }[];
 }
 

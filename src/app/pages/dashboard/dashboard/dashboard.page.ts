@@ -18,19 +18,26 @@ import {
   IonFabButton,
   IonIcon,
   IonModal,
+  IonSearchbar,
   AlertController,
+  ModalController,
   ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { keyOutline, addOutline, arrowForwardOutline } from 'ionicons/icons';
+import { keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
 import { SesionConRol, SesionService } from '../../../core/services/sesion';
 import { SupabaseService } from '../../../core/services/supabase';
 import { EstadoSesion, getFormatoById } from '../../../core/models/sesion.model';
+import {
+  ModoEscaneo, ResultadoEscaneo, ScannerModalComponent
+} from '../../../shared/components/scanner-modal/scanner-modal.component';
 
 interface SesionItemUi {
   id: string;
   titulo: string;
+  /** Título precalculado para la búsqueda (evita normalizar en cada render). */
+  tituloNormalizado: string;
   formato: string;
   tipo: string;
   estado: string;
@@ -40,6 +47,15 @@ interface SesionItemUi {
   cantCatadores: number;
   esOrganizador: boolean;
   organizadorParticipa: boolean;
+}
+
+/** Minúsculas y sin tildes/diacríticos, para comparar texto en español. */
+export function normalizarTexto(texto: string | null | undefined): string {
+  return (texto ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 }
 
 @Component({
@@ -63,6 +79,7 @@ interface SesionItemUi {
     IonFabButton,
     IonIcon,
     IonModal,
+    IonSearchbar,
     CommonModule,
     FormsModule
   ]
@@ -75,6 +92,8 @@ export class DashboardPage implements OnInit {
   cargandoPerfil = true;
   isModalOpen = false;
   filtroSeleccionado: 'todas' | 'organizador' | 'catador' = 'todas';
+  /** Texto del buscador (se filtra por título de la sesión). */
+  terminoBusqueda = '';
 
   sesiones: SesionItemUi[] = [];
   cargando = true;
@@ -87,13 +106,14 @@ export class DashboardPage implements OnInit {
   private readonly supabaseService = inject(SupabaseService);
   private readonly toastController = inject(ToastController);
   private readonly alertController = inject(AlertController);
+  private readonly modalController = inject(ModalController);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private inicializando = false;
   private primeraCargaCompleta = false;
 
   constructor() {
     // arrow-forward-outline se usa en el modal "Unirme" y no estaba registrado.
-    addIcons({ keyOutline, addOutline, arrowForwardOutline });
+    addIcons({ keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline });
   }
 
   ngOnInit(): void {
@@ -104,7 +124,28 @@ export class DashboardPage implements OnInit {
     if (this.primeraCargaCompleta) void this.inicializar();
   }
 
-  get sesionesFiltradas(): SesionItemUi[] {
+  /* ── Contadores de los segmentos ──────────────────────────────────────── */
+  get totalOrganizador(): number {
+    return this.sesiones.filter(s => s.esOrganizador).length;
+  }
+
+  get totalCatador(): number {
+    return this.sesiones.length - this.totalOrganizador;
+  }
+
+  /* ── Filtros ──────────────────────────────────────────────────────────── */
+
+  /** Término normalizado: sin espacios sobrantes, en minúsculas y sin tildes. */
+  get busquedaNormalizada(): string {
+    return normalizarTexto(this.terminoBusqueda);
+  }
+
+  get hayBusqueda(): boolean {
+    return this.busquedaNormalizada.length > 0;
+  }
+
+  /** Sesiones del segmento elegido (Todas / Organizador / Catador). */
+  get sesionesDelSegmento(): SesionItemUi[] {
     if (this.filtroSeleccionado === 'organizador') {
       return this.sesiones.filter(s => s.esOrganizador);
     }
@@ -112,6 +153,44 @@ export class DashboardPage implements OnInit {
       return this.sesiones.filter(s => !s.esOrganizador);
     }
     return this.sesiones;
+  }
+
+  /**
+   * Doble filtro: primero el segmento y luego el título. La comparación
+   * ignora mayúsculas y tildes ("extrinseco" encuentra "Extrínseco").
+   */
+  get sesionesFiltradas(): SesionItemUi[] {
+    const delSegmento = this.sesionesDelSegmento;
+    const termino = this.busquedaNormalizada;
+    if (!termino) return delSegmento;
+    return delSegmento.filter(s => s.tituloNormalizado.includes(termino));
+  }
+
+  /**
+   * Abre el escáner de fichas con IA.
+   *  · 'muestra': ficha suelta → Sesión Personal → resultados.
+   *  · 'sesion': ficha de una sesión en curso donde el usuario participa.
+   */
+  async escanear(tipo: ModoEscaneo): Promise<void> {
+    const modal = await this.modalController.create({
+      component: ScannerModalComponent,
+      componentProps: { modo: tipo },
+      cssClass: 'scanner-modal'
+    });
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss<ResultadoEscaneo>();
+    if (role !== 'guardado') return;
+    if (data?.destino) {
+      await this.router.navigateByUrl(data.destino);
+    } else {
+      void this.inicializar();
+    }
+  }
+
+  limpiarBusqueda(): void {
+    this.terminoBusqueda = '';
+    this.changeDetector.markForCheck();
   }
 
   private async inicializar(): Promise<void> {
@@ -336,6 +415,7 @@ export class DashboardPage implements OnInit {
     return {
       id: sesion.id,
       titulo: sesion.nombre,
+      tituloNormalizado: normalizarTexto(sesion.nombre),
       formato: sesion.formato,
       tipo: getFormatoById(sesion.formato).titulo,
       estado,

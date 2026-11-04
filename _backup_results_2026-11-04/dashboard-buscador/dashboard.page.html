@@ -1,0 +1,162 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>
+      <div class="brand-title">Pacamara</div>
+      <div class="brand-subtitle">{{ nombreUsuario }}</div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="medium" (click)="cerrarSesion()" [disabled]="isSigningOut">
+        Cerrar sesión
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding dashboard-content">
+  <main class="dashboard-container">
+    
+    <!-- RESUMEN DE MÉTRICAS -->
+    <section class="metrics" aria-label="Resumen">
+      <article class="cupping-card metric-card">
+        <div class="metric-label">Sesiones</div>
+        <div class="metric-value">{{ sesiones.length }}</div>
+      </article>
+      <article class="cupping-card metric-card">
+        <div class="metric-label">Muestras</div>
+        <div class="metric-value">—</div>
+      </article>
+      <article class="cupping-card metric-card">
+        <div class="metric-label">Prom. personal</div>
+        <div class="metric-value">—</div>
+      </article>
+    </section>
+
+    <!-- FILTROS POR ROL -->
+    <div class="filter-container">
+      <ion-segment [(ngModel)]="filtroSeleccionado" mode="ios">
+        <ion-segment-button value="todas">
+          <ion-label>Todas ({{ sesiones.length }})</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="organizador">
+          <ion-label>Organizador</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="catador">
+          <ion-label>Catador</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <!-- CABECERA DE SECCIÓN Y BOTÓN NUEVA SESIÓN -->
+    <section class="section-heading">
+      <h2>Mis Sesiones</h2>
+      <ion-button size="small" class="new-session-btn" (click)="nuevaSesion()">
+        <span aria-hidden="true">+</span>
+        Nueva sesión
+      </ion-button>
+    </section>
+
+    <!-- LISTADO DE SESIONES -->
+    <div class="sessions-list-container">
+      @if (cargando) {
+        <div class="loading-state" role="status">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Cargando sesiones…</span>
+        </div>
+      } @else if (sesionesFiltradas.length === 0) {
+        <article class="cupping-card empty-state">
+          @if (sesiones.length === 0) {
+            <h3>Aún no hay sesiones</h3>
+            <p>Crea una sesión o únete presionando el botón flotante con el código del organizador.</p>
+          } @else {
+            <p>No tienes sesiones en esta categoría.</p>
+          }
+        </article>
+      } @else {
+        @for (sesion of sesionesFiltradas; track sesion.id) {
+          <article class="cupping-card session-card" (click)="entrarASesion(sesion)">
+            <div class="session-card__top">
+              <div class="session-chips">
+                <span class="chip" [class.chip-active]="sesion.estado === 'En progreso'">
+                  {{ sesion.estado }}
+                </span>
+                <span class="chip chip-neutral">{{ sesion.rol }}</span>
+              </div>
+              @if (sesion.esOrganizador) {
+                <div class="session-card__menu">
+                  <button
+                    type="button"
+                    class="session-card__menu-trigger"
+                    aria-label="Opciones de sesión"
+                    [attr.aria-expanded]="menuSesionAbiertoId === sesion.id"
+                    [disabled]="sesionEliminandoId === sesion.id"
+                    (click)="toggleMenuSesion(sesion.id, $event)">
+                    ⋮
+                  </button>
+                  @if (menuSesionAbiertoId === sesion.id) {
+                    <div class="session-card__menu-dropdown" (click)="$event.stopPropagation()">
+                      <button
+                        type="button"
+                        class="session-card__menu-item session-card__menu-item--danger"
+                        (click)="solicitarEliminarSesion(sesion, $event)">
+                        Eliminar sesión
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+            <div class="session-type">{{ sesion.tipo }}</div>
+            <h3>{{ sesion.titulo }}</h3>
+            <div class="session-meta">
+              <span>{{ sesion.fecha }}</span>
+              <span>{{ sesion.cantMuestras }} muestras</span>
+              <span>{{ sesion.formato.toLowerCase() === 'extrinseca' ? 'Individual' : sesion.cantCatadores + ' catadores' }}</span>
+            </div>
+          </article>
+        }
+      }
+    </div>
+  </main>
+
+  <!-- BOTÓN FLOTANTE PARA UNIRSE -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button class="join-fab" (click)="abrirModalUnirse()" aria-label="Unirme a una sesión">
+      <ion-icon name="key-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- MODAL INFERIOR (BOTTOM SHEET) -->
+  <ion-modal
+    [isOpen]="isModalOpen"
+    (didDismiss)="cerrarModalUnirse()"
+    [initialBreakpoint]="0.4"
+    [breakpoints]="[0, 0.4]">
+    <ng-template>
+      <div class="modal-content ion-padding">
+        <h3>Unirme a una sesión</h3>
+        <p class="subtitle">Ingresa el código proporcionado por el organizador</p>
+
+        <ion-input
+          [(ngModel)]="codigoInput"
+          placeholder="Ej: ABC-123"
+          autocapitalize="characters"
+          fill="outline"
+          class="custom-input ion-margin-top">
+        </ion-input>
+
+        <ion-button
+          expand="block"
+          class="join-btn primary-btn"
+          [disabled]="isJoining || cargandoPerfil || !codigoInput.trim()"
+          (click)="unirseSesion()">
+          @if (isJoining) {
+            <ion-spinner name="crescent"></ion-spinner>
+          } @else {
+            Unirme
+            <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+          }
+        </ion-button>
+      </div>
+    </ng-template>
+  </ion-modal>
+</ion-content>

@@ -1,0 +1,213 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="page-title">
+        {{ pasoActual === 1 ? 'Crear sesión' : 'Código de acceso' }}
+      </div>
+      <div class="page-subtitle">
+        {{ pasoActual === 1 ? 'Paso 1 — Configuración' : 'Sesión configurada' }}
+      </div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding create-session-content">
+  <main class="create-session-container">
+    @if (error) {
+      <div class="error-message" role="alert">{{ error }}</div>
+    }
+
+    @if (pasoActual === 1) {
+      <section class="cupping-card">
+        <h2 class="section-title">Información general</h2>
+        <div class="session-field">
+          <label class="input-label" for="session-name">Nombre de la sesión</label>
+          <ion-input
+            id="session-name"
+            [(ngModel)]="nombreSesion"
+            placeholder="Ej.: Cosecha de mayo — Colombia"
+            class="custom-input"
+            required
+          ></ion-input>
+        </div>
+        <div>
+          <label class="input-label" for="session-notes">Notas adicionales</label>
+          <ion-textarea
+            id="session-notes"
+            [(ngModel)]="notasSesion"
+            placeholder="Información sobre origen, proceso..."
+            class="custom-input"
+            [autoGrow]="true"
+            rows="3"
+          ></ion-textarea>
+        </div>
+      </section>
+
+      <section class="cupping-card">
+        <h2 class="section-title">Formato CVA</h2>
+        <p class="help-text">Selecciona el tipo de evaluación según la metodología SCA CVA v2.</p>
+
+        @for (formato of formatosList; track formato.id) {
+          <button
+            type="button"
+            class="formato-item"
+            [class.selected]="formatoSeleccionado === formato.id"
+            [attr.aria-pressed]="formatoSeleccionado === formato.id"
+            (click)="formatoSeleccionado = formato.id"
+          >
+            <span class="format-heading">
+              <span class="format-name">{{ formato.titulo }}</span>
+              @if (formatoSeleccionado === formato.id) {
+                <ion-icon
+                  class="selected-mark"
+                  name="checkmark-circle"
+                  aria-label="Seleccionado"
+                ></ion-icon>
+              }
+            </span>
+            <span class="format-description">{{ formato.desc }}</span>
+            <span class="format-tag">{{ formato.tag }}</span>
+          </button>
+        }
+      </section>
+
+      <section class="cupping-card" *ngIf="formatoSeleccionado !== 'extrinseca'">
+        <h2 class="section-title">Parámetros del panel</h2>
+
+        <div class="slider-header">
+          <span class="slider-label">Número de muestras</span>
+          <span class="slider-value">{{ numeroMuestras }}</span>
+        </div>
+        <ion-range
+          [(ngModel)]="numeroMuestras"
+          aria-label="Número de muestras"
+          [min]="1"
+          [max]="20"
+          [step]="1"
+        ></ion-range>
+        <div class="slider-limits samples-limits">
+          <span>1</span><span>20</span>
+        </div>
+
+        <div class="slider-header">
+          <span class="slider-label">Catadores objetivo</span>
+          <span class="slider-value">{{ catadoresObjetivo }}</span>
+        </div>
+        <ion-range
+          [(ngModel)]="catadoresObjetivo"
+          aria-label="Catadores objetivo"
+          [min]="3"
+          [max]="15"
+          [step]="1"
+        ></ion-range>
+        <div class="slider-limits">
+          <span>3 (mín.)</span><span>15</span>
+        </div>
+
+        <hr class="divider">
+
+        <div class="participar-container">
+          <div class="participar-text">
+            <div class="participar-title">¿Participarás como catador?</div>
+            <div class="participar-desc">Tu evaluación contará igual en el promedio recortado del panel.</div>
+          </div>
+          <ion-toggle
+            [(ngModel)]="participaComoCatador"
+            class="custom-toggle"
+            aria-label="Participar como catador"
+          ></ion-toggle>
+        </div>
+
+        <div class="info-box" role="note">
+          <ion-icon name="information-circle-outline" class="info-icon" aria-hidden="true"></ion-icon>
+          <span class="info-text">
+            La sesión requiere mínimo 3 catadores para iniciar. El código expira cuando el organizador inicia la cata.
+          </span>
+        </div>
+      </section>
+    } @else {
+      <section class="cupping-card code-card">
+        <h2 class="section-title">Código de sesión</h2>
+        <div class="code-display">
+          <strong>{{ codigoGenerado }}</strong>
+          <ion-button
+            fill="outline"
+            class="copy-button"
+            (click)="copiarCodigo()"
+            [disabled]="isCopying"
+          >
+            @if (copiado) {
+              Copiado
+            } @else if (isCopying) {
+              Copiando…
+            } @else {
+              Copiar código
+            }
+          </ion-button>
+        </div>
+        <p class="help-text">Comparte este código con los catadores.</p>
+      </section>
+
+      <section class="cupping-card">
+        <h2 class="section-title">Resumen de la sesión</h2>
+        <div class="summary-row"><span>Nombre</span><strong>{{ nombreSesion || 'Sin nombre' }}</strong></div>
+        <hr>
+        <div class="summary-row"><span>Formato CVA</span><strong>{{ getTituloFormato() }}</strong></div>
+        <hr>
+        <div class="summary-row">
+          <span>Muestras</span>
+          <strong>{{ formatoSeleccionado === 'extrinseca' ? 1 : numeroMuestras }}</strong>
+        </div>
+        <hr>
+        <div class="summary-row">
+          <span>Catadores objetivo</span>
+          <strong>{{ formatoSeleccionado === 'extrinseca' ? 3 : catadoresObjetivo }}</strong>
+        </div>
+        <hr>
+        <div class="summary-row">
+          <span>Organizador catador</span>
+          <strong>{{ formatoSeleccionado === 'extrinseca' ? 'Individual' : (participaComoCatador ? 'Sí' : 'No') }}</strong>
+        </div>
+      </section>
+    }
+  </main>
+</ion-content>
+
+<ion-footer class="ion-no-border create-session-footer">
+  @if (pasoActual === 1) {
+    <ion-button
+      expand="block"
+      class="primary-btn"
+      (click)="generarCodigo()"
+      [disabled]="!nombreSesion.trim() || isLoading"
+    >
+      @if (isLoading) {
+        <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+        Generar código de acceso →
+      }
+    </ion-button>
+  } @else {
+    <div class="footer-actions">
+      <ion-button
+        fill="outline"
+        class="edit-button"
+        routerLink="/dashboard"
+        [disabled]="isLoading"
+      >
+        Salir
+      </ion-button>
+      <ion-button
+        expand="block"
+        class="primary-btn continue-button"
+        (click)="irASalaDeEspera()"
+        [disabled]="isLoading"
+      >
+        {{ formatoSeleccionado === 'extrinseca' ? 'Ir a la evaluación →' : 'Ir a sala de espera →' }}
+      </ion-button>
+    </div>
+  }
+</ion-footer>

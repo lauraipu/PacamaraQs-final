@@ -1,0 +1,185 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="sc-toolbar">
+    <ion-title>{{ titulo() }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button aria-label="Cerrar" (click)="cerrar()" [disabled]="guardando()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding sc-content">
+  <!-- Pasos -->
+  <ol class="sc-steps" aria-label="Progreso">
+    <li [class.sc-steps__item--on]="paso() >= 1"><span>1</span>Foto</li>
+    <li [class.sc-steps__item--on]="paso() >= 2"><span>2</span>Formato</li>
+    <li [class.sc-steps__item--on]="paso() >= 3"><span>3</span>Revisión</li>
+  </ol>
+
+  @if (modoSimulado) {
+    <p class="sc-banner sc-banner--info">
+      <ion-icon name="flask-outline" aria-hidden="true"></ion-icon>
+      Modo prueba: no hay llave de IA configurada; el análisis devuelve datos simulados.
+    </p>
+  }
+
+  @if (error(); as mensaje) {
+    <p class="sc-banner sc-banner--error" role="alert">
+      <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>{{ mensaje }}
+    </p>
+  }
+
+  @if (ficha(); as f) {
+    <!-- ═════ Paso D: revisión ═════ -->
+    <section class="sc-card">
+      <div class="sc-review__head">
+        <div>
+          <h2>Datos extraídos · {{ tituloFormato() }}</h2>
+          <p class="sc-muted">Revisa que coincidan con la ficha en papel antes de guardar.</p>
+        </div>
+        @if (f.simulada) { <ion-badge class="sc-badge sc-badge--sim">Simulado</ion-badge> }
+      </div>
+
+      @if (f.camposFaltantes.length > 0) {
+        <p class="sc-banner sc-banner--warn">
+          <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+          No se pudo leer: {{ f.camposFaltantes.join(', ') }}. Esos campos quedarán vacíos.
+        </p>
+      }
+
+      @if (f.formato === 'extrinseca') {
+        <dl class="sc-dl">
+          <dt>País</dt><dd>{{ valorDe(f, 'farming.country') }}</dd>
+          <dt>Región</dt><dd>{{ valorDe(f, 'farming.region') }}</dd>
+          <dt>Finca</dt><dd>{{ valorDe(f, 'farming.farmName') }}</dd>
+          <dt>Variedad</dt><dd>{{ valorDe(f, 'farming.variety') }}</dd>
+          <dt>Proceso</dt><dd>{{ valorDe(f, 'processing.processType') }}</dd>
+          <dt>Grado</dt><dd>{{ valorDe(f, 'trading.grade') }}</dd>
+        </dl>
+      } @else {
+        <table class="sc-table">
+          <thead>
+            <tr>
+              <th scope="col">Atributo</th>
+              @if (f.formato !== 'afectivo') { <th scope="col" class="sc-num">Intensidad</th> }
+              @if (f.formato !== 'descriptivo') { <th scope="col" class="sc-num">Calidad</th> }
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of f.atributos; track a.atributo) {
+              <tr>
+                <td>{{ a.etiqueta }}</td>
+                @if (f.formato !== 'afectivo') { <td class="sc-num">{{ a.intensidad === null ? '—' : (a.intensidad | number:'1.0-1') }}</td> }
+                @if (f.formato !== 'descriptivo') { <td class="sc-num">{{ a.calidad ?? '—' }}</td> }
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (f.formato !== 'descriptivo') {
+          <div class="sc-kpis">
+            <div><strong>{{ f.impresionGlobal ?? '—' }}</strong><span>Impresión global</span></div>
+            <div><strong>{{ f.tazasNoUniformes }} / {{ f.tazasDefectuosas }}</strong><span>Tazas u / d</span></div>
+            <div class="sc-kpis__score"><strong>{{ f.puntaje === null ? '—' : (f.puntaje | number:'1.2-2') }}</strong><span>Puntaje CVA</span></div>
+          </div>
+        }
+
+        @if (f.descriptores.length > 0) {
+          <div class="sc-chips">
+            @for (d of f.descriptores; track d) { <span>{{ d }}</span> }
+          </div>
+        }
+      }
+    </section>
+
+    <div class="sc-actions">
+      <ion-button fill="outline" [disabled]="guardando()" (click)="volverAEscanear()">
+        <ion-icon slot="start" name="refresh-outline"></ion-icon>
+        Volver
+      </ion-button>
+      <ion-button class="primary-btn" [disabled]="guardando()" (click)="guardar()">
+        @if (guardando()) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+          {{ modo === 'muestra' ? 'Guardar y ver resultados' : 'Guardar ficha' }}
+        }
+      </ion-button>
+    </div>
+  } @else if (imagen(); as img) {
+    <!-- ═════ Paso B: vista previa + formato ═════ -->
+    <section class="sc-card sc-preview">
+      <img [src]="img.vistaPrevia" alt="Vista previa de la ficha escaneada">
+      <label class="sc-link">
+        <ion-icon name="image-outline" aria-hidden="true"></ion-icon> Cambiar foto
+        <input type="file" accept="image/*" capture="environment" class="sc-file" (change)="alSeleccionarArchivo($event)" [disabled]="analizando()">
+      </label>
+    </section>
+
+    @if (modo === 'sesion') {
+      <section class="sc-card">
+        <h2 class="sc-label">Sesión en curso</h2>
+        @if (cargandoSesiones()) {
+          <div class="sc-inline"><ion-spinner name="crescent"></ion-spinner> Cargando sesiones…</div>
+        } @else if (sesionesDisponibles().length === 0) {
+          <p class="sc-muted">
+            No tienes sesiones en curso donde participes como catador. Para una ficha suelta usa <b>Escanear muestra</b>.
+          </p>
+        } @else {
+          <ion-select class="sc-select" interface="popover" placeholder="Selecciona la sesión" aria-label="Sesión"
+            [value]="sesionId()" (ionChange)="cambiarSesion($event.detail.value)" [disabled]="analizando()">
+            @for (s of sesionesDisponibles(); track s.id) {
+              <ion-select-option [value]="s.id">{{ s.nombre }}</ion-select-option>
+            }
+          </ion-select>
+          @if (sesionSeleccionada(); as s) {
+            <div class="sc-row">
+              <ion-select class="sc-select" interface="popover" aria-label="Muestra"
+                [value]="numeroMuestra()" (ionChange)="cambiarMuestra($event.detail.value)" [disabled]="analizando()">
+                @for (n of muestrasSesion(); track n) { <ion-select-option [value]="n">Muestra {{ n }}</ion-select-option> }
+              </ion-select>
+              <ion-badge class="sc-badge">{{ tituloFormato() }}</ion-badge>
+            </div>
+            <p class="sc-muted sc-small">El formato lo define la sesión. Si la muestra ya tenía ficha, se reemplaza.</p>
+          }
+        }
+      </section>
+    } @else {
+      <section class="sc-card">
+        <h2 class="sc-label">Formato de la ficha</h2>
+        <ion-segment class="sc-segment" [value]="formato()" (ionChange)="cambiarFormato($event.detail.value)" [disabled]="analizando()">
+          @for (f of formatos; track f.id) {
+            <ion-segment-button [value]="f.id"><ion-label>{{ f.titulo }}</ion-label></ion-segment-button>
+          }
+        </ion-segment>
+        <ion-input class="sc-input" fill="outline" label="Nombre de la muestra (opcional)" labelPlacement="stacked"
+          placeholder="Ej: Pacamara lote 12" maxlength="120" [value]="nombrePersonal()" (ionInput)="cambiarNombre($event.detail.value)">
+        </ion-input>
+        <p class="sc-muted sc-small">Se guardará como una sesión personal de 1 muestra y verás sus resultados.</p>
+      </section>
+    }
+
+    <ion-button expand="block" class="primary-btn sc-analizar" [disabled]="!puedeAnalizar()" (click)="analizar()">
+      @if (analizando()) {
+        <ion-spinner name="crescent"></ion-spinner>&nbsp;Analizando ficha…
+      } @else {
+        <ion-icon slot="start" name="sparkles-outline"></ion-icon>
+        Analizar con IA
+      }
+    </ion-button>
+  } @else {
+    <!-- ═════ Paso A: cámara o galería ═════ -->
+    <label class="sc-drop" [class.sc-drop--busy]="preparandoImagen()">
+      @if (preparandoImagen()) {
+        <ion-spinner name="crescent"></ion-spinner>
+        <strong>Preparando imagen…</strong>
+      } @else {
+        <span class="sc-drop__icon" aria-hidden="true"><ion-icon name="camera-outline"></ion-icon></span>
+        <strong>Abrir cámara o subir foto</strong>
+        <small>Toma la ficha completa, de frente y con buena luz.</small>
+      }
+      <input type="file" accept="image/*" capture="environment" class="sc-file" (change)="alSeleccionarArchivo($event)" [disabled]="preparandoImagen()">
+    </label>
+  }
+</ion-content>

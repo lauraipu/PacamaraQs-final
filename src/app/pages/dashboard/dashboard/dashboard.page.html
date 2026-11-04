@@ -15,20 +15,32 @@
 <ion-content class="ion-padding dashboard-content">
   <main class="dashboard-container">
     
-    <!-- RESUMEN DE MÉTRICAS -->
-    <section class="metrics" aria-label="Resumen">
-      <article class="cupping-card metric-card">
-        <div class="metric-label">Sesiones</div>
-        <div class="metric-value">{{ sesiones.length }}</div>
-      </article>
-      <article class="cupping-card metric-card">
-        <div class="metric-label">Muestras</div>
-        <div class="metric-value">—</div>
-      </article>
-      <article class="cupping-card metric-card">
-        <div class="metric-label">Prom. personal</div>
-        <div class="metric-value">—</div>
-      </article>
+    <!-- ESCANEO RÁPIDO (placeholder hasta implementar las pantallas de escaneo) -->
+    <section class="cupping-card scan-card" aria-labelledby="scan-title">
+      <div class="scan-card__head">
+        <h2 id="scan-title">¿Deseas escanear?</h2>
+        <p>Accede rápido a una sesión o a una muestra con su código.</p>
+      </div>
+      <div class="scan-actions">
+        <button type="button" class="scan-action" (click)="escanear('sesion')">
+          <span class="scan-action__icon" aria-hidden="true">
+            <ion-icon name="qr-code-outline"></ion-icon>
+          </span>
+          <span class="scan-action__text">
+            <strong>Escanear sesión</strong>
+            <small>Código QR del organizador</small>
+          </span>
+        </button>
+        <button type="button" class="scan-action" (click)="escanear('muestra')">
+          <span class="scan-action__icon" aria-hidden="true">
+            <ion-icon name="barcode-outline"></ion-icon>
+          </span>
+          <span class="scan-action__text">
+            <strong>Escanear muestra</strong>
+            <small>Etiqueta de la muestra</small>
+          </span>
+        </button>
+      </div>
     </section>
 
     <!-- FILTROS POR ROL -->
@@ -38,12 +50,34 @@
           <ion-label>Todas ({{ sesiones.length }})</ion-label>
         </ion-segment-button>
         <ion-segment-button value="organizador">
-          <ion-label>Organizador</ion-label>
+          <ion-label>Organizador ({{ totalOrganizador }})</ion-label>
         </ion-segment-button>
         <ion-segment-button value="catador">
-          <ion-label>Catador</ion-label>
+          <ion-label>Catador ({{ totalCatador }})</ion-label>
         </ion-segment-button>
       </ion-segment>
+    </div>
+
+    <!-- BUSCADOR POR TÍTULO -->
+    <div class="search-container">
+      <ion-searchbar
+        class="session-search"
+        [(ngModel)]="terminoBusqueda"
+        [debounce]="150"
+        placeholder="Buscar sesión por nombre"
+        search-icon="search-outline"
+        show-clear-button="focus"
+        inputmode="search"
+        enterkeyhint="search"
+        aria-label="Buscar sesión por nombre"
+        [disabled]="cargando">
+      </ion-searchbar>
+      @if (hayBusqueda && !cargando) {
+        <p class="search-summary" role="status">
+          {{ sesionesFiltradas.length }} {{ sesionesFiltradas.length === 1 ? 'resultado' : 'resultados' }}
+          para «{{ terminoBusqueda.trim() }}»
+        </p>
+      }
     </div>
 
     <!-- CABECERA DE SECCIÓN Y BOTÓN NUEVA SESIÓN -->
@@ -67,6 +101,13 @@
           @if (sesiones.length === 0) {
             <h3>Aún no hay sesiones</h3>
             <p>Crea una sesión o únete presionando el botón flotante con el código del organizador.</p>
+          } @else if (hayBusqueda) {
+            <ion-icon name="search-outline" class="empty-state__icon" aria-hidden="true"></ion-icon>
+            <h3>Sin coincidencias</h3>
+            <p>No se encontraron sesiones que coincidan con tu búsqueda.</p>
+            <ion-button fill="outline" size="small" class="empty-state__action" (click)="limpiarBusqueda()">
+              Limpiar búsqueda
+            </ion-button>
           } @else {
             <p>No tienes sesiones en esta categoría.</p>
           }
@@ -109,8 +150,8 @@
             <h3>{{ sesion.titulo }}</h3>
             <div class="session-meta">
               <span>{{ sesion.fecha }}</span>
-              <span>{{ sesion.cantMuestras }} muestras</span>
-              <span>{{ sesion.cantCatadores }} catadores</span>
+              <span>{{ sesion.cantMuestras }} {{ sesion.cantMuestras === 1 ? 'muestra' : 'muestras' }}</span>
+              <span>{{ sesion.formato.toLowerCase() === 'extrinseca' ? 'Individual' : sesion.cantCatadores === 1 ? 'Personal' : sesion.cantCatadores + ' catadores' }}</span>
             </div>
           </article>
         }

@@ -48,22 +48,45 @@ describe('EvaluationCompletePage', () => {
     });
   });
 
-  it('shows the access code and results button only to the organizer', async () => {
+  it('never shows the access code and offers results to the organizer once the panel is closed', async () => {
     const component = await crear('organizer-id');
 
     expect(component.nombreSesion()).toBe('Cosecha');
     expect(component.esOrganizador()).toBe(true);
-    expect(component.codigoSesion()).toBe('AB12-3C4');
+    expect(component.puedeVerResultados()).toBe(true);
+    expect('codigoSesion' in component).toBe(false);
 
     await component.irAResultados();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/session/session-id/results');
   });
 
-  it('keeps results and code hidden from tasters (blind evaluation)', async () => {
+  it('sends the organizer to the monitor instead of results while tasters are still evaluating', async () => {
+    obtenerSesionPorId.mockResolvedValue({ ...sesionBase(), estado: EstadoSesion.INICIADA });
+    const component = await crear('organizer-id');
+
+    expect(component.puedeVerResultados()).toBe(false);
+    expect(component.debeFinalizarPanel()).toBe(true);
+
+    await component.irAResultados();
+    expect(router.navigateByUrl).not.toHaveBeenCalled();
+    await component.irAMonitoreo();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/session/session-id/organizer-dashboard');
+  });
+
+  it('treats extrinsic sessions as individual (technical sheet, no monitor)', async () => {
+    obtenerSesionPorId.mockResolvedValue({ ...sesionBase(), formato: 'extrinseca', estado: EstadoSesion.FINALIZADA });
+    const component = await crear('organizer-id');
+
+    expect(component.esExtrinseco()).toBe(true);
+    expect(component.debeFinalizarPanel()).toBe(false);
+    expect(component.puedeVerResultados()).toBe(true);
+  });
+
+  it('keeps results hidden from tasters (blind evaluation)', async () => {
     const component = await crear('taster-id');
 
     expect(component.esOrganizador()).toBe(false);
-    expect(component.codigoSesion()).toBe('');
+    expect(component.puedeVerResultados()).toBe(false);
 
     await component.irAResultados();
     expect(router.navigateByUrl).not.toHaveBeenCalled();

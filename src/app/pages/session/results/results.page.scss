@@ -472,3 +472,39 @@
   .re-dl { grid-template-columns: 1fr; }
   .re-dl dt { padding-bottom: 0; border-bottom: none; font-size: 11px; }
 }
+
+/* Modal de exportación · lista de catadores del consolidado (modo Panel) */
+.rc-export__help { margin: -2px 0 8px; color: var(--app-text-muted); font-size: 11px; }
+.rc-export__panel {
+  max-height: 38vh;
+  margin: 0 0 12px;
+  padding: 0;
+  overflow-y: auto;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-control);
+  list-style: none;
+}
+.rc-export__panel-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--app-border);
+  font-size: 13px;
+
+  &:last-child { border-bottom: none; }
+
+  ion-checkbox {
+    --size: 18px;
+    --checkbox-background-checked: var(--app-primary-dark);
+    --border-color-checked: var(--app-primary-dark);
+    flex: 1;
+    color: var(--app-text-main);
+  }
+}
+.rc-export__panel-item--off { opacity: 0.55; }
+.rc-export__calib { color: var(--app-success); font-size: 11px; white-space: nowrap; }
+.rc-export__calib--alto { color: #b45309; }
+.rc-export__calib--bajo { color: #1d4ed8; }

@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
+import { ESTILOS_HOJA_SCA } from './estilos-hoja-sca';
 
 /**
  * Hoja de estilos del reporte impreso. Va dentro del iframe, así que no
@@ -97,7 +98,7 @@ export class ImpresionService {
       };
 
       iframe.srcdoc = `<!doctype html><html lang="es"><head><meta charset="utf-8">`
-        + `<title>${escaparHtml(titulo)}</title><style>${ESTILOS_REPORTE}</style></head>`
+        + `<title>${escaparHtml(titulo)}</title><style>${ESTILOS_REPORTE}${ESTILOS_HOJA_SCA}</style></head>`
         + `<body>${contenidoHtml}</body></html>`;
       doc.body.appendChild(iframe);
     });
