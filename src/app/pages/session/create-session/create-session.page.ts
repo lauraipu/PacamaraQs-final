@@ -69,9 +69,6 @@ export class CreateSessionPage {
   isLoading = false;
   isCopying = false;
   error: string | null = null;
-  private organizadorId = '';
-  private organizadorNombre = 'Organizador';
-  organizadorPendiente = false;
 
   readonly formatosList = [
     {
@@ -118,12 +115,6 @@ export class CreateSessionPage {
       const { user } = await this.authService.getUser();
       if (!user) throw new Error('Debes iniciar sesión para crear una sesión.');
 
-      this.organizadorId = user.id;
-      const metadataNombre = user.user_metadata['nombre'];
-      this.organizadorNombre = typeof metadataNombre === 'string' && metadataNombre.trim()
-        ? metadataNombre.trim()
-        : user.email ?? 'Organizador';
-
       const esExtrinseco = this.formatoSeleccionado === FormatoCva.EXTRINSECA.id;
       const nuevaSesion: Sesion = {
         id: '',
@@ -133,7 +124,7 @@ export class CreateSessionPage {
         formato: this.formatoSeleccionado,
         numeroMuestras: esExtrinseco ? 1 : this.numeroMuestras,
         catadoresObjetivo: esExtrinseco ? 3 : this.catadoresObjetivo,
-        organizadorId: user.id,
+        organizadorId: user.id, // informativo: el servidor usa auth.uid()
         organizadorParticipa: esExtrinseco ? false : this.participaComoCatador,
         estado: EstadoSesion.EN_ESPERA
       };
@@ -144,33 +135,14 @@ export class CreateSessionPage {
       this.pasoActual = 2;
       this.changeDetector.detectChanges();
 
-      if (nuevaSesion.organizadorParticipa) {
-        this.organizadorPendiente = true;
-        try {
-          await this.registrarOrganizador();
-        } catch (error) {
-          console.error('ERROR COMPLETO DE SUPABASE:', error);
-          this.error = `La sesión se creó, pero no se pudo agregar al organizador como catador. ${this.mensajeError(error)}`;
-        }
-      }
+      // crear_sesion() (RPC) ya registró al organizador como participante
+      // en la misma transacción: no hay estado intermedio "sesión sin organizador".
     } catch (error) {
       console.error('ERROR COMPLETO DE SUPABASE:', error);
       this.error = this.mensajeError(error);
     } finally {
       this.isLoading = false;
       this.changeDetector.detectChanges();
-    }
-  }
-
-  async reintentarRegistroOrganizador(): Promise<void> {
-    this.isLoading = true;
-    this.error = null;
-    try {
-      await this.registrarOrganizador();
-    } catch (error) {
-      this.error = `No se pudo agregar al organizador como catador. ${this.mensajeError(error)}`;
-    } finally {
-      this.isLoading = false;
     }
   }
 
@@ -184,7 +156,11 @@ export class CreateSessionPage {
         await Clipboard.write({ string: this.codigoGenerado });
       }
       this.copiado = true;
-      window.setTimeout(() => this.copiado = false, 2000);
+      // Zoneless: un setTimeout no dispara detección de cambios por sí solo.
+      window.setTimeout(() => {
+        this.copiado = false;
+        this.changeDetector.markForCheck();
+      }, 2000);
       const toast = await this.toastController.create({
         message: '¡Código copiado!',
         duration: 2000,
@@ -201,30 +177,15 @@ export class CreateSessionPage {
       await toast.present();
     } finally {
       this.isCopying = false;
+      this.changeDetector.markForCheck();
     }
   }
 
   async irASalaDeEspera(): Promise<void> {
-    if (this.organizadorPendiente) {
-      this.error = 'Agrega al organizador a la sesión antes de continuar.';
-      return;
-    }
-
     const ruta = this.formatoSeleccionado === FormatoCva.EXTRINSECA.id
       ? `/extrinsic-form/${this.sesionIdGenerado}`
       : `/session/waiting/${this.sesionIdGenerado}`;
     await this.router.navigateByUrl(ruta, { replaceUrl: true });
-  }
-
-  private async registrarOrganizador(): Promise<void> {
-    await this.sesionService.insertarParticipanteDirecto(
-      this.sesionIdGenerado,
-      this.organizadorId,
-      this.organizadorNombre,
-      true,
-      true
-    );
-    this.organizadorPendiente = false;
   }
 
   private mensajeError(error: unknown): string {

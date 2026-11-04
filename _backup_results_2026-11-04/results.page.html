@@ -1,0 +1,146 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="rs-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="rs-title">Resultados finales</div>
+      <div class="rs-subtitle">{{ resultados()?.nombreSesion }} · {{ tituloFormato() }}</div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="outline" size="small" [disabled]="!resultados()" (click)="exportarPDF()">
+        <ion-icon name="download-outline" slot="start"></ion-icon>
+        Exportar PDF
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding rs-content">
+  <main class="rs-container">
+    @if (cargando()) {
+      <div class="rs-center" role="status"><ion-spinner name="crescent"></ion-spinner></div>
+    } @else if (error(); as mensaje) {
+      <section class="cupping-card rs-center" role="alert">
+        @if (accesoDenegado()) {
+          <ion-icon name="lock-closed-outline" class="rs-lock" aria-hidden="true"></ion-icon>
+          <h2>Resultados reservados al organizador</h2>
+        }
+        <p>{{ mensaje }}</p>
+        <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
+      </section>
+    } @else if (resultados(); as r) {
+      <section class="cupping-card rs-meta">
+        <div class="rs-meta__status">
+          <p class="rs-meta__headline">
+            <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+            Sesión cerrada · {{ porcentajeCompletado() }}% completada
+          </p>
+          <p class="rs-meta__detail">
+            {{ hayRecorte()
+              ? 'Consolidación mediante promedio recortado SCA (se descartan máximo y mínimo con 5 o más catadores).'
+              : 'Consolidación mediante promedio simple (menos de 5 fichas por muestra).' }}
+          </p>
+        </div>
+        <div class="rs-meta__stats">
+          <div><strong>{{ r.totalMuestras }}</strong><span>Muestras</span></div>
+          <div><strong>{{ r.catadores.length }}</strong><span>Catadores</span></div>
+          <div><strong>{{ tituloFormato() }}</strong><span>Formato</span></div>
+        </div>
+      </section>
+
+      <section class="cupping-card">
+        <h2 class="rs-section-title">Ranking — promedio del panel</h2>
+        <div class="rs-table-wrap">
+          <table class="rs-table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Muestra</th>
+                <th scope="col">Fichas</th>
+                <th scope="col">Mín – Máx</th>
+                <th scope="col">Puntaje panel</th>
+                <th scope="col">Clasificación</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (fila of ranking(); track fila.numeroMuestra) {
+                <tr>
+                  <td class="rs-rank">
+                    @if (fila.posicion === 1) {
+                      <ion-icon name="trophy-outline" aria-label="Primer lugar"></ion-icon>
+                    }
+                    #{{ fila.posicion }}
+                  </td>
+                  <td>
+                    Muestra {{ fila.numeroMuestra }}
+                    @if (fila.cerradaForzada) { <span class="rs-tag">cerrada</span> }
+                  </td>
+                  <td>{{ fila.evaluacionesRecibidas }} / {{ fila.evaluacionesEsperadas }}</td>
+                  <td class="rs-muted">{{ fila.puntajeMin | number:'1.2-2' }} – {{ fila.puntajeMax | number:'1.2-2' }}</td>
+                  <td class="rs-score">
+                    {{ fila.puntajePromedioPanel | number:'1.2-2' }}
+                    @if (fila.recortado) {
+                      <span class="rs-tag" title="Promedio simple: {{ fila.puntajePromedioSimple | number:'1.2-2' }}">recortado</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="rs-badge" [style.color]="fila.clasificacion.color" [style.background]="fila.clasificacion.fondo">
+                      {{ fila.clasificacion.etiqueta }}
+                    </span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="6" class="rs-muted">Ninguna muestra recibió fichas.</td></tr>
+              }
+            </tbody>
+            @if (ranking().length > 0) {
+              <tfoot>
+                <tr>
+                  <td colspan="4">Promedio del panel</td>
+                  <td class="rs-score">{{ promedioPanel() | number:'1.2-2' }}</td>
+                  <td>
+                    <span class="rs-badge" [style.color]="clasificacionPanel().color" [style.background]="clasificacionPanel().fondo">
+                      {{ clasificacionPanel().etiqueta }}
+                    </span>
+                  </td>
+                </tr>
+              </tfoot>
+            }
+          </table>
+        </div>
+        @if (muestrasSinFichas().length > 0) {
+          <p class="rs-muted rs-note">
+            Sin fichas: {{ muestrasSinFichas().length }} muestra(s) cerradas sin evaluaciones.
+          </p>
+        }
+      </section>
+
+      <section>
+        <h2 class="rs-section-title">Análisis de catadores</h2>
+        <p class="rs-muted rs-note">Participación y consistencia individual dentro del panel.</p>
+        <div class="rs-grid">
+          @for (catador of r.catadores; track catador.cupperId) {
+            <app-cupper-result-card [catador]="catador"></app-cupper-result-card>
+          }
+        </div>
+      </section>
+
+      <section class="rs-formula">
+        <h2 class="rs-section-title">Fórmula CVA aplicada</h2>
+        <p class="rs-formula__expr">S = 0.65625 × Σhᵢ + 52.75 − 2u − 4d</p>
+        <p class="rs-muted">
+          El consolidado descarta el valor más alto y el más bajo por muestra cuando hay 5 o más fichas.
+        </p>
+      </section>
+
+      <div class="rs-actions">
+        <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
+        <ion-button class="primary-btn" (click)="exportarPDF()">
+          <ion-icon name="download-outline" slot="start"></ion-icon>
+          Exportar a PDF (Formato SCA)
+        </ion-button>
+      </div>
+    }
+  </main>
+</ion-content>

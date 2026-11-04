@@ -5,6 +5,7 @@ import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import { BaseCataForm } from '../../../core/cva/base-cata-form';
+import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
 import { ETIQUETAS_HEDONICAS } from '../../../core/cva/cva';
 
 addIcons({ arrowBackOutline });
@@ -27,7 +28,7 @@ interface FormularioAfectivo extends Record<AtributoHedonico | 'impresionGlobal'
   selector: 'app-affective-form',
   templateUrl: './affective-form.page.html',
   standalone: true,
-  imports: [IonContent, IonIcon, CommonModule, FormsModule]
+  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent]
 })
 export class AffectiveFormPage extends BaseCataForm<FormularioAfectivo> {
   override formulario: FormularioAfectivo = this.crearFormularioVacio();

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
@@ -39,7 +39,8 @@ export class RegistroPage {
   confirmPassword = '';
   showPassword = false;
   politicaAceptada = false;
-  isLoading = false;
+  // Signal: la app es zoneless y el estado cambia tras `await`.
+  readonly isLoading = signal(false);
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -63,11 +64,13 @@ export class RegistroPage {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
     try {
       const result = await this.authService.registro(this.email, this.password, this.nombre);
       if (result.session) {
-        await this.router.navigateByUrl('/dashboard', { replaceUrl: true });
+        // El perfil (rol 'catador') lo crea el trigger on_auth_user_created.
+        const destino = await this.authService.obtenerRutaInicio();
+        await this.router.navigateByUrl(destino ?? '/login', { replaceUrl: true });
       } else {
         await this.mostrarToast(
           'Cuenta creada. Revisa tu correo para confirmar el registro.',
@@ -80,7 +83,7 @@ export class RegistroPage {
         error instanceof Error ? error.message : 'No se pudo completar el registro.'
       );
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 

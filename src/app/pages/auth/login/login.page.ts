@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonButton, IonContent, IonInput, IonSpinner, ToastController } from '@ionic/angular';
 import { AuthService } from '../../../core/services/auth';
+import { mensajeDeError } from '../../../core/utils/errores';
 
 @Component({
   selector: 'app-login',
@@ -13,9 +14,11 @@ import { AuthService } from '../../../core/services/auth';
   imports: [IonContent, IonInput, IonButton, IonSpinner, CommonModule, FormsModule, RouterLink]
 })
 export class LoginPage implements OnInit {
+  // ngModel necesita propiedades mutables; el resto del estado es signal.
   email = '';
   password = '';
-  isLoading = false;
+  readonly isLoading = signal(false);
+  readonly verificandoSesion = signal(true);
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -29,22 +32,31 @@ export class LoginPage implements OnInit {
     } else if (authError === 'session') {
       void this.mostrarToast('No se pudo validar la sesión. Inicia sesión nuevamente.');
     }
+    void this.redirigirSiYaAutenticado(authError === null);
   }
 
   async login(): Promise<void> {
+    if (this.isLoading()) return;
     if (!this.email.trim() || !this.password) {
       await this.mostrarToast('Ingresa tu correo y contraseña.');
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
     try {
-      await this.authService.login(this.email, this.password);
-      await this.irAlPanelPorRol();
+      const rol = await this.authService.login(this.email, this.password);
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      const esRutaInterna = !!returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//');
+      // El administrador siempre va a su panel; el catador puede volver a donde estaba.
+      const destino = rol === 'catador' && esRutaInterna
+        ? returnUrl
+        : this.authService.rutaInicioPorRol(rol);
+      this.password = '';
+      await this.router.navigateByUrl(destino, { replaceUrl: true });
     } catch (error) {
-      await this.mostrarToast(this.mensajeError(error, 'Error al iniciar sesión.'));
+      await this.mostrarToast(this.traducirError(error));
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 
@@ -52,21 +64,27 @@ export class LoginPage implements OnInit {
     await this.router.navigateByUrl('/registro');
   }
 
-  private async irAlPanelPorRol(): Promise<void> {
-    const { user } = await this.authService.getUser();
-    if (!user || user.is_anonymous) {
-      throw new Error('No se pudo validar tu usuario autenticado.');
+  /** Con sesión válida, /login no se muestra: se va directo al panel del rol. */
+  private async redirigirSiYaAutenticado(permitido: boolean): Promise<void> {
+    try {
+      if (!permitido) return;
+      const destino = await this.authService.obtenerRutaInicio();
+      if (destino && destino !== '/login') {
+        await this.router.navigateByUrl(destino, { replaceUrl: true });
+      }
+    } catch {
+      // Sin sesión o sin rol: se queda en el login.
+    } finally {
+      this.verificandoSesion.set(false);
     }
+  }
 
-    const role = (await this.authService.obtenerRolGlobal(user.id)).trim().toLowerCase();
-    const destination = role === 'administrador'
-      ? '/admin-dashboard'
-      : role === 'catador' || role === 'organizador'
-        ? '/dashboard'
-        : null;
-
-    if (!destination) throw new Error('Tu cuenta no tiene un rol habilitado para acceder.');
-    await this.router.navigateByUrl(destination, { replaceUrl: true });
+  private traducirError(error: unknown): string {
+    const mensaje = mensajeDeError(error, 'Error al iniciar sesión.');
+    if (/invalid login credentials/i.test(mensaje)) return 'Correo o contraseña incorrectos.';
+    if (/email not confirmed/i.test(mensaje)) return 'Confirma tu correo antes de iniciar sesión.';
+    if (/failed to fetch|network/i.test(mensaje)) return 'Sin conexión. Revisa tu red e intenta de nuevo.';
+    return mensaje;
   }
 
   private async mostrarToast(message: string): Promise<void> {
@@ -77,9 +95,5 @@ export class LoginPage implements OnInit {
       color: 'danger'
     });
     await toast.present();
-  }
-
-  private mensajeError(error: unknown, fallback: string): string {
-    return error instanceof Error ? error.message : fallback;
   }
 }

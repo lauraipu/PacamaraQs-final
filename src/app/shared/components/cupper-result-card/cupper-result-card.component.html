@@ -16,10 +16,10 @@
    <div class="calibration-badge" 
        [ngClass]="{'generoso': esGeneroso, 'estricto': esEstricto, 'calibrado': estaCalibrado}">
     @if (esGeneroso) {
-      <span>↑ +{{ catador.desviacionRespectoPanel }} (Generoso)</span>
+      <span>↑ +{{ catador.desviacionRespectoPanel | number:'1.2-2' }} (Generoso)</span>
     }
     @if (esEstricto) {
-      <span>↓ {{ catador.desviacionRespectoPanel }} (Estricto)</span>
+      <span>↓ {{ catador.desviacionRespectoPanel | number:'1.2-2' }} (Estricto)</span>
     }
     @if (estaCalibrado) {
       <span>✓ Calibrado con el panel</span>

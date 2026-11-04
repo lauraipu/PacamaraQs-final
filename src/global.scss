@@ -36,7 +36,12 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* Desactivado (auditoría 2026-11-03): la paleta oscura automática cambiaba
+   los fondos de Ionic a negro mientras las páginas tienen colores claros fijos
+   (#fff, #0f172b) → texto oscuro sobre fondo oscuro en móviles con modo
+   oscuro. Los prototipos son solo claros. Reactivar cuando todas las páginas
+   usen tokens var(--app-*). */
+/* @import '@ionic/angular/css/palettes/dark.system.css'; */
 
 ion-item {
   --border-color: transparent;
@@ -51,7 +56,7 @@ body {
 .custom-input {
   --background: var(--app-bg-card);
   --color: var(--app-text-main);
-  --placeholder-color: #94a3b8;
+  --placeholder-color: var(--app-text-faint);
   --placeholder-opacity: 1;
   --border-width: 1px;
   --border-color: var(--app-border-input);
@@ -199,4 +204,11 @@ app-create-session {
   .create-session-footer { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--app-bg-card); box-shadow: 0 -2px 10px rgb(0 0 0 / 5%); }
   .edit-button { flex: 1; height: 50px; }
   .continue-button { flex: 2; }
+}
+
+/* Código de sesión y fórmula CVA en monoespaciada (prototipo). */
+.code-display,
+.code-display strong {
+  font-family: var(--app-font-mono);
+  letter-spacing: 0.2em;
 }

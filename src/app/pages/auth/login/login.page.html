@@ -6,56 +6,60 @@
     <h1 class="title">PacamaraSQ</h1>
     <p class="subtitle">Sistema de Evaluación CVA · SCA</p>
 
-    <form class="login-form" (ngSubmit)="login()">
-      <div class="form-group">
-        <ion-input
-          [(ngModel)]="email"
-          name="email"
-          label="Correo"
-          labelPlacement="stacked"
-          placeholder="nombre@lab.com"
-          type="email"
-          autocomplete="email"
-          inputmode="email"
-          fill="outline"
-          class="custom-input"
-          required
-        ></ion-input>
+    @if (verificandoSesion()) {
+      <div class="session-check" role="status">
+        <ion-spinner name="crescent"></ion-spinner>
       </div>
+    } @else {
+      <form class="login-form" (ngSubmit)="login()">
+        <div class="form-group">
+          <label class="field-label" for="login-email">Usuario</label>
+          <ion-input
+            id="login-email"
+            [(ngModel)]="email"
+            name="email"
+            aria-label="Correo electrónico"
+            placeholder="nombre@lab.com"
+            type="email"
+            autocomplete="email"
+            inputmode="email"
+            fill="outline"
+            class="custom-input"
+            required
+          ></ion-input>
+        </div>
 
-      <div class="form-group">
-        <ion-input
-          [(ngModel)]="password"
-          name="password"
-          label="Contraseña"
-          labelPlacement="stacked"
-          placeholder="Tu contraseña"
-          type="password"
-          autocomplete="current-password"
-          fill="outline"
-          class="custom-input"
-          required
-        ></ion-input>
-      </div>
+        <div class="form-group">
+          <label class="field-label" for="login-password">Contraseña</label>
+          <ion-input
+            id="login-password"
+            [(ngModel)]="password"
+            name="password"
+            aria-label="Contraseña"
+            placeholder="••••••••"
+            type="password"
+            autocomplete="current-password"
+            fill="outline"
+            class="custom-input"
+            required
+          ></ion-input>
+        </div>
 
-      <ion-button
-        expand="block"
-        type="submit"
-        class="btn-login"
-        [disabled]="isLoading"
-      >
-        @if (isLoading) {
-          <ion-spinner name="crescent"></ion-spinner>
-        } @else {
-          <span>Iniciar sesión</span>
-        }
-      </ion-button>
+        <ion-button expand="block" type="submit" class="btn-login" [disabled]="isLoading()">
+          @if (isLoading()) {
+            <ion-spinner name="crescent"></ion-spinner>
+          } @else {
+            <span>Iniciar sesión</span>
+          }
+        </ion-button>
+      </form>
 
-    </form>
+      <p class="register-link">
+        ¿No tienes cuenta?
+        <a routerLink="/registro">Regístrate</a>
+      </p>
+    }
 
-    <p class="register-link">
-      ¿No tienes cuenta?
-      <a routerLink="/registro">Regístrate</a>
-    </p>
+    <p class="login-footer">Plataforma profesional para paneles de catación de café de especialidad</p>
   </main>
 </ion-content>

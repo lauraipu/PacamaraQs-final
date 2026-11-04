@@ -8,19 +8,19 @@
     <h1 class="title">Cata finalizada</h1>
     <p class="subtitle">Gracias por completar la sesión. Consulta al organizador si necesitas confirmar el registro de tu evaluación.</p>
 
-    @if (error) {
-      <p class="subtitle" role="alert">{{ error }}</p>
+    @if (error(); as mensaje) {
+      <p class="subtitle" role="alert">{{ mensaje }}</p>
     }
 
     <div class="info-card">
       <div class="info-row">
         <span class="info-label">Sesión</span>
-        <span class="info-value">{{ nombreSesion }}</span>
+        <span class="info-value">{{ nombreSesion() }}</span>
       </div>
-      @if (esOrganizador && codigoSesion) {
+      @if (esOrganizador() && codigoSesion()) {
         <div class="info-row">
           <span class="info-label">Código</span>
-          <span class="info-value">{{ codigoSesion }}</span>
+          <span class="info-value">{{ codigoSesion() }}</span>
         </div>
       }
     </div>
@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    @if (esOrganizador) {
+    @if (esOrganizador()) {
       <ion-button expand="block" class="primary-btn" (click)="irAResultados()">
         Ver resultados del panel →
       </ion-button>

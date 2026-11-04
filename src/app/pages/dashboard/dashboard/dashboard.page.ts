@@ -22,7 +22,7 @@ import {
   ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { keyOutline, addOutline } from 'ionicons/icons';
+import { keyOutline, addOutline, arrowForwardOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
 import { SesionConRol, SesionService } from '../../../core/services/sesion';
 import { SupabaseService } from '../../../core/services/supabase';
@@ -92,7 +92,8 @@ export class DashboardPage implements OnInit {
   private primeraCargaCompleta = false;
 
   constructor() {
-    addIcons({ keyOutline, addOutline });
+    // arrow-forward-outline se usa en el modal "Unirme" y no estaba registrado.
+    addIcons({ keyOutline, addOutline, arrowForwardOutline });
   }
 
   ngOnInit(): void {

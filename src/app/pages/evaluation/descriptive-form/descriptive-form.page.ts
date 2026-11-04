@@ -5,6 +5,7 @@ import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, chevronDownOutline, chevronForwardOutline } from 'ionicons/icons';
 import { BaseCataForm } from '../../../core/cva/base-cata-form';
+import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
 import { RUEDA_SABORES } from '../../../core/cva/cva';
 
 addIcons({ arrowBackOutline, chevronDownOutline, chevronForwardOutline });
@@ -32,7 +33,7 @@ interface FormularioDescriptivo {
   selector: 'app-descriptive-form',
   templateUrl: './descriptive-form.page.html',
   standalone: true,
-  imports: [IonContent, IonIcon, CommonModule, FormsModule]
+  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent]
 })
 export class DescriptiveFormPage extends BaseCataForm<FormularioDescriptivo> {
   override formulario: FormularioDescriptivo = this.crearFormularioVacio();

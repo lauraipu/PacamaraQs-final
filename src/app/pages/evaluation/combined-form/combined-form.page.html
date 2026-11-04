@@ -1,5 +1,16 @@
 <ion-content class="cva-combined" [scrollY]="true">
-  <div *ngIf="error" class="evaluation-error" role="alert">{{ error }}</div>
+  <app-estado-ficha
+    [pendientes]="pendientesLocales()"
+    [enLinea]="enLinea()"
+    [muestraCerrada]="muestraActualCerrada()"
+    [rechazo]="rechazoActual()"
+    [esperandoFinalizar]="esperandoSincronizacion()"
+    (reintentar)="reintentarSincronizacion()"
+    (salir)="salirConPendientes()">
+  </app-estado-ficha>
+  @if (error(); as mensaje) {
+    <div class="evaluation-error" role="alert">{{ mensaje }}</div>
+  }
   
   <!-- HEADER -->
   <header class="cva-header">
@@ -10,7 +21,7 @@
         </button>
         <div class="cva-header__meta">
           <p class="cva-header__session-name">Evaluación Combinada</p>
-          <p class="cva-header__sample-label">Muestra {{ muestraActual }} <span>de {{ totalMuestras }}</span></p>
+          <p class="cva-header__sample-label">Muestra {{ muestraActual() }} <span>de {{ totalMuestras() }}</span></p>
         </div>
       </div>
       <div class="cva-header__right">
@@ -30,7 +41,7 @@
     </div>
     <div class="cva-header__progress-bar-wrap">
       <div class="cva-header__progress-bar">
-        <div class="cva-header__progress-bar-fill" [style.width]="(muestraActual / totalMuestras) * 100 + '%'"></div>
+        <div class="cva-header__progress-bar-fill" [style.width]="(muestraActual() / totalMuestras()) * 100 + '%'"></div>
       </div>
     </div>
   </header>
@@ -351,7 +362,7 @@
 
         <div class="sample-navigation">
           <button
-            *ngIf="muestraActual > 1"
+            *ngIf="muestraActual() > 1"
             type="button"
             class="submit-btn sample-navigation__previous"
             (click)="irAMuestraAnterior()">
@@ -361,8 +372,8 @@
             type="button"
             class="submit-btn"
             (click)="irAMuestraSiguiente()"
-            [disabled]="guardando">
-            {{ guardando ? 'Guardando…' : (muestraActual === totalMuestras ? 'Terminar cata' : 'Siguiente muestra →') }}
+            [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : (muestraActual() === totalMuestras() ? 'Terminar cata' : 'Siguiente muestra →') }}
           </button>
         </div>
       </aside>

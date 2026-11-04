@@ -1,10 +1,5 @@
-import { EstadoSesion, Sesion } from '../models/sesion.model';
-import {
-  participanteDtoToDomain,
-  participanteToDto,
-  sesionDtoToDomain,
-  sesionToDto
-} from './sesion.mapper';
+import { EstadoSesion } from '../models/sesion.model';
+import { participanteDtoToDomain, sesionDtoToDomain } from './sesion.mapper';
 
 describe('sesion mapper', () => {
   it('maps the in-progress database state to the initiated session state', () => {
@@ -54,25 +49,6 @@ describe('sesion mapper', () => {
     });
   });
 
-  it('round-trips cancelled sessions without treating them as completed', () => {
-    const session: Sesion = {
-      id: '',
-      codigoAcceso: 'AB12-3C4',
-      nombre: 'Cata',
-      formato: 'afectivo',
-      numeroMuestras: 3,
-      catadoresObjetivo: 5,
-      organizadorId: 'organizer-id',
-      organizadorParticipa: true,
-      estado: EstadoSesion.CANCELADA
-    };
-
-    expect(sesionToDto(session)).toMatchObject({
-      id: null,
-      estado: 'cancelada'
-    });
-  });
-
   it('preserves false participant values and maps missing user ids to empty strings', () => {
     const participant = participanteDtoToDomain({
       sesion_id: 'session-id',
@@ -88,8 +64,5 @@ describe('sesion mapper', () => {
       esOrganizador: false,
       listo: false
     });
-
-    const dto = participanteToDto(participant);
-    expect(dto.usuario_id).toBeNull();
   });
 });

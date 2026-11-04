@@ -9,7 +9,6 @@ describe('CreateSessionPage', () => {
   let component: CreateSessionPage;
   let fixture: ComponentFixture<CreateSessionPage>;
   const crearSesion = vi.fn();
-  const insertarParticipanteDirecto = vi.fn();
   const getUser = vi.fn();
 
   beforeEach(() => {
@@ -20,7 +19,7 @@ describe('CreateSessionPage', () => {
         provideRouter([]),
         { provide: ToastController, useValue: { create: vi.fn().mockResolvedValue({ present: vi.fn() }) } },
         { provide: AuthService, useValue: { getUser } },
-        { provide: SesionService, useValue: { crearSesion, insertarParticipanteDirecto } }
+        { provide: SesionService, useValue: { crearSesion } }
       ]
     });
     fixture = TestBed.createComponent(CreateSessionPage);
@@ -53,54 +52,26 @@ describe('CreateSessionPage', () => {
     expect(getParametersSection()).toBeTruthy();
   });
 
-  it('creates a session and registers the organizer as a participant', async () => {
-    getUser.mockResolvedValue({
-      user: {
-        id: 'user-id',
-        email: 'organizer@example.com',
-        user_metadata: {}
-      }
-    });
-    crearSesion.mockImplementation(async (session) => ({
-      ...session,
-      id: 'session-id',
-      codigoAcceso: 'AB12-3C4'
-    }));
-    insertarParticipanteDirecto.mockResolvedValue(undefined);
+  it('creates the session through the RPC (organizer is registered server-side)', async () => {
+    getUser.mockResolvedValue({ user: { id: 'user-id', email: 'organizer@example.com', user_metadata: {} } });
+    crearSesion.mockImplementation(async session => ({ ...session, id: 'session-id', codigoAcceso: 'AB12-3C4' }));
 
     component.nombreSesion = '  Cosecha de mayo  ';
     await component.generarCodigo();
 
+    expect(crearSesion).toHaveBeenCalledTimes(1);
     expect(crearSesion).toHaveBeenCalledWith(expect.objectContaining({
       nombre: 'Cosecha de mayo',
-      organizadorId: 'user-id',
       organizadorParticipa: true
     }));
-    expect(insertarParticipanteDirecto).toHaveBeenCalledWith(
-      'session-id',
-      'user-id',
-      'organizer@example.com',
-      true,
-      true
-    );
     expect(component.codigoGenerado).toBe('AB12-3C4');
     expect(component.pasoActual).toBe(2);
     expect(component.error).toBeNull();
   });
 
-  it('creates extrinsic sessions with valid defaults and does not register the organizer', async () => {
-    getUser.mockResolvedValue({
-      user: {
-        id: 'user-id',
-        email: 'organizer@example.com',
-        user_metadata: {}
-      }
-    });
-    crearSesion.mockImplementation(async session => ({
-      ...session,
-      id: 'session-id',
-      codigoAcceso: 'AB12-3C4'
-    }));
+  it('creates extrinsic sessions with valid defaults', async () => {
+    getUser.mockResolvedValue({ user: { id: 'user-id', email: 'organizer@example.com', user_metadata: {} } });
+    crearSesion.mockImplementation(async session => ({ ...session, id: 'session-id', codigoAcceso: 'AB12-3C4' }));
 
     component.nombreSesion = 'Cata extrínseca';
     component.formatoSeleccionado = 'extrinseca';
@@ -116,34 +87,18 @@ describe('CreateSessionPage', () => {
       catadoresObjetivo: 3,
       organizadorParticipa: false
     }));
-    expect(insertarParticipanteDirecto).not.toHaveBeenCalled();
-    expect(component.organizadorPendiente).toBe(false);
   });
 
-  it('does not recreate a session when organizer registration fails', async () => {
-    getUser.mockResolvedValue({
-      user: { id: 'user-id', email: 'organizer@example.com', user_metadata: {} }
-    });
-    crearSesion.mockResolvedValue({
-      id: 'session-id',
-      codigoAcceso: 'AB12-3C4',
-      nombre: 'Cosecha',
-      formato: 'combinado',
-      numeroMuestras: 6,
-      catadoresObjetivo: 5,
-      organizadorId: 'user-id',
-      organizadorParticipa: true,
-      estado: 'EN_ESPERA'
-    });
-    insertarParticipanteDirecto.mockRejectedValue(new Error('insert denied'));
+  it('shows the backend error and stays on step 1 when creation fails', async () => {
+    getUser.mockResolvedValue({ user: { id: 'user-id', email: 'organizer@example.com', user_metadata: {} } });
+    crearSesion.mockRejectedValue(new Error('permission denied'));
 
     component.nombreSesion = 'Cosecha';
     await component.generarCodigo();
 
-    expect(crearSesion).toHaveBeenCalledTimes(1);
-    expect(component.pasoActual).toBe(2);
-    expect(component.organizadorPendiente).toBe(true);
-    expect(component.error).toContain('insert denied');
+    expect(component.pasoActual).toBe(1);
+    expect(component.error).toContain('permission denied');
+    expect(component.isLoading).toBe(false);
   });
 
   it('does not create a session when no user is authenticated', async () => {

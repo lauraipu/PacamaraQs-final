@@ -1,95 +1,77 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { checkmarkCircleOutline, lockClosedOutline } from 'ionicons/icons';
-
-import {
-  IonContent,
-  IonIcon,
-  IonButton,
-  NavController
-} from '@ionic/angular';
-
-import { SupabaseService } from '../../../core/services/supabase';
+import { IonButton, IonContent, IonIcon, NavController } from '@ionic/angular';
+import { AuthService } from '../../../core/services/auth';
+import { SesionService } from '../../../core/services/sesion';
 
 addIcons({ checkmarkCircleOutline, lockClosedOutline });
 
+/**
+ * Antes: hablaba directo con Supabase (2 consultas a `sesiones`, la segunda
+ * redundante) y usaba propiedades simples → en zoneless los datos no se
+ * pintaban hasta el siguiente evento. Ahora usa SesionService + signals.
+ */
 @Component({
   selector: 'app-evaluation-complete',
   templateUrl: './evaluation-complete.page.html',
   styleUrls: ['./evaluation-complete.page.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    IonContent,
-    IonIcon,
-    IonButton
-  ]
+  imports: [CommonModule, IonContent, IonIcon, IonButton]
 })
 export class EvaluationCompletePage implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private supabase = inject(SupabaseService).client;
-  private navCtrl = inject(NavController);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly navCtrl = inject(NavController);
+  private readonly authService = inject(AuthService);
+  private readonly sesionService = inject(SesionService);
 
-  sesionId = '';
-  esOrganizador = false;
-  nombreSesion = '';
-  codigoSesion = '';
-  error: string | null = null;
-  cargando = true;
+  readonly esOrganizador = signal(false);
+  readonly nombreSesion = signal('');
+  readonly codigoSesion = signal('');
+  readonly error = signal<string | null>(null);
+  readonly cargando = signal(true);
 
-  async ngOnInit() {
+  private sesionId = '';
+
+  async ngOnInit(): Promise<void> {
     this.sesionId = this.route.snapshot.paramMap.get('id')?.trim() ?? '';
     if (!this.sesionId) {
-      this.error = 'No se encontró el ID de la sesión.';
-      this.cargando = false;
+      this.error.set('No se encontró el ID de la sesión.');
+      this.cargando.set(false);
       return;
     }
 
     try {
-      const { data: { user }, error: userError } = await this.supabase.auth.getUser();
-      if (userError) throw userError;
+      const { session } = await this.authService.getSession();
+      const user = session?.user;
       if (!user) {
         await this.router.navigateByUrl('/login', { replaceUrl: true });
         return;
       }
 
-      const { data: sesion, error: sesionError } = await this.supabase
-        .from('sesiones')
-        .select('nombre, organizador_id')
-        .eq('id', this.sesionId)
-        .maybeSingle();
-      if (sesionError) throw sesionError;
+      const sesion = await this.sesionService.obtenerSesionPorId(this.sesionId);
       if (!sesion) throw new Error('No se encontró la sesión.');
 
-      this.nombreSesion = sesion.nombre;
-      this.esOrganizador = sesion.organizador_id === user.id;
-
-      if (this.esOrganizador) {
-        const { data: codigo, error: codigoError } = await this.supabase
-          .from('sesiones')
-          .select('codigo_sesion')
-          .eq('id', this.sesionId)
-          .eq('organizador_id', user.id)
-          .maybeSingle();
-        if (codigoError) throw codigoError;
-        this.codigoSesion = codigo?.codigo_sesion ?? '';
-      }
+      this.nombreSesion.set(sesion.nombre);
+      const esOrganizador = sesion.organizadorId === user.id;
+      this.esOrganizador.set(esOrganizador);
+      this.codigoSesion.set(esOrganizador ? sesion.codigoAcceso : '');
     } catch (error) {
-      this.error = error instanceof Error ? error.message : 'No se pudo cargar la sesión.';
+      this.error.set(error instanceof Error ? error.message : 'No se pudo cargar la sesión.');
     } finally {
-      this.cargando = false;
+      this.cargando.set(false);
     }
   }
 
   async irAResultados(): Promise<void> {
-    if (!this.esOrganizador || !this.sesionId) return;
+    if (!this.esOrganizador() || !this.sesionId) return;
     await this.router.navigateByUrl(`/session/${this.sesionId}/results`);
   }
 
-  volverAlPanel() {
-    this.navCtrl.navigateRoot('/dashboard');
+  volverAlPanel(): void {
+    void this.navCtrl.navigateRoot('/dashboard');
   }
 }

@@ -1,59 +1,80 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { participanteDtoToDomain, participanteToDto, sesionDtoToDomain, sesionToDto } from '../mappers/sesion.mapper';
-import { EstadoSesion, Participante, Sesion, SesionDto } from '../models/sesion.model';
+import { participanteDtoToDomain, sesionDtoToDomain } from '../mappers/sesion.mapper';
+import { Participante, ParticipanteDto, Sesion, SesionDto } from '../models/sesion.model';
 import { SupabaseService } from './supabase';
 
 export interface SesionConRol extends Sesion {
   esOrganizador: boolean;
 }
 
+/** Progreso del panel SIN puntajes (evaluación ciega). */
+export interface ProgresoCatador {
+  usuarioId: string;
+  nombre: string;
+  esOrganizador: boolean;
+  listo: boolean;
+  muestrasEnviadas: number[];
+}
+
+export interface ProgresoPanel {
+  estado: string;
+  numeroMuestras: number;
+  muestrasCerradas: number[];
+  catadores: ProgresoCatador[];
+}
+
+export interface ResultadoCierreMuestra {
+  numeroMuestra: number;
+  fichasPendientesDescartadas: number;
+  sesionCompletada: boolean;
+}
+
+interface ProgresoPanelDto {
+  estado: string;
+  numero_muestras: number;
+  muestras_cerradas: number[] | null;
+  catadores: {
+    usuario_id: string;
+    nombre: string;
+    es_organizador: boolean;
+    listo: boolean;
+    muestras_enviadas: number[] | null;
+  }[] | null;
+}
+
+interface CierreMuestraDto {
+  numero_muestra: number;
+  fichas_pendientes_descartadas: number;
+  sesion_completada: boolean;
+}
+
+/**
+ * Acceso a datos de sesiones. Todas las escrituras de estado pasan por RPCs
+ * SECURITY DEFINER que validan las reglas de negocio en el servidor; el
+ * cliente nunca escribe directo en sesiones/participantes/muestras.
+ * El tiempo real (Presence/Broadcast) vive en RealtimeService.
+ */
 @Injectable({ providedIn: 'root' })
 export class SesionService {
-  public readonly supabase = inject(SupabaseService);
+  private readonly supabase = inject(SupabaseService);
 
   async crearSesion(sesion: Sesion): Promise<Sesion> {
-    if (!sesion.nombre || sesion.nombre.trim() === '') {
+    if (!sesion.nombre?.trim()) {
       throw new Error('El nombre de la sesión no puede estar vacío');
     }
 
-    const sesionNormalizada: Sesion = {
-      ...sesion,
-      formato: sesion.formato.toLowerCase(),
-      codigoAcceso: this.generarCodigoUnico()
-    };
-    const dto = sesionToDto(sesionNormalizada);
-    delete dto.id;
-
-    const { data, error } = await this.supabase.client
-      .from('sesiones')
-      .insert([dto])
-      .select()
-      .single();
+    const { data, error } = await this.supabase.client.rpc('crear_sesion', {
+      p_nombre: sesion.nombre.trim(),
+      p_formato: sesion.formato.toLowerCase(),
+      p_numero_muestras: sesion.numeroMuestras,
+      p_catadores_objetivo: sesion.catadoresObjetivo,
+      p_organizador_participa: sesion.organizadorParticipa,
+      p_notas: sesion.notas?.trim() || null
+    });
 
     if (error) throw error;
-    return sesionDtoToDomain(data);
-  }
-
-  async insertarParticipanteDirecto(
-    sesionId: string,
-    usuarioId?: string | null,
-    nombre?: string,
-    esOrganizador = true,
-    listo = false
-  ): Promise<Participante> {
-    return this.insertarParticipanteSeguro({ sesionId, usuarioId, nombre, esOrganizador, listo });
-  }
-
-  async obtenerSesionPorCodigo(codigo: string): Promise<Sesion | null> {
-    const { data, error } = await this.supabase.client
-      .from('sesiones')
-      .select('*')
-      .eq('codigo_sesion', codigo.trim().toUpperCase())
-      .maybeSingle();
-
-    if (error) throw error;
-    return data ? sesionDtoToDomain(data) : null;
+    if (!data) throw new Error('Supabase no devolvió la sesión creada.');
+    return sesionDtoToDomain(data as SesionDto);
   }
 
   async obtenerSesionPorId(sesionId: string): Promise<Sesion | null> {
@@ -64,7 +85,7 @@ export class SesionService {
       .maybeSingle();
 
     if (error) throw error;
-    return data ? sesionDtoToDomain(data) : null;
+    return data ? sesionDtoToDomain(data as SesionDto) : null;
   }
 
   async esOrganizadorDeSesion(sesionId: string, usuarioId: string): Promise<boolean> {
@@ -79,9 +100,7 @@ export class SesionService {
   }
 
   async obtenerMisSesiones(usuarioId: string): Promise<SesionConRol[]> {
-    if (!usuarioId.trim()) {
-      throw new Error('El ID de usuario es inválido');
-    }
+    if (!usuarioId.trim()) throw new Error('El ID de usuario es inválido');
 
     const { data: participaciones, error: errorParticipaciones } = await this.supabase.client
       .from('participantes')
@@ -90,7 +109,7 @@ export class SesionService {
     if (errorParticipaciones) throw errorParticipaciones;
 
     const rolesPorSesion = new Map<string, boolean>();
-    for (const participacion of participaciones) {
+    for (const participacion of participaciones ?? []) {
       if (!participacion.sesion_id) continue;
       rolesPorSesion.set(
         participacion.sesion_id,
@@ -99,49 +118,40 @@ export class SesionService {
     }
 
     const idsParticipacion = [...rolesPorSesion.keys()];
-    const [sesionesOrganizadas, sesionesParticipadas] = await Promise.all([
+    const [organizadas, participadas] = await Promise.all([
       this.supabase.client
         .from('sesiones')
         .select('*')
         .eq('organizador_id', usuarioId)
         .order('creado_en', { ascending: false }),
       idsParticipacion.length > 0
-        ? this.supabase.client
-          .from('sesiones')
-          .select('*')
-          .in('id', idsParticipacion)
-        : Promise.resolve({ data: [], error: null })
+        ? this.supabase.client.from('sesiones').select('*').in('id', idsParticipacion)
+        : Promise.resolve({ data: [] as SesionDto[], error: null })
     ]);
 
-    if (sesionesOrganizadas.error) throw sesionesOrganizadas.error;
-    if (sesionesParticipadas.error) throw sesionesParticipadas.error;
+    if (organizadas.error) throw organizadas.error;
+    if (participadas.error) throw participadas.error;
 
     const sesiones = new Map<string, SesionConRol>();
-    for (const dto of sesionesOrganizadas.data) {
+    for (const dto of (organizadas.data ?? []) as SesionDto[]) {
       const sesion = sesionDtoToDomain(dto);
       if (sesion.id) sesiones.set(sesion.id, { ...sesion, esOrganizador: true });
     }
-
-    for (const dto of sesionesParticipadas.data) {
+    for (const dto of (participadas.data ?? []) as SesionDto[]) {
       const sesion = sesionDtoToDomain(dto);
       if (!sesion.id) continue;
-
-      const sesionExistente = sesiones.get(sesion.id);
+      const existente = sesiones.get(sesion.id);
       sesiones.set(sesion.id, {
         ...sesion,
-        esOrganizador: sesionExistente?.esOrganizador ?? rolesPorSesion.get(sesion.id) ?? false
+        esOrganizador: existente?.esOrganizador ?? rolesPorSesion.get(sesion.id) ?? false
       });
     }
 
-    return [...sesiones.values()].sort((a, b) =>
-      (b.creadaEn ?? '').localeCompare(a.creadaEn ?? '')
-    );
+    return [...sesiones.values()].sort((a, b) => (b.creadaEn ?? '').localeCompare(a.creadaEn ?? ''));
   }
 
   async eliminarSesion(sesionId: string): Promise<void> {
-    if (!sesionId.trim()) {
-      throw new Error('El ID de sesión es inválido');
-    }
+    if (!sesionId.trim()) throw new Error('El ID de sesión es inválido');
 
     const { data, error } = await this.supabase.client
       .from('sesiones')
@@ -156,250 +166,123 @@ export class SesionService {
 
   async unirseASesion(codigo: string): Promise<{ sesion: Sesion }> {
     const codigoNormalizado = codigo.trim().toUpperCase();
-    if (!codigoNormalizado) {
-      throw new Error('El código es obligatorio');
-    }
+    if (!codigoNormalizado) throw new Error('El código es obligatorio');
 
-    const { error: joinError } = await this.supabase.client.rpc('unirse_sesion', {
+    const { data: sesionId, error } = await this.supabase.client.rpc('unirse_sesion', {
       p_codigo: codigoNormalizado
     });
-    if (joinError) throw joinError;
+    if (error) throw error;
+    if (typeof sesionId !== 'string' || !sesionId) throw new Error('No se pudo unir a la sesión.');
 
-    const sesion = await this.obtenerSesionPorCodigo(codigoNormalizado);
-    if (!sesion || !sesion.id) {
+    const sesion = await this.obtenerSesionPorId(sesionId);
+    if (!sesion?.id) {
       throw new Error('Te uniste, pero no se pudo cargar la sesión. Intenta actualizar el panel.');
     }
     return { sesion };
   }
 
-  async marcarComoListo(participanteId: string, listo = true): Promise<void> {
-    const { error } = await this.supabase.client
+  /** Lista autoritativa de participantes (resincronización REST). */
+  async obtenerParticipantes(sesionId: string): Promise<Participante[]> {
+    const { data, error } = await this.supabase.client
       .from('participantes')
-      .update({ listo })
-      .eq('id', participanteId);
+      .select('*')
+      .eq('sesion_id', sesionId)
+      .order('unido_en', { ascending: true });
 
+    if (error) throw error;
+    return this.normalizarParticipantes((data ?? []) as ParticipanteDto[]);
+  }
+
+  async obtenerMuestrasCerradas(sesionId: string): Promise<number[]> {
+    const { data, error } = await this.supabase.client
+      .from('cierres_muestra')
+      .select('numero_muestra')
+      .eq('sesion_id', sesionId);
+
+    if (error) throw error;
+    return (data ?? [])
+      .map(fila => Number(fila.numero_muestra))
+      .filter(numero => Number.isInteger(numero))
+      .sort((a, b) => a - b);
+  }
+
+  async marcarComoListo(sesionId: string, listo = true): Promise<void> {
+    const { error } = await this.supabase.client.rpc('marcar_listo', {
+      p_sesion_id: sesionId,
+      p_listo: listo
+    });
+    if (error) throw error;
+  }
+
+  /**
+   * Sin `usuarioId`: el usuario actual abandona la sesión.
+   * Con `usuarioId`: el organizador retira a un catador (Grace Period vencido).
+   */
+  async abandonarSesion(sesionId: string, usuarioId?: string): Promise<void> {
+    const { error } = await this.supabase.client.rpc('abandonar_sesion', {
+      p_sesion_id: sesionId,
+      p_usuario_id: usuarioId ?? null
+    });
     if (error) throw error;
   }
 
   async iniciarSesion(sesionId: string): Promise<void> {
-    const { data, error } = await this.supabase.client.rpc('iniciar_sesion', {
-      p_sesion_id: sesionId
+    const { error } = await this.supabase.client.rpc('iniciar_sesion', { p_sesion_id: sesionId });
+    if (error) throw error;
+  }
+
+  async forzarCierreMuestra(sesionId: string, numeroMuestra: number, motivo?: string): Promise<ResultadoCierreMuestra> {
+    const { data, error } = await this.supabase.client.rpc('forzar_cierre_muestra', {
+      p_sesion_id: sesionId,
+      p_numero_muestra: numeroMuestra,
+      p_motivo: motivo?.trim() || null
     });
     if (error) throw error;
-    if (data === false) throw new Error('Supabase rechazó el inicio de la sesión.');
-  }
 
-  async obtenerParticipantes(sesionId: string): Promise<Participante[]> {
-    const idLimpio = sesionId?.trim();
-    if (!idLimpio) {
-      throw new Error('ID de sesión inválido');
-    }
-
-    const { data, error } = await this.supabase.client
-      .from('participantes')
-      .select('*')
-      .eq('sesion_id', idLimpio);
-
-    if (error) throw error;
-    return data.map(participanteDtoToDomain);
-  }
-
-  observarParticipantes(sesionId: string): Observable<Participante[]> {
-    return new Observable<Participante[]>(observer => {
-      const idLimpio = sesionId?.trim();
-      if (!idLimpio) {
-        observer.error(new Error('ID de sesión inválido'));
-        return;
-      }
-
-      let activo = true;
-
-      const cargarParticipantes = async () => {
-        try {
-          const { data, error } = await this.supabase.client
-            .from('participantes')
-            .select('*')
-            .eq('sesion_id', idLimpio);
-
-          if (error) {
-            console.error('Error al consultar participantes en Supabase:', error);
-            if (activo) observer.error(error);
-            return;
-          }
-
-          if (activo && data) {
-            observer.next(data.map(participanteDtoToDomain));
-          }
-        } catch (err) {
-          console.error('Error inesperado al cargar participantes:', err);
-          if (activo) observer.error(err);
-        }
-      };
-
-      // 1. Carga inicial inmediata por REST
-      void cargarParticipantes();
-
-      // 2. Sondeo de respaldo periódico (mitiga problemas si el canal Realtime falla con 'transport failure')
-      const intervalId = setInterval(() => {
-        if (activo) {
-          void cargarParticipantes();
-        }
-      }, 4000);
-
-      // 3. Canal Realtime con identificador único para evitar colisiones con suscripciones previas
-      const channelName = `sala_espera_${idLimpio}_${Date.now()}`;
-      const channel = this.supabase.client
-        .channel(channelName)
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'participantes', filter: `sesion_id=eq.${idLimpio}` },
-          () => {
-            void cargarParticipantes();
-          }
-        )
-        .subscribe((status, error) => {
-          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-            console.warn(`[Realtime Supabase] Aviso en el canal (${status}):`, error);
-            // Reintentar vía REST sin romper el Observable
-            void cargarParticipantes();
-          }
-        });
-
-      return () => {
-        activo = false;
-        clearInterval(intervalId);
-        void this.supabase.client.removeChannel(channel);
-      };
-    });
-  }
-
-  observarSesion(sesionId: string): Observable<Sesion> {
-    return new Observable<Sesion>(observer => {
-      const idLimpio = sesionId?.trim();
-      if (!idLimpio) {
-        observer.error(new Error('ID de sesión inválido'));
-        return;
-      }
-
-      let activo = true;
-      const cargarSesion = async () => {
-        try {
-          const { data, error } = await this.supabase.client
-            .from('sesiones')
-            .select('*')
-            .eq('id', idLimpio)
-            .maybeSingle();
-
-          if (error) throw error;
-          if (!data) throw new Error('No se encontró la sesión solicitada.');
-          if (activo) observer.next(sesionDtoToDomain(data));
-        } catch (error) {
-          console.error('Error al consultar la sesión en Supabase:', error);
-          if (activo) observer.error(error);
-        }
-      };
-
-      void cargarSesion();
-
-      const intervalId = setInterval(() => {
-        if (activo) void cargarSesion();
-      }, 4000);
-
-      const channel = this.supabase.client
-        .channel(`sesion_estado_${idLimpio}_${Date.now()}`)
-        .on(
-          'postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'sesiones', filter: `id=eq.${idLimpio}` },
-          payload => {
-            if (activo) observer.next(sesionDtoToDomain(payload.new as SesionDto));
-          }
-        )
-        .subscribe((status, error) => {
-          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-            console.warn(`[Realtime Supabase] Aviso en el canal de sesión (${status}):`, error);
-            void cargarSesion();
-          }
-        });
-
-      return () => {
-        activo = false;
-        clearInterval(intervalId);
-        void this.supabase.client.removeChannel(channel);
-      };
-    });
-  }
-
-  private async insertarParticipanteSeguro({
-    sesionId,
-    usuarioId,
-    nombre,
-    esOrganizador,
-    listo
-  }: {
-    sesionId: string;
-    usuarioId?: string | null;
-    nombre?: string;
-    esOrganizador: boolean;
-    listo: boolean;
-  }): Promise<Participante> {
-    const sesionIdNormalizado = sesionId.trim();
-    if (!sesionIdNormalizado) throw new Error('El ID de sesión es inválido');
-
-    let usuarioIdNormalizado = usuarioId?.trim() || null;
-    let nombreNormalizado = nombre?.trim() || '';
-
-    if (!usuarioIdNormalizado || !nombreNormalizado) {
-      const { data, error } = await this.supabase.client.auth.getUser();
-      if (error) throw error;
-
-      usuarioIdNormalizado ||= data.user?.id?.trim() || null;
-      const nombreMetadata = data.user?.user_metadata?.['nombre'];
-      nombreNormalizado ||= typeof nombreMetadata === 'string' ? nombreMetadata.trim() : '';
-      nombreNormalizado ||= data.user?.email?.trim() || '';
-    }
-
-    nombreNormalizado ||= esOrganizador ? 'Organizador' : 'Catador';
-
-    if (usuarioIdNormalizado) {
-      const { data: existente, error } = await this.supabase.client
-        .from('participantes')
-        .select('*')
-        .eq('sesion_id', sesionIdNormalizado)
-        .eq('usuario_id', usuarioIdNormalizado)
-        .maybeSingle();
-
-      if (error) throw error;
-      if (existente) return participanteDtoToDomain(existente);
-    }
-
-    const { data, error } = await this.supabase.client
-      .from('participantes')
-      .insert([{
-        sesion_id: sesionIdNormalizado,
-        usuario_id: usuarioIdNormalizado,
-        nombre: nombreNormalizado,
-        es_organizador: esOrganizador,
-        listo,
-        unido_en: new Date().toISOString()
-      }])
-      .select()
-      .single();
-
-    if (error) throw error;
-    if (!data) throw new Error('No se pudo registrar al participante en la sesión.');
-    return participanteDtoToDomain(data);
-  }
-
-  private generarCodigoUnico(): string {
-    const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numeros = '0123456789';
-    const alfanumerico = letras + numeros;
-    const aleatorio = (caracteres: string) => {
-      const bytes = new Uint32Array(1);
-      crypto.getRandomValues(bytes);
-      return caracteres[bytes[0] % caracteres.length];
+    const dto = data as CierreMuestraDto | null;
+    return {
+      numeroMuestra: Number(dto?.numero_muestra ?? numeroMuestra),
+      fichasPendientesDescartadas: Number(dto?.fichas_pendientes_descartadas ?? 0),
+      sesionCompletada: dto?.sesion_completada === true
     };
+  }
 
-    return `${aleatorio(letras)}${aleatorio(letras)}${aleatorio(numeros)}${aleatorio(numeros)}-${aleatorio(numeros)}${aleatorio(alfanumerico)}${aleatorio(numeros)}`;
+  async finalizarSesionForzado(sesionId: string, motivo?: string): Promise<void> {
+    const { error } = await this.supabase.client.rpc('finalizar_sesion_forzado', {
+      p_sesion_id: sesionId,
+      p_motivo: motivo?.trim() || null
+    });
+    if (error) throw error;
+  }
+
+  async obtenerProgresoPanel(sesionId: string): Promise<ProgresoPanel> {
+    const { data, error } = await this.supabase.client.rpc('get_progreso_panel', { p_sesion_id: sesionId });
+    if (error) throw error;
+
+    const dto = data as ProgresoPanelDto | null;
+    return {
+      estado: dto?.estado ?? '',
+      numeroMuestras: Number(dto?.numero_muestras ?? 0),
+      muestrasCerradas: (dto?.muestras_cerradas ?? []).map(Number),
+      catadores: (dto?.catadores ?? []).map(c => ({
+        usuarioId: c.usuario_id,
+        nombre: c.nombre,
+        esOrganizador: c.es_organizador === true,
+        listo: c.listo === true,
+        muestrasEnviadas: (c.muestras_enviadas ?? []).map(Number)
+      }))
+    };
+  }
+
+  /** Descarta filas sin usuario real y deduplica por usuario (defensa en profundidad). */
+  private normalizarParticipantes(filas: ParticipanteDto[]): Participante[] {
+    const porUsuario = new Map<string, Participante>();
+    for (const fila of filas) {
+      const participante = participanteDtoToDomain(fila);
+      if (participante.usuarioId && !porUsuario.has(participante.usuarioId)) {
+        porUsuario.set(participante.usuarioId, participante);
+      }
+    }
+    return [...porUsuario.values()];
   }
 }

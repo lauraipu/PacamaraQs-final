@@ -5,6 +5,7 @@ import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import { BaseCataForm } from '../../../core/cva/base-cata-form';
+import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
 
 addIcons({ arrowBackOutline });
 
@@ -41,7 +42,7 @@ interface FormularioExtrinseco {
   selector: 'app-extrinsic-form',
   templateUrl: './extrinsic-form.page.html',
   standalone: true,
-  imports: [IonContent, IonIcon, CommonModule, FormsModule]
+  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent]
 })
 export class ExtrinsicFormPage extends BaseCataForm<FormularioExtrinseco> {
   override formulario: FormularioExtrinseco = this.crearFormularioVacio();

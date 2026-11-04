@@ -151,19 +151,6 @@
         <p class="help-text">Comparte este código con los catadores.</p>
       </section>
 
-      @if (organizadorPendiente) {
-        <section class="cupping-card retry-card">
-          <p>No se pudo registrar al organizador como participante.</p>
-          <ion-button
-            fill="outline"
-            (click)="reintentarRegistroOrganizador()"
-            [disabled]="isLoading"
-          >
-            Reintentar
-          </ion-button>
-        </section>
-      }
-
       <section class="cupping-card">
         <h2 class="section-title">Resumen de la sesión</h2>
         <div class="summary-row"><span>Nombre</span><strong>{{ nombreSesion || 'Sin nombre' }}</strong></div>
@@ -182,7 +169,7 @@
         <hr>
         <div class="summary-row">
           <span>Organizador catador</span>
-          <strong>{{ formatoSeleccionado === 'extrinseca' ? 'No' : (participaComoCatador ? 'Sí' : 'No') }}</strong>
+          <strong>{{ formatoSeleccionado === 'extrinseca' ? 'Individual' : (participaComoCatador ? 'Sí' : 'No') }}</strong>
         </div>
       </section>
     }
@@ -217,9 +204,9 @@
         expand="block"
         class="primary-btn continue-button"
         (click)="irASalaDeEspera()"
-        [disabled]="isLoading || organizadorPendiente"
+        [disabled]="isLoading"
       >
-        Ir a sala de espera →
+        {{ formatoSeleccionado === 'extrinseca' ? 'Ir a la evaluación →' : 'Ir a sala de espera →' }}
       </ion-button>
     </div>
   }

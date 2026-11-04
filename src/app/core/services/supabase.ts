@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class SupabaseService { // <-- Mantenemos el nombre de la clase
+export class SupabaseService {
   private supabaseClient?: SupabaseClient;
 
   get client(): SupabaseClient {
@@ -22,5 +22,3 @@ export class SupabaseService { // <-- Mantenemos el nombre de la clase
     return this.supabaseClient;
   }
 }
-
-export { SupabaseService as Supabase };

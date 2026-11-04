@@ -59,15 +59,6 @@
   gap: 8px;
 }
 
-.guest-btn {
-  --border-color: var(--app-primary-dark);
-  --color: var(--app-primary-dark);
-  --border-radius: 12px;
-  height: 50px;
-  margin-top: 0;
-  text-transform: none;
-}
-
 .register-link {
   margin-top: 24px;
   color: var(--app-text-muted);
@@ -77,4 +68,26 @@
 .register-link a {
   color: var(--app-primary-dark);
   font-weight: 600;
+}
+.field-label {
+  color: var(--app-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.session-check {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.login-footer {
+  margin: 32px auto 0;
+  max-width: 260px;
+  color: var(--app-text-faint);
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
 }

@@ -1,36 +1,32 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth';
+import { AuthService, RolGlobal } from '../services/auth';
 
-export const roleGuard: CanActivateFn = async (route, _state) => {
+/**
+ * Valida public.usuarios.rol_global contra `data.roles` de la ruta.
+ * Si el rol es válido pero la ruta no le corresponde, redirige a su inicio
+ * (administrador → /admin-dashboard, catador → /dashboard).
+ */
+export const roleGuard: CanActivateFn = async route => {
   const authService = inject(AuthService);
   const router = inject(Router);
-  const allowedRoles = route.data['roles'] as string[] | undefined;
+  const rolesPermitidos = route.data['roles'] as RolGlobal[] | undefined;
 
-  if (!allowedRoles?.length) {
+  if (!rolesPermitidos?.length) {
     console.error('La ruta protegida no define roles permitidos.');
-    return router.createUrlTree(['/dashboard']);
+    return router.createUrlTree(['/login']);
   }
 
   try {
-    const { user } = await authService.getUser();
-    if (!user || user.is_anonymous) return router.createUrlTree(['/login']);
+    await authService.asegurarInicializado();
+    if (!authService.autenticado()) return router.createUrlTree(['/login']);
 
-    const role = await authService.obtenerRolGlobal(user.id);
-    if (allowedRoles.includes(role)) return true;
+    const rol = await authService.obtenerRol();
+    if (rolesPermitidos.includes(rol)) return true;
 
-    if (role === 'administrador') return router.createUrlTree(['/admin-dashboard']);
-    if (role === 'catador' || role === 'organizador') {
-      return router.createUrlTree(['/dashboard']);
-    }
-
-    return router.createUrlTree(['/login'], {
-      queryParams: { authError: 'role' }
-    });
+    return router.createUrlTree([authService.rutaInicioPorRol(rol)]);
   } catch (error) {
     console.error('No se pudo validar el rol del usuario:', error);
-    return router.createUrlTree(['/login'], {
-      queryParams: { authError: 'role' }
-    });
+    return router.createUrlTree(['/login'], { queryParams: { authError: 'role' } });
   }
 };

@@ -3,10 +3,15 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/dashboard" text=""></ion-back-button>
     </ion-buttons>
-    <ion-title>Sala de espera</ion-title>
+    <ion-title>
+      <div class="page-title">Sala de espera</div>
+      @if (sesion(); as s) {
+        <div class="page-subtitle">{{ s.nombre }}</div>
+      }
+    </ion-title>
     <ion-buttons slot="end">
       <ion-badge color="dark" class="blind-badge">
-        <ion-icon name="lock-closed-outline" style="margin-right: 4px;"></ion-icon>
+        <ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon>
         Evaluación ciega
       </ion-badge>
     </ion-buttons>
@@ -15,39 +20,52 @@
 
 <ion-content class="ion-padding waiting-content">
   <main class="waiting-container">
-    @if (error) {
-      <div class="waiting-error" role="alert">{{ error }}</div>
+    @if (sinConexion()) {
+      <div class="connection-banner" role="status">
+        <ion-icon name="cloud-offline-outline" aria-hidden="true"></ion-icon>
+        Reconectando con la sala… los cambios se sincronizarán al volver la conexión.
+      </div>
     }
 
-    @if (cargando) {
-      <div class="empty-state" style="margin-top: 32px;">
-        <ion-spinner name="crescent" style="display: block; margin: 0 auto 12px;"></ion-spinner>
+    @if (error(); as mensaje) {
+      <div class="waiting-error" role="alert">
+        <span>{{ mensaje }}</span>
+        <ion-button size="small" fill="outline" (click)="reintentar()">
+          <ion-icon name="refresh-outline" slot="start"></ion-icon>
+          Reintentar
+        </ion-button>
+      </div>
+    }
+
+    @if (cargando()) {
+      <div class="empty-state loading-state" role="status">
+        <ion-spinner name="crescent"></ion-spinner>
         <span>Cargando sala de espera…</span>
       </div>
-    } @else {
-      @if (sesion) {
-        <section class="cupping-card metrics-card">
-          <div class="metric-item">
-            <span class="metric-label">Formato</span>
-            <span class="metric-value">{{ sesion.formato | titlecase }}</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-label">Muestras</span>
-            <span class="metric-value">{{ sesion.numeroMuestras }}</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-label">Catadores</span>
-            <span class="metric-value">{{ participantes.length }} / {{ sesion.catadoresObjetivo }}</span>
-          </div>
-        </section>
+    } @else if (sesion(); as s) {
+      <section class="cupping-card metrics-card">
+        <div class="metric-item">
+          <span class="metric-label">Formato</span>
+          <span class="metric-value">{{ s.formato | titlecase }}</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Muestras</span>
+          <span class="metric-value">{{ s.numeroMuestras }}</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Catadores</span>
+          <span class="metric-value">{{ participantes().length }} / {{ s.catadoresObjetivo }}</span>
+        </div>
+      </section>
 
+      @if (esOrganizador()) {
         <section class="cupping-card share-card">
           <h3 class="section-title">COMPARTIR ACCESO</h3>
           <div class="share-box">
-            <div class="code-display">{{ sesion.codigoAcceso }}</div>
+            <div class="code-display">{{ s.codigoAcceso }}</div>
             <ion-button fill="outline" size="small" (click)="copiarCodigo()">
               <ion-icon name="copy-outline" slot="start"></ion-icon>
-              {{ copiado ? 'Copiado' : 'Código' }}
+              {{ copiado() ? 'Copiado' : 'Código' }}
             </ion-button>
           </div>
           <p class="share-hint">El código expira cuando inicies la cata.</p>
@@ -57,60 +75,99 @@
       <section class="cupping-card">
         <div class="list-header">
           <h3 class="section-title">
-            <ion-icon name="people-outline"></ion-icon> CATADORES CONECTADOS
+            <ion-icon name="people-outline" aria-hidden="true"></ion-icon> CATADORES CONECTADOS
           </h3>
-          <span class="list-subtitle">{{ participantesListos }} listos · mín. 3 para iniciar</span>
+          <span class="list-subtitle">{{ participantesListos() }} listos · mín. {{ MINIMO_CATADORES }} para iniciar</span>
         </div>
 
-        @if (participantes.length > 0) {
+        @if (participantesEnSala().length > 0) {
           <ion-list lines="none" class="tasters-list">
-            @for (participante of participantes; track participante.id) {
-              <ion-item class="taster-item">
+            @for (p of participantesEnSala(); track p.usuarioId) {
+              <ion-item class="taster-item" [class.taster-item--inestable]="p.conexion === 'inestable'">
                 <div class="avatar" slot="start">
-                  {{ (participante.nombre.charAt(0) || '?').toUpperCase() }}
+                  {{ (p.nombre.charAt(0) || '?').toUpperCase() }}
+                  <span
+                    class="presence-dot"
+                    [class.presence-dot--online]="p.conexion === 'en_linea'"
+                    [class.presence-dot--unstable]="p.conexion === 'inestable'"
+                    [attr.aria-label]="p.conexion === 'en_linea' ? 'En línea' : p.conexion === 'inestable' ? 'Conexión inestable' : 'Desconectado'">
+                  </span>
                 </div>
                 <ion-label>
                   <h2>
-                    {{ participante.nombre }}
-                    @if (participante.esOrganizador) { <span class="org-tag">organizador</span> }
+                    {{ p.nombre }}
+                    @if (p.esOrganizador) { <span class="org-tag">organizador</span> }
+                    @if (p.usuarioId === usuarioActualId()) { <span class="org-tag">tú</span> }
                   </h2>
-                  <p>Se unió ahora</p>
+                  @if (p.conexion === 'inestable') {
+                    <p class="unstable-text">Conexión inestable · se retira en {{ p.segundosGracia }} s</p>
+                  } @else if (p.conexion === 'desconectado') {
+                    <p>Desconectado · {{ tiempoDesde(p.unidoEn) }}</p>
+                  } @else {
+                    <p>{{ tiempoDesde(p.unidoEn) }}</p>
+                  }
                 </ion-label>
                 <div slot="end" class="status-indicator">
-                  <span class="dot" [class.ready]="participante.listo"></span>
-                  {{ participante.listo ? 'Listo' : 'Conectado' }}
+                  <span class="dot" [class.ready]="p.listo"></span>
+                  {{ p.listo ? 'Listo' : 'Conectado' }}
                 </div>
               </ion-item>
             }
           </ion-list>
         } @else {
           <div class="empty-state">
-            Esperando que se unan al menos 2 catadores más.
+            Esperando que se unan al menos {{ MINIMO_CATADORES }} catadores.
           </div>
         }
       </section>
 
       <section class="privacy-card">
-        <ion-icon name="lock-closed-outline"></ion-icon>
-        <p>Evaluación 100% ciega. Puedes ver quién se ha unido, pero no verás ninguna evaluación ni puntaje hasta el cierre automático del panel.</p>
+        <ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon>
+        <p>
+          <strong>Evaluación 100% ciega.</strong>
+          No verás puntajes ni evaluaciones de otros catadores. El panel se cierra
+          automáticamente cuando el último catador termina.
+        </p>
       </section>
 
-      @if (esOrganizador && sesion && sesion.estado === EstadoSesion.EN_ESPERA) {
+      @if (miParticipacion(); as yo) {
+        @if (!esOrganizador()) {
+          <div class="start-button-container">
+            <ion-button
+              expand="block"
+              [class.primary-btn]="!yo.listo"
+              [fill]="yo.listo ? 'outline' : 'solid'"
+              [disabled]="cambiandoListo()"
+              (click)="alternarListo()">
+              @if (cambiandoListo()) {
+                <ion-spinner name="crescent"></ion-spinner>
+              } @else if (yo.listo) {
+                <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                Estoy listo · tocar para cancelar
+              } @else {
+                Estoy listo para catar
+              }
+            </ion-button>
+            <p class="waiting-hint"><span class="pulse-dot"></span> Esperando que el organizador inicie la cata…</p>
+            <ion-button expand="block" fill="clear" color="medium" [disabled]="saliendo()" (click)="salirDeSala()">
+              <ion-icon name="exit-outline" slot="start"></ion-icon>
+              Salir de la sesión
+            </ion-button>
+          </div>
+        }
+      }
+
+      @if (esOrganizador() && s.estado === EstadoSesion.EN_ESPERA) {
         <div class="start-button-container">
-          <ion-button
-            expand="block"
-            class="primary-btn"
-            (click)="iniciarCata()"
-            [disabled]="!puedeIniciar"
-          >
-            @if (iniciando) {
+          <ion-button expand="block" class="primary-btn" (click)="iniciarCata()" [disabled]="!puedeIniciar()">
+            @if (iniciando()) {
               Iniciando…
-            } @else if (organizadorParticipaComoCatador) {
-              Iniciar cata · {{ participantesListos }} catadores listos
-            } @else if (participantesListos < 3) {
-              Iniciar y monitorear (mín. 3 — faltan {{ 3 - participantesListos }})
+            } @else if (faltanListos() > 0) {
+              Faltan {{ faltanListos() }} catador(es) listo(s)
+            } @else if (organizadorParticipaComoCatador()) {
+              Iniciar cata · {{ participantesListos() }} catadores listos
             } @else {
-              Iniciar y monitorear · {{ participantesListos }} catadores listos
+              Iniciar y monitorear · {{ participantesListos() }} catadores listos
             }
           </ion-button>
         </div>

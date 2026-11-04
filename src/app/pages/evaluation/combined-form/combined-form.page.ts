@@ -11,6 +11,7 @@ import {
   lockClosedOutline
 } from 'ionicons/icons';
 import { BaseCataForm } from '../../../core/cva/base-cata-form';
+import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
 import {
   DESCRIPTORES_MOUTHFEEL,
   ETIQUETAS_HEDONICAS,
@@ -69,7 +70,7 @@ export type AtributoCalificable =
   selector: 'app-combined-form',
   templateUrl: './combined-form.page.html',
   standalone: true,
-  imports: [IonContent, IonIcon, CommonModule, FormsModule]
+  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent]
 })
 export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
 
@@ -202,7 +203,10 @@ export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
   }
 
   override async finalizarCata(): Promise<void> {
-    const incompletas = this.respuestas.filter(respuesta => !this.esRespuestaCompleta(respuesta)).length;
+    // Las muestras cerradas por el organizador no se exigen.
+    const incompletas = this.respuestas.filter(
+      (respuesta, indice) => !this.muestrasCerradas().has(indice + 1) && !this.esRespuestaCompleta(respuesta)
+    ).length;
     if (incompletas > 0) {
       const alert = await this.alertCtrl.create({
         header: 'Cata incompleta',
