@@ -48,6 +48,11 @@ export interface AtributoFicha {
 export interface FichaReporte {
   numeroMuestra: number;
   puntaje: number;
+  /** La RPC devolvió puntaje NULL (ficha escaneada con calidades sin leer). */
+  sinPuntaje: boolean;
+  /** Notas y descriptores revisados en el modal del escáner (evaluaciones.notas). */
+  notas: string;
+  descriptores: string[];
   tazasNoUniformes: number;
   tazasDefectuosas: number;
   impresionGlobal: number | null;
@@ -101,6 +106,17 @@ export const ATRIBUTOS_CVA: readonly { clave: AtributoCva; etiqueta: string }[] 
 const ESCALA_HEDONICA_DESC = [9, 8, 7, 6, 5, 4, 3, 2, 1] as const;
 const INTENSIDAD_MAX = 15;
 const HEDONICA_MAX = 9;
+
+const textoDe = (v: unknown): string => (typeof v === 'string' ? v.trim() : '');
+
+/** Descriptores generales (escáner) + los de cada atributo, sin repetir. */
+function descriptoresDe(formulario: Record<string, unknown> | null | undefined): string[] {
+  if (!formulario) return [];
+  const lista = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
+  const bloques = Object.values((formulario['atributos'] as Record<string, unknown> | undefined) ?? formulario);
+  const porAtributo = bloques.flatMap(b => (b && typeof b === 'object' ? lista((b as Record<string, unknown>)['descriptores']) : []));
+  return [...new Set([...lista(formulario['descriptores']), ...porAtributo])];
+}
 
 export function clasificarPuntaje(puntaje: number): Clasificacion {
   if (puntaje >= 90) return { etiqueta: 'Excepcional', color: '#15803d', fondo: '#f0fdf4' };
@@ -229,6 +245,8 @@ export class ResultsPage implements OnInit {
   readonly esAfectivo = computed(() => this.formato() === FormatoCva.AFECTIVO.id);
   readonly esDescriptivo = computed(() => this.formato() === FormatoCva.DESCRIPTIVO.id);
   readonly esExtrinseco = computed(() => this.formato() === FormatoCva.EXTRINSECA.id);
+  /** Sesión Personal: se oculta todo lo de panel y solo se muestra la ficha. */
+  readonly esPersonal = computed(() => this.resultados()?.esPersonal === true);
 
   readonly ranking = computed<FilaRanking[]>(() => {
     const muestras = this.resultados()?.muestras ?? [];
@@ -318,7 +336,9 @@ export class ResultsPage implements OnInit {
 
   /** Fichas del catador seleccionado, ordenadas por número de muestra. */
   readonly fichasReporte = computed<FichaReporte[]>(() =>
-    this.fichasDe(this.catadorReporte()).filter(f => f.puntaje > 0)
+    // En panel, sin puntaje = ficha incompleta. En Sesión Personal la ficha
+    // escaneada puede no tener puntaje (calidades sin leer) y aun así se muestra.
+    this.fichasDe(this.catadorReporte()).filter(f => this.esPersonal() || !f.sinPuntaje)
   );
 
   /* ── Vista Afectivo ───────────────────────────────────────────────────── */
@@ -569,6 +589,15 @@ export class ResultsPage implements OnInit {
 
   /** Abre el modal; opcionalmente pre-seleccionado desde una ficha individual. */
   abrirExportar(opciones?: { numeroMuestra: number; cupperId: string }): void {
+    // Sesión Personal: una sola ficha → PDF directo, sin elegir catador/muestra.
+    if (this.esPersonal()) {
+      const catador = this.catadorReporte();
+      this.modoExportacion.set('catador');
+      this.catadorExportarId.set(opciones?.cupperId ?? catador?.cupperId ?? null);
+      this.muestraExportar.set(opciones?.numeroMuestra ?? this.numerosMuestra()[0] ?? 1);
+      void this.exportarPDF();
+      return;
+    }
     // Primera apertura: todos los catadores con fichas entran al consolidado.
     if (this.catadoresPanelIds().size === 0) {
       this.catadoresPanelIds.set(new Set(this.catadoresExportables().map(c => c.cupperId)));
@@ -673,6 +702,9 @@ export class ResultsPage implements OnInit {
       .map(p => ({
         numeroMuestra: p.numeroMuestra,
         puntaje: p.puntaje,
+        sinPuntaje: !(p.puntaje > 0),
+        notas: textoDe(p.formulario?.['notas'] ?? p.formulario?.['notes']),
+        descriptores: descriptoresDe(p.formulario),
         tazasNoUniformes: p.tazasNoUniformes,
         tazasDefectuosas: p.tazasDefectuosas,
         impresionGlobal: p.impresionGlobal,

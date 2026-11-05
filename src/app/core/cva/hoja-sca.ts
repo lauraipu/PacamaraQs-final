@@ -154,6 +154,11 @@ const CATEGORIA_DE_SUB: ReadonlyMap<string, string> = new Map(
   )
 );
 
+/** Etiqueta impresa en la hoja SCA → clave (descriptores escaneados/editados en el modal). */
+const ETIQUETA_SCA_A_CLAVE: ReadonlyMap<string, string> = new Map(
+  DESCRIPTORES_SCA.flat().map(c => [normalizar(c.etiqueta), c.clave] as const)
+);
+
 /** Convierte los descriptores elegidos en la app a casillas SCA. */
 export function casillasDeDescriptores(descriptores: readonly string[]): Set<string> {
   const casillas = new Set<string>();
@@ -171,8 +176,11 @@ export function casillasDeDescriptores(descriptores: readonly string[]): Set<str
       continue;
     }
     const categoria = CATEGORIA_DE_SUB.get(n);
-    const clave = categoria ? CATEGORIA_APP_A_SCA[categoria] : undefined;
-    if (clave) casillas.add(clave);
+    const clave = (categoria ? CATEGORIA_APP_A_SCA[categoria] : undefined) ?? ETIQUETA_SCA_A_CLAVE.get(n);
+    if (clave) {
+      casillas.add(clave);
+      casillas.add(clave.split('.')[0]);
+    }
   }
   return casillas;
 }
@@ -263,8 +271,10 @@ export function leerFichaSca(ficha: FichaCatador): FichaSca {
   const extras = (atributos: AtributoHoja[]) => atributos.map(a => comoTexto(bloque(a)['extra'])).filter(Boolean);
   const listar = (nombres: string[]) => (nombres.length ? `Descriptores: ${[...new Set(nombres)].join(', ')}` : '');
 
-  const olfativos = descriptores(['fragancia', 'aroma']);
-  const gustativos = descriptores(['sabor', 'sabor_residual']);
+  // Descriptores generales de la hoja (escáner): aplican a ambas filas.
+  const generales = comoTextos(formulario['descriptores']);
+  const olfativos = [...descriptores(['fragancia', 'aroma']), ...generales];
+  const gustativos = [...descriptores(['sabor', 'sabor_residual']), ...generales];
   const boca = [...comoTextos(formulario['mouthfeel']), ...comoTextos(bloque('sensacion_boca')['textura'])];
   const defectos = comoTextos(formulario['tiposDefecto']);
   const defectosSinCasilla = defectos.filter(d => casillasDeDefectos([d]).size === 0);

@@ -41,6 +41,12 @@
         @if (f.simulada) { <ion-badge class="sc-badge sc-badge--sim">Simulado</ion-badge> }
       </div>
 
+      @if (avisoLectura(); as aviso) {
+        <p class="sc-banner sc-banner--warn" role="status">
+          <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>{{ aviso }}
+        </p>
+      }
+
       @if (f.camposFaltantes.length > 0) {
         <p class="sc-banner sc-banner--warn">
           <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
@@ -85,12 +91,28 @@
           </div>
         }
 
-        @if (f.descriptores.length > 0) {
-          <div class="sc-chips">
-            @for (d of f.descriptores; track d) { <span>{{ d }}</span> }
-          </div>
-        }
       }
+
+      @if (usaDescriptores()) {
+        <h3 class="sc-label" style="margin-top:16px">Descriptores (Editable)</h3>
+        <div style="display:grid;gap:6px">
+          @for (fila of filasDescriptores; track fila[0].clave) {
+            <div style="display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center">
+              @for (c of fila; track c.clave) {
+                <ion-checkbox labelPlacement="end" justify="start"
+                  [style.font-weight]="c.principal ? 600 : 400" [style.padding-left]="c.principal ? '0' : '8px'"
+                  [checked]="descriptoresMarcados().has(c.clave)"
+                  (ionChange)="alternarDescriptor(c.clave, $event.detail.checked)">{{ c.etiqueta }}</ion-checkbox>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <ion-textarea style="margin-top:16px" label="Notas (Editable)" labelPlacement="stacked" fill="outline"
+        [autoGrow]="true" [rows]="3" [maxlength]="2000" placeholder="Escribe aquí las notas de la ficha"
+        [value]="notasEditables()" (ionInput)="cambiarNotas($event.detail.value)">
+      </ion-textarea>
     </section>
 
     <div class="sc-actions">

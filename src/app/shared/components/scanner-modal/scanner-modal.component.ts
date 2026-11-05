@@ -1,14 +1,15 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  IonBadge, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonSegment, IonSegmentButton,
-  IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar, ModalController, ToastController
+  IonBadge, IonButton, IonButtons, IonCheckbox, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonSegment, IonSegmentButton,
+  IonSelect, IonSelectOption, IonSpinner, IonTextarea, IonTitle, IonToolbar, ModalController, ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   alertCircleOutline, cameraOutline, checkmarkCircleOutline, closeOutline, flaskOutline, imageOutline,
   refreshOutline, sparklesOutline
 } from 'ionicons/icons';
+import { casillasDeDescriptores, DESCRIPTORES_SCA } from '../../../core/cva/hoja-sca';
 import { EstadoSesion, FormatoCva, getFormatoById } from '../../../core/models/sesion.model';
 import {
   FichaEscaneada, FORMATOS_ESCANEO, FormatoEscaneo, tituloFormatoEscaneo
@@ -42,7 +43,7 @@ export interface ResultadoEscaneo {
   standalone: true,
   imports: [
     CommonModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonSpinner,
-    IonSegment, IonSegmentButton, IonLabel, IonSelect, IonSelectOption, IonInput, IonBadge
+    IonSegment, IonSegmentButton, IonLabel, IonSelect, IonSelectOption, IonInput, IonBadge, IonCheckbox, IonTextarea
   ]
 })
 export class ScannerModalComponent implements OnInit {
@@ -66,6 +67,18 @@ export class ScannerModalComponent implements OnInit {
   readonly guardando = signal(false);
   readonly ficha = signal<FichaEscaneada | null>(null);
   readonly error = signal<string | null>(null);
+
+  /* Revisión editable */
+  readonly filasDescriptores = DESCRIPTORES_SCA;
+  readonly notasEditables = signal('');
+  readonly descriptoresMarcados = signal<ReadonlySet<string>>(new Set());
+  /** Solo Combinado y Descriptivo tienen casillas de descriptores en la hoja. */
+  readonly usaDescriptores = computed(() => {
+    const f = this.ficha()?.formato;
+    return f === 'combinado' || f === 'descriptivo';
+  });
+  /** Qué no pudo leer la IA (se calcula sobre lo leído, no sobre lo editado). */
+  readonly avisoLectura = signal<string | null>(null);
 
   /* Modo sesión */
   readonly cargandoSesiones = signal(false);
@@ -145,7 +158,9 @@ export class ScannerModalComponent implements OnInit {
     this.error.set(null);
     this.analizando.set(true);
     try {
-      this.ficha.set(await this.scanner.analizarFicha(imagen.base64, this.formato()));
+      const ficha = await this.scanner.analizarFicha(imagen.base64, this.formato());
+      this.prepararRevision(ficha);
+      this.ficha.set(ficha);
     } catch (error) {
       this.error.set(mensajeDeError(error, 'No se pudo analizar la ficha.'));
     } finally {
@@ -158,10 +173,30 @@ export class ScannerModalComponent implements OnInit {
     this.error.set(null);
   }
 
+  /* ── Paso D: revisión editable ────────────────────────────────────────── */
+  cambiarNotas(valor: unknown): void {
+    this.notasEditables.set(typeof valor === 'string' ? valor : '');
+  }
+
+  /** Marcar un subdescriptor marca su categoría; desmarcar la categoría desmarca sus subs. */
+  alternarDescriptor(clave: string, marcado: boolean): void {
+    const categoria = clave.split('.')[0];
+    const nuevo = new Set(this.descriptoresMarcados());
+    if (marcado) {
+      nuevo.add(clave);
+      nuevo.add(categoria);
+    } else {
+      nuevo.delete(clave);
+      if (clave === categoria) [...nuevo].filter(c => c.startsWith(`${categoria}.`)).forEach(c => nuevo.delete(c));
+    }
+    this.descriptoresMarcados.set(nuevo);
+  }
+
   /* ── Paso D: guardar ──────────────────────────────────────────────────── */
   async guardar(): Promise<void> {
-    const ficha = this.ficha();
-    if (!ficha || this.guardando()) return;
+    const original = this.ficha();
+    if (!original || this.guardando()) return;
+    const ficha = this.aplicarEdicion(original);
     this.error.set(null);
     this.guardando.set(true);
     try {
@@ -203,6 +238,48 @@ export class ScannerModalComponent implements OnInit {
   }
 
   /* ── Internos ─────────────────────────────────────────────────────────── */
+
+  private notasDe(ficha: FichaEscaneada): string {
+    const valor = ficha.formulario[ficha.formato === 'extrinseca' ? 'notes' : 'notas'];
+    return typeof valor === 'string' ? valor.trim() : '';
+  }
+
+  /** Precarga notas y casillas con lo que leyó la IA y decide el aviso amarillo. */
+  private prepararRevision(ficha: FichaEscaneada): void {
+    const notas = this.notasDe(ficha);
+    const marcados = casillasDeDescriptores(ficha.descriptores);
+    const conDescriptores = ficha.formato === 'combinado' || ficha.formato === 'descriptivo';
+    this.notasEditables.set(notas);
+    this.descriptoresMarcados.set(marcados);
+    const faltan = [!notas && 'notas', conDescriptores && marcados.size === 0 && 'descriptores'].filter(Boolean);
+    this.avisoLectura.set(faltan.length
+      ? `La IA no pudo leer ${faltan.join(' ni ')}. Por favor, agrégalos manualmente.`
+      : null);
+  }
+
+  /**
+   * Ficha final para evaluaciones.notas: atributos de la IA + notas corregidas
+   * + descriptores (etiquetas SCA marcadas). Las listas por atributo se filtran
+   * para no conservar casillas que el usuario desmarcó.
+   */
+  private aplicarEdicion(ficha: FichaEscaneada): FichaEscaneada {
+    const formulario: Record<string, unknown> = structuredClone(ficha.formulario);
+    formulario[ficha.formato === 'extrinseca' ? 'notes' : 'notas'] = this.notasEditables().trim();
+    if (!this.usaDescriptores()) return { ...ficha, formulario };
+
+    const marcados = this.descriptoresMarcados();
+    const descriptores = DESCRIPTORES_SCA.flat().filter(c => marcados.has(c.clave)).map(c => c.etiqueta);
+    const sigueMarcado = (d: string) => [...casillasDeDescriptores([d])].every(c => marcados.has(c));
+    const bloques = ficha.formato === 'combinado' ? (formulario['atributos'] as Record<string, unknown>) : formulario;
+    for (const bloque of Object.values(bloques ?? {})) {
+      const b = bloque as Record<string, unknown> | null;
+      if (b && typeof b === 'object' && Array.isArray(b['descriptores'])) {
+        b['descriptores'] = (b['descriptores'] as string[]).filter(sigueMarcado);
+      }
+    }
+    formulario['descriptores'] = descriptores;
+    return { ...ficha, formulario, descriptores };
+  }
 
   /**
    * Sesiones donde el usuario puede enviar fichas (lo mismo que exige RLS):

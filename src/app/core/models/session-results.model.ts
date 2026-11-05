@@ -63,6 +63,8 @@ export interface SessionResults {
   nombreSesion: string;
   formatoCva: string;
   fechaCierre: string;
+  /** Sesión Personal (ficha escaneada): 1 catador, sin panel. */
+  esPersonal?: boolean;
   totalMuestras: number;
   totalCatadores: number;
   muestras: SampleConsolidatedResult[];

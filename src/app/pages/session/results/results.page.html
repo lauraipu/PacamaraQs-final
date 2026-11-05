@@ -19,6 +19,94 @@
   </ion-toolbar>
 </ion-header>
 
+<!-- Reporte de sesión individual (panel Combinado y Sesión Personal) -->
+<ng-template #reporteIndividual>
+        @if (catadorReporte(); as cat) {
+          <ion-card class="rc-card">
+            <ion-card-content>
+              <h2 class="rs-section-title rc-section-title--tight">Reporte de sesión individual</h2>
+              <div class="rc-report__head">
+                <div class="rc-report__who">
+                  <span class="rc-avatar" aria-hidden="true">{{ cat.nombre.charAt(0).toUpperCase() }}</span>
+                  <div>
+                    <p class="rc-report__name">{{ cat.nombre }}</p>
+                    <p class="rc-report__meta">
+                      @if (esPersonal()) { Ficha escaneada · sesión personal }
+                      @else { {{ cat.muestrasEvaluadas }} de {{ cat.muestrasAsignadas }} muestras evaluadas · estado {{ cat.estado }} }
+                    </p>
+                  </div>
+                </div>
+                <div class="rc-report__score">
+                  <strong>{{ cat.puntajePromedio > 0 ? (cat.puntajePromedio | number:'1.2-2') : '—' }}</strong>
+                  <span>{{ esPersonal() ? 'Puntaje CVA' : 'Promedio' }}</span>
+                </div>
+              </div>
+
+              @if (fichasReporte().length > 0) {
+                <p class="rs-muted rs-note">Haz clic en una ficha para ver su detalle.</p>
+                <ion-accordion-group class="rc-fichas" [multiple]="false"
+                  [value]="esPersonal() ? cat.cupperId + '-' + fichasReporte()[0].numeroMuestra : undefined">
+                  @for (ficha of fichasReporte(); track ficha.numeroMuestra) {
+                    <ion-accordion [value]="cat.cupperId + '-' + ficha.numeroMuestra" class="rc-ficha">
+                      <ion-item slot="header" lines="none" class="rc-ficha__header">
+                        <ion-label>Muestra {{ ficha.numeroMuestra }}</ion-label>
+                        @if (!ficha.sinPuntaje) {
+                          <ion-badge slot="end" class="rc-chip" [style.--background]="ficha.clasificacion.fondo" [style.--color]="ficha.clasificacion.color">
+                            {{ ficha.clasificacion.etiqueta }}
+                          </ion-badge>
+                        }
+                        <span slot="end" class="rc-ficha__score">{{ ficha.sinPuntaje ? '—' : (ficha.puntaje | number:'1.2-2') }}</span>
+                      </ion-item>
+                      <div slot="content" class="rc-ficha__body">
+                        @if (ficha.atributos.length > 0) {
+                          <div class="rc-ficha__row rc-ficha__row--head">
+                            <span>Atributo</span><span class="rc-ficha__cols"><em>Intensidad</em><em>Calidad</em></span>
+                          </div>
+                          @for (a of ficha.atributos; track a.clave) {
+                            <div class="rc-ficha__row">
+                              <span>{{ a.etiqueta }}</span>
+                              <span class="rc-ficha__cols">
+                                <strong>{{ a.intensidad === null ? '—' : (a.intensidad | number:'1.0-2') }}</strong>
+                                <strong>{{ a.calidad === null ? '—' : (a.calidad | number:'1.0-2') }}</strong>
+                              </span>
+                            </div>
+                          }
+                        }
+                        @if (ficha.impresionGlobal !== null) {
+                          <div class="rc-ficha__row"><span>Impresión global</span><strong>{{ ficha.impresionGlobal | number:'1.0-2' }}</strong></div>
+                        }
+                        <div class="rc-ficha__row"><span>Tazas no uniformes</span><strong>{{ ficha.tazasNoUniformes }}</strong></div>
+                        <div class="rc-ficha__row"><span>Tazas defectuosas</span><strong>{{ ficha.tazasDefectuosas }}</strong></div>
+                        <div class="rc-ficha__row rc-ficha__row--total">
+                          <span>Puntaje final</span><strong>{{ ficha.sinPuntaje ? '—' : (ficha.puntaje | number:'1.2-2') }}</strong>
+                        </div>
+                        @if (ficha.sinPuntaje) {
+                          <p class="rs-muted rs-note">Sin puntaje CVA: faltan calidades o la impresión global en la ficha.</p>
+                        }
+                        @if (ficha.descriptores.length > 0) {
+                          <div class="rc-ficha__row"><span>Descriptores</span><strong>{{ ficha.descriptores.join(', ') }}</strong></div>
+                        }
+                        @if (ficha.notas) {
+                          <div class="rc-ficha__row"><span>Notas</span><strong style="white-space:pre-line;text-align:right">{{ ficha.notas }}</strong></div>
+                        }
+                        <div class="rc-ficha__actions">
+                          <ion-button size="small" fill="outline"
+                            (click)="abrirExportar({ numeroMuestra: ficha.numeroMuestra, cupperId: cat.cupperId })">
+                            Exportar PDF
+                          </ion-button>
+                        </div>
+                      </div>
+                    </ion-accordion>
+                  }
+                </ion-accordion-group>
+              } @else {
+                <p class="rs-muted rs-note">{{ esPersonal() ? 'La ficha escaneada no se encontró.' : 'Este catador aún no tiene fichas enviadas.' }}</p>
+              }
+            </ion-card-content>
+          </ion-card>
+        }
+</ng-template>
+
 <!-- Medidor semicircular reutilizable (escala 0–100) -->
 <ng-template #medidor let-valor="valor" let-aguja="aguja" let-etiqueta="etiqueta">
   <ion-card class="rc-card rc-gauge">
@@ -119,7 +207,19 @@
         </div>
       </section>
     } @else if (resultados(); as r) {
-      @if (esCombinado()) {
+      @if (esPersonal() && !esExtrinseco()) {
+        <!-- ═══════════════ SESIÓN PERSONAL (ficha escaneada) ═══════════════ -->
+        <!-- 1 catador: sin medidores, ranking ni calibración (todo saldría en 0). -->
+        <ng-container *ngTemplateOutlet="reporteIndividual"></ng-container>
+
+        <div class="rs-actions">
+          <ion-button fill="outline" (click)="volverAlPanel()">Volver al inicio</ion-button>
+          <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="formatoHoja() ? abrirExportar() : exportarPDF()">
+            <ion-icon name="download-outline" slot="start"></ion-icon>
+            Exportar PDF
+          </ion-button>
+        </div>
+      } @else if (esCombinado()) {
         <!-- ═══════════════ FORMATO COMBINADO ═══════════════ -->
 
         <!-- Medidores -->
@@ -227,77 +327,7 @@
         </section>
 
         <!-- Reporte de sesión individual -->
-        @if (catadorReporte(); as cat) {
-          <ion-card class="rc-card">
-            <ion-card-content>
-              <h2 class="rs-section-title rc-section-title--tight">Reporte de sesión individual</h2>
-              <div class="rc-report__head">
-                <div class="rc-report__who">
-                  <span class="rc-avatar" aria-hidden="true">{{ cat.nombre.charAt(0).toUpperCase() }}</span>
-                  <div>
-                    <p class="rc-report__name">{{ cat.nombre }}</p>
-                    <p class="rc-report__meta">
-                      {{ cat.muestrasEvaluadas }} de {{ cat.muestrasAsignadas }} muestras evaluadas · estado {{ cat.estado }}
-                    </p>
-                  </div>
-                </div>
-                <div class="rc-report__score">
-                  <strong>{{ cat.puntajePromedio | number:'1.2-2' }}</strong>
-                  <span>Promedio</span>
-                </div>
-              </div>
-
-              @if (fichasReporte().length > 0) {
-                <p class="rs-muted rs-note">Haz clic en una ficha para ver su detalle.</p>
-                <ion-accordion-group class="rc-fichas" [multiple]="false">
-                  @for (ficha of fichasReporte(); track ficha.numeroMuestra) {
-                    <ion-accordion [value]="cat.cupperId + '-' + ficha.numeroMuestra" class="rc-ficha">
-                      <ion-item slot="header" lines="none" class="rc-ficha__header">
-                        <ion-label>Muestra {{ ficha.numeroMuestra }}</ion-label>
-                        <ion-badge slot="end" class="rc-chip" [style.--background]="ficha.clasificacion.fondo" [style.--color]="ficha.clasificacion.color">
-                          {{ ficha.clasificacion.etiqueta }}
-                        </ion-badge>
-                        <span slot="end" class="rc-ficha__score">{{ ficha.puntaje | number:'1.2-2' }}</span>
-                      </ion-item>
-                      <div slot="content" class="rc-ficha__body">
-                        @if (ficha.atributos.length > 0) {
-                          <div class="rc-ficha__row rc-ficha__row--head">
-                            <span>Atributo</span><span class="rc-ficha__cols"><em>Intensidad</em><em>Calidad</em></span>
-                          </div>
-                          @for (a of ficha.atributos; track a.clave) {
-                            <div class="rc-ficha__row">
-                              <span>{{ a.etiqueta }}</span>
-                              <span class="rc-ficha__cols">
-                                <strong>{{ a.intensidad === null ? '—' : (a.intensidad | number:'1.0-2') }}</strong>
-                                <strong>{{ a.calidad === null ? '—' : (a.calidad | number:'1.0-2') }}</strong>
-                              </span>
-                            </div>
-                          }
-                        }
-                        @if (ficha.impresionGlobal !== null) {
-                          <div class="rc-ficha__row"><span>Impresión global</span><strong>{{ ficha.impresionGlobal | number:'1.0-2' }}</strong></div>
-                        }
-                        <div class="rc-ficha__row"><span>Tazas no uniformes</span><strong>{{ ficha.tazasNoUniformes }}</strong></div>
-                        <div class="rc-ficha__row"><span>Tazas defectuosas</span><strong>{{ ficha.tazasDefectuosas }}</strong></div>
-                        <div class="rc-ficha__row rc-ficha__row--total">
-                          <span>Puntaje final</span><strong>{{ ficha.puntaje | number:'1.2-2' }}</strong>
-                        </div>
-                        <div class="rc-ficha__actions">
-                          <ion-button size="small" fill="outline"
-                            (click)="abrirExportar({ numeroMuestra: ficha.numeroMuestra, cupperId: cat.cupperId })">
-                            Exportar PDF
-                          </ion-button>
-                        </div>
-                      </div>
-                    </ion-accordion>
-                  }
-                </ion-accordion-group>
-              } @else {
-                <p class="rs-muted rs-note">Este catador aún no tiene fichas enviadas.</p>
-              }
-            </ion-card-content>
-          </ion-card>
-        }
+        <ng-container *ngTemplateOutlet="reporteIndividual"></ng-container>
 
         <!-- Fórmula -->
         <section class="rs-formula">

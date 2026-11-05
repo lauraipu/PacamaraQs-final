@@ -273,7 +273,10 @@ export function sanearFicha(crudo: Registro, formato: FormatoEscaneo, simulada: 
     tazasNoUniformes: u,
     tazasDefectuosas: d,
     puntaje,
-    descriptores: [...new Set(descriptores)],
+    descriptores: [...new Set([
+      ...descriptores,
+      ...(formato === 'combinado' || formato === 'descriptivo' ? canonizarDescriptores(crudo['descriptores']) : [])
+    ])],
     camposFaltantes: faltantes,
     simulada
   };
