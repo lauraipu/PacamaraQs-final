@@ -189,4 +189,17 @@ export const ESTILOS_HOJA_SCA = `
 
   /* ── Pie legal ──────────────────────────────────────────────────────── */
   .sca-legal { margin-top: 1.8mm; color: #555b63; font-size: 5.6pt; line-height: 1.3; }
+  app-sca-report-template { display: block; }
+  /* Afectivo (Parte 2) */
+  .sca-afe { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.5mm 4mm; margin-top: 3mm; }
+  .sca-afe__attr { display: flex; flex-direction: column; gap: 1.2mm; }
+  .sca-afe__attr b { font-size: 9.5pt; }
+  .sca-afe__cups { display: flex; gap: 8mm; grid-column: 1 / -1; font-size: 8pt; }
+  .sca-afe__cups > div { display: flex; align-items: center; gap: 2mm; }
+  .sca-afe__full { grid-column: 1 / -1; }
+  /* Extrínseco */
+  .sca-ext--break { break-before: page; page-break-before: always; }
+  .sca-ext__sec { margin-top: 3mm; break-inside: avoid; }
+  .sca-ext__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 6mm; margin-top: 2mm; }
+  .sca-ext__certs { display: flex; flex-wrap: wrap; gap: 2mm 6mm; margin-top: 2mm; }
 `;

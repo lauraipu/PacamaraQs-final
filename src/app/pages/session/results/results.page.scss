@@ -508,3 +508,24 @@
 .rc-export__calib { color: var(--app-success); font-size: 11px; white-space: nowrap; }
 .rc-export__calib--alto { color: #b45309; }
 .rc-export__calib--bajo { color: #1d4ed8; }
+
+/* ── Gráficas de perfil (radar) ───────────────────────────────────────── */
+.rr-toggle { --track-background-checked: var(--app-primary-dark); width: 100%; font-weight: 600; }
+.rr-filtros { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; ion-select { flex: 1 1 160px; } }
+.rr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.rr-chart {
+  margin: 0;
+  figcaption { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; span { color: var(--app-text-muted, #6b7280); } }
+  svg { width: 100%; height: auto; overflow: visible; }
+}
+.rr-ring { fill: none; stroke: var(--app-border, #e5e7eb); stroke-width: 1; }
+.rr-axis { stroke: var(--app-border, #e5e7eb); stroke-width: 1; }
+.rr-label { font-size: 9px; fill: var(--app-text-muted, #6b7280); }
+.rr-panel { fill: rgba(156, 163, 175, 0.12); stroke: #9ca3af; stroke-width: 2; stroke-dasharray: 5 4; }
+.rr-catador { fill: color-mix(in srgb, var(--app-primary-dark) 15%, transparent); stroke: var(--app-primary-dark); stroke-width: 2.5; stroke-linejoin: round; }
+.rr-legend {
+  display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0 0; font-size: 12px;
+  span { display: inline-flex; align-items: center; gap: 6px; }
+  i { display: inline-block; width: 22px; border-top: 2.5px solid var(--app-primary-dark); }
+  .rr-legend__panel { border-top: 2px dashed #9ca3af; }
+}

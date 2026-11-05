@@ -13,7 +13,7 @@ import { ETIQUETAS_HEDONICAS, RUEDA_SABORES } from './cva';
  *    se llenan desde la app.
  */
 
-export type FormatoHoja = 'combinado' | 'descriptivo';
+export type FormatoHoja = 'combinado' | 'descriptivo' | 'afectivo';
 export type AtributoHoja =
   | 'fragancia' | 'aroma' | 'sabor' | 'sabor_residual' | 'acidez' | 'dulzor' | 'sensacion_boca';
 
@@ -317,7 +317,6 @@ export function mayoria(conjuntos: readonly Set<string>[]): Set<string> {
   return new Set([...conteo].filter(([, n]) => n / conjuntos.length > 0.5).map(([clave]) => clave));
 }
 
-const NOTA_PANEL = 'Ver reporte individual de cada catador.';
 
 /**
  * Consolida fichas de los catadores seleccionados:
@@ -325,7 +324,19 @@ const NOTA_PANEL = 'Ver reporte individual de cada catador.';
  *  · Casillas: regla de mayoría (> 50 % de las fichas).
  *  · Calidad 1–9 y tazas: promedio (los círculos pintan el entero más cercano).
  */
-export function consolidarFichas(fichas: readonly FichaSca[], resumenNotas: string): FichaSca {
+/** Unión sin duplicados: casilla marcada si CUALQUIER ficha la marcó. */
+export function union(conjuntos: readonly Set<string>[]): Set<string> {
+  return new Set(conjuntos.flatMap(c => Array.from(c)));
+}
+
+export function consolidarFichas(fichas: readonly FichaSca[], resumenNotas: string, nombres: readonly string[] = []): FichaSca {
+  /** "Catador 1: buena acidez / Catador 2: muy dulce" (solo quien escribió algo). */
+  const notasDe = (campo: keyof FichaSca['notas']): string =>
+    fichas
+      .map((f, i) => ({ nombre: nombres[i] ?? `Catador ${i + 1}`, texto: f.notas[campo].trim() }))
+      .filter(n => n.texto)
+      .map(n => `${n.nombre}: ${n.texto}`)
+      .join(' / ');
   const intensidad = {} as Record<AtributoHoja, number | null>;
   const calidad = {} as Record<AtributoHoja, number | null>;
   for (const a of ATRIBUTOS_HOJA) {
@@ -336,8 +347,9 @@ export function consolidarFichas(fichas: readonly FichaSca[], resumenNotas: stri
     intensidad,
     calidad,
     impresionGlobal: promedio(fichas.map(f => f.impresionGlobal)),
-    olfativo: mayoria(fichas.map(f => f.olfativo)),
-    gustativo: mayoria(fichas.map(f => f.gustativo)),
+    // Descriptores: unión de todos los catadores seleccionados (sin repetir).
+    olfativo: union(fichas.map(f => f.olfativo)),
+    gustativo: union(fichas.map(f => f.gustativo)),
     gustos: mayoria(fichas.map(f => f.gustos)),
     boca: mayoria(fichas.map(f => f.boca)),
     defectos: mayoria(fichas.map(f => f.defectos)),
@@ -345,12 +357,12 @@ export function consolidarFichas(fichas: readonly FichaSca[], resumenNotas: stri
     tazasDefectuosas: promedio(fichas.map(f => f.tazasDefectuosas)),
     puntaje: promedio(fichas.map(f => f.puntaje)),
     notas: {
-      olfativo: NOTA_PANEL,
-      gustativo: NOTA_PANEL,
-      acidez: NOTA_PANEL,
-      dulzor: NOTA_PANEL,
-      boca: NOTA_PANEL,
-      otras: resumenNotas
+      olfativo: notasDe('olfativo'),
+      gustativo: notasDe('gustativo'),
+      acidez: notasDe('acidez'),
+      dulzor: notasDe('dulzor'),
+      boca: notasDe('boca'),
+      otras: [resumenNotas, notasDe('otras')].filter(Boolean).join(' · ')
     }
   };
 }

@@ -1,0 +1,318 @@
+<!-- ═══════════ Piezas de la hoja SCA (se copian al iframe de impresión) ═══════════ -->
+<ng-template #scaSlider let-titulo="titulo" let-v="v">
+  <div class="sca-attr">
+    <div class="sca-attr__name"><b>{{ titulo }}</b><small>Intensidad@if (v !== null) {<span class="sca-attr__val">{{ v | number:'1.0-1' }}</span>}</small></div>
+    <div class="sca-slider">
+      <div class="sca-slider__zones"><span>BAJA</span><span>MEDIA</span><span>ALTA</span></div>
+      <div class="sca-slider__bar">
+        @if (v !== null) {
+          <i class="sca-slider__mark" [style.left.%]="v / 15 * 100"></i>
+        }
+      </div>
+      <div class="sca-slider__ticks"></div>
+      <div class="sca-slider__nums"><span style="left:0">0</span><span style="left:33.333%">5</span><span style="left:66.667%">10</span><span style="left:100%">15</span></div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #scaCirculos let-v="v">
+  <div class="sca-circles">
+    @for (n of escala9; track n) {
+      <span class="sca-c" [class.sca-c--on]="circuloMarcado(v) === n">{{ n }}</span>
+    }
+    <span class="sca-final" [class.sca-final--on]="v !== null">{{ v === null ? 'FINAL' : (v | number:'1.0-2') }}</span>
+  </div>
+</ng-template>
+
+<ng-template #scaCasilla let-on="on" let-etiqueta="etiqueta" let-principal="principal" let-detalle="detalle">
+  <span class="sca-cb" [class.sca-cb--on]="on"><i></i>@if (principal) {<b>{{ etiqueta }}</b>} @else {{{ etiqueta }}}@if (detalle) { <small>{{ detalle }}</small>}</span>
+</ng-template>
+
+<ng-template #scaDescriptores let-marcadas="marcadas">
+  @for (fila of descriptoresSca; track $index) {
+    <div class="sca-desc__row">
+      @for (c of fila; track c.clave) {
+        <ng-container *ngTemplateOutlet="scaCasilla; context: { on: marcadas.has(c.clave), etiqueta: c.etiqueta, principal: c.principal }"></ng-container>
+      }
+    </div>
+  }
+</ng-template>
+
+<ng-template #scaGustos let-marcadas="marcadas">
+  <div class="sca-gustos">
+    <p class="sca-label">Gustos Predominantes (2)</p>
+    @for (g of gustosSca; track g.clave) {
+      <div class="sca-desc__row"><ng-container *ngTemplateOutlet="scaCasilla; context: { on: marcadas.has(g.clave), etiqueta: g.etiqueta, principal: true }"></ng-container></div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #scaBoca let-marcadas="marcadas">
+  @for (b of bocaSca; track b.clave) {
+    <div class="sca-desc__row"><ng-container *ngTemplateOutlet="scaCasilla; context: { on: marcadas.has(b.clave), etiqueta: b.etiqueta, principal: true, detalle: b.detalle }"></ng-container></div>
+  }
+</ng-template>
+
+<ng-template #scaNotas let-texto="texto" let-titulo="titulo">
+  <div class="sca-notes"><p class="sca-label">{{ titulo || 'Notas' }}</p>@if (texto) {<p class="sca-notes__text">{{ texto }}</p>}</div>
+</ng-template>
+
+<ng-template #scaTazas let-n="n">
+  <span class="sca-boxes">@for (i of [1, 2, 3, 4, 5]; track i) {<i [class.on]="n !== null && i <= circuloMarcadoTazas(n)"></i>}</span>
+</ng-template>
+
+<!-- ═══════════ Hoja SCA de los 4 formatos ═══════════ -->
+@if (formato === 'extrinseca') {
+    @for (f of fichasTecnicas; track $index; let primera = $first) {
+      <article class="sca-page sca-ext" [class.sca-ext--break]="!primera">
+        <header class="sca-head">
+          <div class="sca-head__main">
+            <p class="sca-head__brand">PacamaraQs · Evaluación sensorial CVA</p>
+            <h1>Formato Extrínseco</h1>
+            <div class="sca-fields">
+              <div class="sca-field sca-field--wide"><span>Nombre</span><b>{{ f.registradaPor || '' }}</b></div>
+              <div class="sca-field"><span>Fecha</span><b>{{ f.registradaEn ? (f.registradaEn | date:'dd/MM/yyyy') : fecha }}</b></div>
+              <div class="sca-field sca-field--wide"><span>Objetivo</span><b>{{ objetivo }}</b></div>
+              <div class="sca-field"><span>Nº de muestra</span><b>{{ f.numeroMuestra }}</b></div>
+            </div>
+          </div>
+        </header>
+        @for (sec of f.secciones; track sec.titulo) {
+          <section class="sca-ext__sec">
+            <span class="sca-bar sca-bar--block">{{ sec.titulo.toUpperCase() }}</span>
+            <div class="sca-ext__grid">
+              @for (c of sec.campos; track c.etiqueta) {
+                <div class="sca-field"><span>{{ c.etiqueta }}</span><b>{{ c.valor }}</b></div>
+              }
+            </div>
+          </section>
+        }
+        <section class="sca-ext__sec">
+          <span class="sca-bar sca-bar--block">CERTIFICACIONES</span>
+          <div class="sca-ext__certs">
+            @for (c of f.certificaciones; track c) {
+              <ng-container *ngTemplateOutlet="scaCasilla; context: { on: true, etiqueta: c, principal: true }"></ng-container>
+            } @empty {
+              <ng-container *ngTemplateOutlet="scaCasilla; context: { on: false, etiqueta: 'Ninguna registrada', principal: false }"></ng-container>
+            }
+          </div>
+        </section>
+        <section class="sca-ext__sec">
+          <span class="sca-bar sca-bar--block">NOTAS</span>
+          <p class="sca-notes__text">{{ f.notas }}</p>
+        </section>
+        <footer class="sca-legal">
+          Formato modificado para PacamaraQs, basado en el Sistema de Evaluación del Café de la SCA (Versión 2, junio 2024).
+          No es un documento oficial de la SCA.
+        </footer>
+      </article>
+    } @empty {
+      <p class="sca-notes__text">Esta sesión no tiene fichas técnicas registradas.</p>
+    }
+} @else if (hoja; as h) {
+      <article class="sca-page" [class.sca-page--combinado]="h.formato === 'combinado'">
+        <!-- Cabecera -->
+        <header class="sca-head">
+          <div class="sca-head__main">
+            <p class="sca-head__brand">PacamaraQs · Evaluación sensorial CVA</p>
+            <h1>{{ h.titulo }}</h1>
+            <div class="sca-fields">
+              <div class="sca-field sca-field--wide"><span>Nombre</span><b>{{ h.nombre }}</b></div>
+              <div class="sca-field"><span>Fecha</span><b>{{ h.fecha }}</b></div>
+              <div class="sca-field sca-field--wide"><span>Objetivo</span><b>{{ h.objetivo }}</b></div>
+              <div class="sca-field"><span>Nº de muestra</span><b>{{ h.numeroMuestra }}</b></div>
+            </div>
+          </div>
+          @if (h.formato !== 'descriptivo') {
+            <div class="sca-legend">
+              <p>IMPRESIÓN DE CALIDAD</p>
+              <ol>@for (l of LEYENDA_HEDONICA; track l.n) {<li><i>{{ l.n }}</i>{{ l.etiqueta.toUpperCase() }}</li>}</ol>
+            </div>
+          }
+        </header>
+
+        <!-- Consolidado del panel -->
+        @if (h.resumenPanel; as rp) {
+          <section class="sca-kpis" aria-label="Consolidado del panel">
+            @if (rp.puntaje !== null) {
+              <div class="sca-kpi"><strong>{{ rp.puntaje | number:'1.2-2' }}</strong><span>Puntaje panel</span></div>
+              <div class="sca-kpi"><strong>{{ rp.clasificacion }}</strong><span>Clasificación</span></div>
+            }
+            <div class="sca-kpi"><strong>{{ rp.fichas }}</strong><span>Fichas</span></div>
+            @if (rp.puntaje !== null) {
+              <div class="sca-kpi"><strong>{{ rp.minMax }}</strong><span>Mín – Máx</span></div>
+            }
+            <p class="sca-kpis__note">
+              {{ rp.recortado ? 'Promedio recortado SCA (se descartan máximo y mínimo).' : 'Promedio simple de las fichas seleccionadas.' }}
+              Intensidades: promedio · Descriptores: unión de todas las fichas · Gustos, textura y defectos: mayoría (&gt; 50 %) · Círculos: entero más cercano al promedio.
+            </p>
+          </section>
+        }
+
+        @if (h.formato === 'combinado') {
+          <!-- ══════ FORMATO COMBINADO ══════ -->
+          <div class="sca-bars">
+            <div class="sca-bars__left">
+              <span class="sca-bar">PARTE 1: EVALUACIÓN DESCRIPTIVA</span>
+              <span class="sca-bar">NIVEL DE TUESTE</span>
+              <span class="sca-roast"><em>{{ h.nivelTueste || '' }}</em></span>
+            </div>
+            <span class="sca-bar sca-bars__right">PARTE 2: EVALUACIÓN AFECTIVA</span>
+          </div>
+
+          <div class="sca-comb">
+            <!-- Fragancia / Aroma -->
+            <div class="sca-l sca-l--sliders">
+              <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Fragancia', v: h.ficha.intensidad.fragancia }"></ng-container>
+              <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Aroma', v: h.ficha.intensidad.aroma }"></ng-container>
+            </div>
+            <div class="sca-r sca-r--circles">
+              <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.fragancia }"></ng-container>
+              <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.aroma }"></ng-container>
+            </div>
+            <div class="sca-l sca-split sca-h-desc">
+              <div class="sca-desc"><ng-container *ngTemplateOutlet="scaDescriptores; context: { marcadas: h.ficha.olfativo }"></ng-container></div>
+              <ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.olfativo }"></ng-container>
+            </div>
+            <div class="sca-r"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, ['fragancia', 'aroma']) }"></ng-container></div>
+
+            <!-- Sabor / Sabor residual -->
+            <div class="sca-l sca-l--sliders">
+              <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sabor', v: h.ficha.intensidad.sabor }"></ng-container>
+              <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sabor Residual', v: h.ficha.intensidad.sabor_residual }"></ng-container>
+            </div>
+            <div class="sca-r sca-r--circles">
+              <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.sabor }"></ng-container>
+              <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.sabor_residual }"></ng-container>
+            </div>
+            <div class="sca-l sca-split sca-h-desc2">
+              <div class="sca-desc">
+                <ng-container *ngTemplateOutlet="scaDescriptores; context: { marcadas: h.ficha.gustativo }"></ng-container>
+                <ng-container *ngTemplateOutlet="scaGustos; context: { marcadas: h.ficha.gustos }"></ng-container>
+              </div>
+              <ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.gustativo }"></ng-container>
+            </div>
+            <div class="sca-r"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, ['sabor', 'sabor_residual']) }"></ng-container></div>
+
+            <!-- Acidez -->
+            <div class="sca-l sca-l--one"><ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Acidez', v: h.ficha.intensidad.acidez }"></ng-container></div>
+            <div class="sca-r sca-r--circles"><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.acidez }"></ng-container></div>
+            <div class="sca-l sca-h-note"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.acidez }"></ng-container></div>
+            <div class="sca-r sca-h-note"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, ['acidez']) }"></ng-container></div>
+
+            <!-- Dulzor -->
+            <div class="sca-l sca-l--one"><ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Dulzor', v: h.ficha.intensidad.dulzor }"></ng-container></div>
+            <div class="sca-r sca-r--circles"><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.dulzor }"></ng-container></div>
+            <div class="sca-l sca-h-note"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.dulzor }"></ng-container></div>
+            <div class="sca-r sca-h-note"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, ['dulzor']) }"></ng-container></div>
+
+            <!-- Sensación en boca -->
+            <div class="sca-l sca-l--one"><ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sensación en boca', v: h.ficha.intensidad.sensacion_boca }"></ng-container></div>
+            <div class="sca-r sca-r--circles"><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.sensacion_boca }"></ng-container></div>
+            <div class="sca-l sca-split sca-split--boca sca-h-boca">
+              <div class="sca-desc"><ng-container *ngTemplateOutlet="scaBoca; context: { marcadas: h.ficha.boca }"></ng-container></div>
+              <ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.boca }"></ng-container>
+            </div>
+            <div class="sca-r sca-h-boca"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, ['sensacion_boca']) }"></ng-container></div>
+
+            <!-- Otras notas | Impresión global -->
+            <div class="sca-l sca-otras">
+              <span class="sca-bar sca-bar--block">OTRAS NOTAS</span>
+              <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
+            </div>
+            <div class="sca-r sca-global">
+              <div class="sca-global__head">
+                <b class="sca-global__title">Impresión global</b>
+                <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.impresionGlobal }"></ng-container>
+              </div>
+              <ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.puntaje !== null ? 'Puntaje CVA: ' + (h.ficha.puntaje | number:'1.2-2') + ' · ' + etiquetaCalidad(h.ficha.impresionGlobal) : etiquetaCalidad(h.ficha.impresionGlobal) }"></ng-container>
+              <div class="sca-cups">
+                <div class="sca-cups__left">
+                  <div><b>TAZAS NO UNIFORMES</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasNoUniformes }"></ng-container></div>
+                  <div><b>TAZAS DEFECTUOSAS</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasDefectuosas }"></ng-container></div>
+                </div>
+                <div class="sca-cups__right">
+                  <b>DEFECTO (DE HABERLO)</b>
+                  <div>
+                    @for (d of defectosSca; track d.clave) {
+                      <ng-container *ngTemplateOutlet="scaCasilla; context: { on: h.ficha.defectos.has(d.clave), etiqueta: d.etiqueta.toUpperCase(), principal: true }"></ng-container>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @else if (h.formato === 'afectivo') {
+          <!-- ══════ FORMATO AFECTIVO (Parte 2: evaluación afectiva) ══════ -->
+          <div class="sca-bars sca-bars--desc">
+            <span class="sca-bar sca-bar--muestra">Nº DE MUESTRA <em>{{ h.numeroMuestra }}</em></span>
+            <span class="sca-bar">NIVEL DE TUESTE</span>
+            <span class="sca-roast"><em>{{ h.nivelTueste || '' }}</em></span>
+          </div>
+          <span class="sca-bar sca-bar--block">PARTE 2: EVALUACIÓN AFECTIVA · IMPRESIÓN DE CALIDAD (1 – 9)</span>
+          <div class="sca-afe">
+            @for (a of atributosAfectivos; track a.clave) {
+              <div class="sca-afe__attr"><b>{{ a.etiqueta }}</b><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad[a.clave] }"></ng-container></div>
+              <div class="sca-afe__note"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, [a.clave]) }"></ng-container></div>
+            }
+            <div class="sca-afe__attr"><b>Impresión global</b><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.impresionGlobal }"></ng-container></div>
+            <div class="sca-afe__note"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.puntaje !== null ? 'Puntaje CVA: ' + (h.ficha.puntaje | number:'1.2-2') + ' · ' + etiquetaCalidad(h.ficha.impresionGlobal) : etiquetaCalidad(h.ficha.impresionGlobal) }"></ng-container></div>
+            <div class="sca-afe__cups">
+              <div><b>TAZAS NO UNIFORMES</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasNoUniformes }"></ng-container></div>
+              <div><b>TAZAS DEFECTUOSAS</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasDefectuosas }"></ng-container></div>
+            </div>
+            <div class="sca-otras sca-afe__full">
+              <span class="sca-bar sca-bar--block">OTRAS NOTAS</span>
+              <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
+            </div>
+          </div>
+        } @else {
+          <!-- ══════ FORMATO DESCRIPTIVO ══════ -->
+          <div class="sca-bars sca-bars--desc">
+            <span class="sca-bar sca-bar--muestra">Nº DE MUESTRA <em>{{ h.numeroMuestra }}</em></span>
+            <span class="sca-bar">NIVEL DE TUESTE</span>
+            <span class="sca-roast"><em>{{ h.nivelTueste || '' }}</em></span>
+          </div>
+          <div class="sca-desc-grid">
+            <div class="sca-l sca-l--sliders">
+              <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Fragancia', v: h.ficha.intensidad.fragancia }"></ng-container>
+              <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Aroma', v: h.ficha.intensidad.aroma }"></ng-container>
+            </div>
+            <div class="sca-r sca-span2"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.olfativo }"></ng-container></div>
+            <div class="sca-l sca-desc sca-desc--2col"><ng-container *ngTemplateOutlet="scaDescriptores; context: { marcadas: h.ficha.olfativo }"></ng-container></div>
+
+            <div class="sca-l sca-l--sliders">
+              <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sabor', v: h.ficha.intensidad.sabor }"></ng-container>
+              <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sabor Residual', v: h.ficha.intensidad.sabor_residual }"></ng-container>
+            </div>
+            <div class="sca-r sca-span2"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.gustativo }"></ng-container></div>
+            <div class="sca-l sca-desc-gustos">
+              <div class="sca-desc sca-desc--2col"><ng-container *ngTemplateOutlet="scaDescriptores; context: { marcadas: h.ficha.gustativo }"></ng-container></div>
+              <ng-container *ngTemplateOutlet="scaGustos; context: { marcadas: h.ficha.gustos }"></ng-container>
+            </div>
+
+            <div class="sca-l sca-l--one sca-h-attr"><ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Acidez', v: h.ficha.intensidad.acidez }"></ng-container></div>
+            <div class="sca-r sca-h-attr"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.acidez }"></ng-container></div>
+
+            <div class="sca-l sca-l--one sca-h-attr"><ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Dulzor', v: h.ficha.intensidad.dulzor }"></ng-container></div>
+            <div class="sca-r sca-h-attr"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.dulzor }"></ng-container></div>
+
+            <div class="sca-l">
+              <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sensación en boca', v: h.ficha.intensidad.sensacion_boca }"></ng-container>
+              <div class="sca-desc sca-desc--boca"><ng-container *ngTemplateOutlet="scaBoca; context: { marcadas: h.ficha.boca }"></ng-container></div>
+            </div>
+            <div class="sca-r"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.boca }"></ng-container></div>
+
+            <div class="sca-l sca-otras sca-full">
+              <span class="sca-bar sca-bar--block">OTRAS NOTAS</span>
+              <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
+            </div>
+          </div>
+        }
+
+        <footer class="sca-legal">
+          Formato modificado para PacamaraQs, basado en el Sistema de Evaluación del Café de la SCA (Versión 2, junio 2024).
+          No es un documento oficial de la SCA.
+        </footer>
+      </article>
+}

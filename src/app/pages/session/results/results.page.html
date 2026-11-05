@@ -11,9 +11,9 @@
     </ion-title>
     <ion-buttons slot="end">
       <ion-button fill="outline" size="small" [disabled]="!resultados() || imprimiendo()"
-        (click)="formatoHoja() ? abrirExportar() : exportarPDF()">
+        (click)="abrirMenuExportar()">
         <ion-icon name="download-outline" slot="start"></ion-icon>
-        Exportar PDF
+        Exportar
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -107,6 +107,51 @@
         }
 </ng-template>
 
+<!-- Gráficas de perfil (radar): promedio del panel vs. catador seleccionado -->
+<ng-template #graficasPerfil>
+  <ion-card class="rc-card">
+    <ion-card-content>
+      <ion-toggle class="rr-toggle" justify="space-between" [checked]="mostrarGraficas()"
+        (ionChange)="alternarGraficas($event.detail.checked)">Mostrar gráficas de perfil</ion-toggle>
+      @if (mostrarGraficas()) {
+        <div class="rr-filtros">
+          <ion-select interface="popover" label="Muestra" labelPlacement="stacked" fill="outline"
+            [value]="muestraRadar()" (ionChange)="seleccionarMuestraRadar($event.detail.value)">
+            @for (n of numerosMuestra(); track n) { <ion-select-option [value]="n">Muestra {{ n }}</ion-select-option> }
+          </ion-select>
+          @if (catadoresConFichas().length > 0) {
+            <ion-select interface="popover" label="Catador" labelPlacement="stacked" fill="outline"
+              [value]="catadorReporte()?.cupperId" (ionChange)="seleccionarCatadorRadar($event.detail.value)">
+              @for (c of catadoresConFichas(); track c.cupperId) { <ion-select-option [value]="c.cupperId">{{ c.nombre }}</ion-select-option> }
+            </ion-select>
+          }
+        </div>
+        <div class="rr-grid">
+          @for (g of graficasRadar(); track g.id) {
+            <figure class="rr-chart">
+              <figcaption><strong>{{ g.titulo }}</strong><span>{{ g.escala }}</span></figcaption>
+              <svg viewBox="0 0 300 240" role="img" [attr.aria-label]="g.titulo">
+                @for (a of g.anillos; track $index) { <polygon class="rr-ring" [attr.points]="a"></polygon> }
+                @for (e of g.ejes; track e.etiqueta) {
+                  <line class="rr-axis" x1="150" y1="120" [attr.x2]="e.x" [attr.y2]="e.y"></line>
+                  <text class="rr-label" [attr.x]="e.lx" [attr.y]="e.ly" [attr.text-anchor]="e.anchor">{{ e.etiqueta }}</text>
+                }
+                @if (g.panel) { <polygon class="rr-panel" [attr.points]="g.panel"></polygon> }
+                @if (g.catador) { <polygon class="rr-catador" [attr.points]="g.catador"></polygon> }
+              </svg>
+              @if (!g.panel && !g.catador) { <p class="rs-muted rs-note">Sin datos de atributos para esta muestra.</p> }
+            </figure>
+          }
+        </div>
+        <p class="rr-legend">
+          <span><i class="rr-legend__panel"></i>Promedio del panel</span>
+          <span><i class="rr-legend__catador"></i>{{ catadorReporte()?.nombre ?? 'Catador' }}</span>
+        </p>
+      }
+    </ion-card-content>
+  </ion-card>
+</ng-template>
+
 <!-- Medidor semicircular reutilizable (escala 0–100) -->
 <ng-template #medidor let-valor="valor" let-aguja="aguja" let-etiqueta="etiqueta">
   <ion-card class="rc-card rc-gauge">
@@ -115,7 +160,6 @@
         @for (a of arcosMedidor; track a.clase) {
           <path [attr.d]="a.d" [attr.class]="'rc-gauge__arc ' + a.clase"></path>
         }
-        <text x="100" y="22" text-anchor="middle" class="rc-gauge__tick">50</text>
         <line class="rc-gauge__needle" [attr.x1]="centroMedidor.x" [attr.y1]="centroMedidor.y"
           [attr.x2]="aguja.x" [attr.y2]="aguja.y"></line>
         <circle class="rc-gauge__hub" [attr.cx]="centroMedidor.x" [attr.cy]="centroMedidor.y" r="6"></circle>
@@ -214,9 +258,9 @@
 
         <div class="rs-actions">
           <ion-button fill="outline" (click)="volverAlPanel()">Volver al inicio</ion-button>
-          <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="formatoHoja() ? abrirExportar() : exportarPDF()">
+          <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar PDF
+            Exportar
           </ion-button>
         </div>
       } @else if (esCombinado()) {
@@ -306,6 +350,8 @@
           </ion-card-content>
         </ion-card>
 
+        <ng-container *ngTemplateOutlet="graficasPerfil"></ng-container>
+
         <!-- Análisis de catadores -->
         <section class="rc-block">
           <h2 class="rs-section-title rc-section-title--tight">Análisis de catadores</h2>
@@ -340,9 +386,9 @@
 
         <div class="rs-actions">
           <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
-          <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="abrirExportar()">
+          <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar a PDF (Formato SCA)
+            Exportar
           </ion-button>
         </div>
       } @else if (esAfectivo()) {
@@ -447,11 +493,13 @@
 
         <ng-container *ngTemplateOutlet="participacion; context: { r: r }"></ng-container>
 
+        <ng-container *ngTemplateOutlet="graficasPerfil"></ng-container>
+
         <div class="rs-actions">
           <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
-          <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="exportarPDF()">
+          <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar a PDF (Formato SCA)
+            Exportar
           </ion-button>
         </div>
       } @else if (esDescriptivo()) {
@@ -522,11 +570,13 @@
 
         <ng-container *ngTemplateOutlet="participacion; context: { r: r }"></ng-container>
 
+        <ng-container *ngTemplateOutlet="graficasPerfil"></ng-container>
+
         <div class="rs-actions">
           <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
-          <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="abrirExportar()">
+          <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar a PDF (Formato SCA)
+            Exportar
           </ion-button>
         </div>
       } @else if (esExtrinseco()) {
@@ -597,9 +647,9 @@
 
         <div class="rs-actions">
           <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
-          <ion-button class="primary-btn" [disabled]="imprimiendo() || fichasTecnicas().length === 0" (click)="exportarPDF()">
+          <ion-button class="primary-btn" [disabled]="imprimiendo() || fichasTecnicas().length === 0" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar Ficha Técnica a PDF
+            Exportar
           </ion-button>
         </div>
       } @else {
@@ -710,9 +760,9 @@
   
         <div class="rs-actions">
           <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
-          <ion-button class="primary-btn" (click)="exportarPDF()">
+          <ion-button class="primary-btn" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar a PDF (Formato SCA)
+            Exportar
           </ion-button>
         </div>
       }
@@ -721,7 +771,7 @@
 
   <!-- Modal de exportación (formatos con hoja SCA: Combinado y Descriptivo) -->
   @if (formatoHoja()) {
-    <ion-modal class="rc-export-modal" [isOpen]="modalExportarAbierto()" (didDismiss)="cerrarExportar()">
+    <ion-modal #modalExportar class="rc-export-modal" [isOpen]="modalExportarAbierto()" (didDismiss)="cerrarExportar()">
       <ng-template>
         <div class="rc-export">
           <div class="rc-export__head">
@@ -785,347 +835,14 @@
     </ion-modal>
   }
 
-  <!-- ═══════════ Piezas de la hoja SCA (se copian al iframe de impresión) ═══════════ -->
-  <ng-template #scaSlider let-titulo="titulo" let-v="v">
-    <div class="sca-attr">
-      <div class="sca-attr__name"><b>{{ titulo }}</b><small>Intensidad@if (v !== null) {<span class="sca-attr__val">{{ v | number:'1.0-1' }}</span>}</small></div>
-      <div class="sca-slider">
-        <div class="sca-slider__zones"><span>BAJA</span><span>MEDIA</span><span>ALTA</span></div>
-        <div class="sca-slider__bar">
-          @if (v !== null) {
-            <i class="sca-slider__mark" [style.left.%]="v / 15 * 100"></i>
-          }
-        </div>
-        <div class="sca-slider__ticks"></div>
-        <div class="sca-slider__nums"><span style="left:0">0</span><span style="left:33.333%">5</span><span style="left:66.667%">10</span><span style="left:100%">15</span></div>
-      </div>
-    </div>
-  </ng-template>
-
-  <ng-template #scaCirculos let-v="v">
-    <div class="sca-circles">
-      @for (n of escala9; track n) {
-        <span class="sca-c" [class.sca-c--on]="circuloMarcado(v) === n">{{ n }}</span>
-      }
-      <span class="sca-final" [class.sca-final--on]="v !== null">{{ v === null ? 'FINAL' : (v | number:'1.0-2') }}</span>
-    </div>
-  </ng-template>
-
-  <ng-template #scaCasilla let-on="on" let-etiqueta="etiqueta" let-principal="principal" let-detalle="detalle">
-    <span class="sca-cb" [class.sca-cb--on]="on"><i></i>@if (principal) {<b>{{ etiqueta }}</b>} @else {{{ etiqueta }}}@if (detalle) { <small>{{ detalle }}</small>}</span>
-  </ng-template>
-
-  <ng-template #scaDescriptores let-marcadas="marcadas">
-    @for (fila of descriptoresSca; track $index) {
-      <div class="sca-desc__row">
-        @for (c of fila; track c.clave) {
-          <ng-container *ngTemplateOutlet="scaCasilla; context: { on: marcadas.has(c.clave), etiqueta: c.etiqueta, principal: c.principal }"></ng-container>
-        }
-      </div>
-    }
-  </ng-template>
-
-  <ng-template #scaGustos let-marcadas="marcadas">
-    <div class="sca-gustos">
-      <p class="sca-label">Gustos Predominantes (2)</p>
-      @for (g of gustosSca; track g.clave) {
-        <div class="sca-desc__row"><ng-container *ngTemplateOutlet="scaCasilla; context: { on: marcadas.has(g.clave), etiqueta: g.etiqueta, principal: true }"></ng-container></div>
-      }
-    </div>
-  </ng-template>
-
-  <ng-template #scaBoca let-marcadas="marcadas">
-    @for (b of bocaSca; track b.clave) {
-      <div class="sca-desc__row"><ng-container *ngTemplateOutlet="scaCasilla; context: { on: marcadas.has(b.clave), etiqueta: b.etiqueta, principal: true, detalle: b.detalle }"></ng-container></div>
-    }
-  </ng-template>
-
-  <ng-template #scaNotas let-texto="texto" let-titulo="titulo">
-    <div class="sca-notes"><p class="sca-label">{{ titulo || 'Notas' }}</p>@if (texto) {<p class="sca-notes__text">{{ texto }}</p>}</div>
-  </ng-template>
-
-  <ng-template #scaTazas let-n="n">
-    <span class="sca-boxes">@for (i of [1, 2, 3, 4, 5]; track i) {<i [class.on]="n !== null && i <= circuloMarcadoTazas(n)"></i>}</span>
-  </ng-template>
-
   <!--
-    Reporte imprimible: HTML plano (sin componentes Ionic) que ImpresionService
-    copia a un iframe aislado con su propia hoja de estilos (clases sca-* y rp-*).
+    Reporte imprimible (los 4 formatos): ScaReportTemplateComponent renderiza la
+    hoja SCA oculta e ImpresionService copia su HTML a un iframe aislado.
   -->
   @if (resultados(); as r) {
     <div #reporteImprimible hidden aria-hidden="true">
-      @if (formatoHoja() && hojaSca(); as h) {
-        <article class="sca-page" [class.sca-page--combinado]="h.formato === 'combinado'">
-          <!-- Cabecera -->
-          <header class="sca-head">
-            <div class="sca-head__main">
-              <p class="sca-head__brand">PacamaraQs · Evaluación sensorial CVA</p>
-              <h1>{{ h.titulo }}</h1>
-              <div class="sca-fields">
-                <div class="sca-field sca-field--wide"><span>Nombre</span><b>{{ h.nombre }}</b></div>
-                <div class="sca-field"><span>Fecha</span><b>{{ h.fecha }}</b></div>
-                <div class="sca-field sca-field--wide"><span>Objetivo</span><b>{{ h.objetivo }}</b></div>
-                <div class="sca-field"><span>Nº de muestra</span><b>{{ h.numeroMuestra }}</b></div>
-              </div>
-            </div>
-            @if (h.formato === 'combinado') {
-              <div class="sca-legend">
-                <p>IMPRESIÓN DE CALIDAD</p>
-                <ol>@for (l of LEYENDA_HEDONICA; track l.n) {<li><i>{{ l.n }}</i>{{ l.etiqueta.toUpperCase() }}</li>}</ol>
-              </div>
-            }
-          </header>
-
-          <!-- Consolidado del panel -->
-          @if (h.resumenPanel; as rp) {
-            <section class="sca-kpis" aria-label="Consolidado del panel">
-              @if (rp.puntaje !== null) {
-                <div class="sca-kpi"><strong>{{ rp.puntaje | number:'1.2-2' }}</strong><span>Puntaje panel</span></div>
-                <div class="sca-kpi"><strong>{{ rp.clasificacion }}</strong><span>Clasificación</span></div>
-              }
-              <div class="sca-kpi"><strong>{{ rp.fichas }}</strong><span>Fichas</span></div>
-              @if (rp.puntaje !== null) {
-                <div class="sca-kpi"><strong>{{ rp.minMax }}</strong><span>Mín – Máx</span></div>
-              }
-              <p class="sca-kpis__note">
-                {{ rp.recortado ? 'Promedio recortado SCA (se descartan máximo y mínimo).' : 'Promedio simple de las fichas seleccionadas.' }}
-                Intensidades: promedio · Casillas: mayoría (&gt; 50 %) · Círculos: entero más cercano al promedio.
-              </p>
-            </section>
-          }
-
-          @if (h.formato === 'combinado') {
-            <!-- ══════ FORMATO COMBINADO ══════ -->
-            <div class="sca-bars">
-              <div class="sca-bars__left">
-                <span class="sca-bar">PARTE 1: EVALUACIÓN DESCRIPTIVA</span>
-                <span class="sca-bar">NIVEL DE TUESTE</span>
-                <span class="sca-roast"><em>{{ h.nivelTueste || '' }}</em></span>
-              </div>
-              <span class="sca-bar sca-bars__right">PARTE 2: EVALUACIÓN AFECTIVA</span>
-            </div>
-
-            <div class="sca-comb">
-              <!-- Fragancia / Aroma -->
-              <div class="sca-l sca-l--sliders">
-                <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Fragancia', v: h.ficha.intensidad.fragancia }"></ng-container>
-                <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Aroma', v: h.ficha.intensidad.aroma }"></ng-container>
-              </div>
-              <div class="sca-r sca-r--circles">
-                <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.fragancia }"></ng-container>
-                <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.aroma }"></ng-container>
-              </div>
-              <div class="sca-l sca-split sca-h-desc">
-                <div class="sca-desc"><ng-container *ngTemplateOutlet="scaDescriptores; context: { marcadas: h.ficha.olfativo }"></ng-container></div>
-                <ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.olfativo }"></ng-container>
-              </div>
-              <div class="sca-r"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, ['fragancia', 'aroma']) }"></ng-container></div>
-
-              <!-- Sabor / Sabor residual -->
-              <div class="sca-l sca-l--sliders">
-                <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sabor', v: h.ficha.intensidad.sabor }"></ng-container>
-                <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sabor Residual', v: h.ficha.intensidad.sabor_residual }"></ng-container>
-              </div>
-              <div class="sca-r sca-r--circles">
-                <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.sabor }"></ng-container>
-                <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.sabor_residual }"></ng-container>
-              </div>
-              <div class="sca-l sca-split sca-h-desc2">
-                <div class="sca-desc">
-                  <ng-container *ngTemplateOutlet="scaDescriptores; context: { marcadas: h.ficha.gustativo }"></ng-container>
-                  <ng-container *ngTemplateOutlet="scaGustos; context: { marcadas: h.ficha.gustos }"></ng-container>
-                </div>
-                <ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.gustativo }"></ng-container>
-              </div>
-              <div class="sca-r"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, ['sabor', 'sabor_residual']) }"></ng-container></div>
-
-              <!-- Acidez -->
-              <div class="sca-l sca-l--one"><ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Acidez', v: h.ficha.intensidad.acidez }"></ng-container></div>
-              <div class="sca-r sca-r--circles"><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.acidez }"></ng-container></div>
-              <div class="sca-l sca-h-note"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.acidez }"></ng-container></div>
-              <div class="sca-r sca-h-note"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, ['acidez']) }"></ng-container></div>
-
-              <!-- Dulzor -->
-              <div class="sca-l sca-l--one"><ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Dulzor', v: h.ficha.intensidad.dulzor }"></ng-container></div>
-              <div class="sca-r sca-r--circles"><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.dulzor }"></ng-container></div>
-              <div class="sca-l sca-h-note"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.dulzor }"></ng-container></div>
-              <div class="sca-r sca-h-note"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, ['dulzor']) }"></ng-container></div>
-
-              <!-- Sensación en boca -->
-              <div class="sca-l sca-l--one"><ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sensación en boca', v: h.ficha.intensidad.sensacion_boca }"></ng-container></div>
-              <div class="sca-r sca-r--circles"><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad.sensacion_boca }"></ng-container></div>
-              <div class="sca-l sca-split sca-split--boca sca-h-boca">
-                <div class="sca-desc"><ng-container *ngTemplateOutlet="scaBoca; context: { marcadas: h.ficha.boca }"></ng-container></div>
-                <ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.boca }"></ng-container>
-              </div>
-              <div class="sca-r sca-h-boca"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: etiquetasAfectivas(h, ['sensacion_boca']) }"></ng-container></div>
-
-              <!-- Otras notas | Impresión global -->
-              <div class="sca-l sca-otras">
-                <span class="sca-bar sca-bar--block">OTRAS NOTAS</span>
-                <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
-              </div>
-              <div class="sca-r sca-global">
-                <div class="sca-global__head">
-                  <b class="sca-global__title">Impresión global</b>
-                  <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.impresionGlobal }"></ng-container>
-                </div>
-                <ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.puntaje !== null ? 'Puntaje CVA: ' + (h.ficha.puntaje | number:'1.2-2') + ' · ' + etiquetaCalidad(h.ficha.impresionGlobal) : etiquetaCalidad(h.ficha.impresionGlobal) }"></ng-container>
-                <div class="sca-cups">
-                  <div class="sca-cups__left">
-                    <div><b>TAZAS NO UNIFORMES</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasNoUniformes }"></ng-container></div>
-                    <div><b>TAZAS DEFECTUOSAS</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasDefectuosas }"></ng-container></div>
-                  </div>
-                  <div class="sca-cups__right">
-                    <b>DEFECTO (DE HABERLO)</b>
-                    <div>
-                      @for (d of defectosSca; track d.clave) {
-                        <ng-container *ngTemplateOutlet="scaCasilla; context: { on: h.ficha.defectos.has(d.clave), etiqueta: d.etiqueta.toUpperCase(), principal: true }"></ng-container>
-                      }
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          } @else {
-            <!-- ══════ FORMATO DESCRIPTIVO ══════ -->
-            <div class="sca-bars sca-bars--desc">
-              <span class="sca-bar sca-bar--muestra">Nº DE MUESTRA <em>{{ h.numeroMuestra }}</em></span>
-              <span class="sca-bar">NIVEL DE TUESTE</span>
-              <span class="sca-roast"><em>{{ h.nivelTueste || '' }}</em></span>
-            </div>
-            <div class="sca-desc-grid">
-              <div class="sca-l sca-l--sliders">
-                <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Fragancia', v: h.ficha.intensidad.fragancia }"></ng-container>
-                <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Aroma', v: h.ficha.intensidad.aroma }"></ng-container>
-              </div>
-              <div class="sca-r sca-span2"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.olfativo }"></ng-container></div>
-              <div class="sca-l sca-desc sca-desc--2col"><ng-container *ngTemplateOutlet="scaDescriptores; context: { marcadas: h.ficha.olfativo }"></ng-container></div>
-
-              <div class="sca-l sca-l--sliders">
-                <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sabor', v: h.ficha.intensidad.sabor }"></ng-container>
-                <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sabor Residual', v: h.ficha.intensidad.sabor_residual }"></ng-container>
-              </div>
-              <div class="sca-r sca-span2"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.gustativo }"></ng-container></div>
-              <div class="sca-l sca-desc-gustos">
-                <div class="sca-desc sca-desc--2col"><ng-container *ngTemplateOutlet="scaDescriptores; context: { marcadas: h.ficha.gustativo }"></ng-container></div>
-                <ng-container *ngTemplateOutlet="scaGustos; context: { marcadas: h.ficha.gustos }"></ng-container>
-              </div>
-
-              <div class="sca-l sca-l--one sca-h-attr"><ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Acidez', v: h.ficha.intensidad.acidez }"></ng-container></div>
-              <div class="sca-r sca-h-attr"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.acidez }"></ng-container></div>
-
-              <div class="sca-l sca-l--one sca-h-attr"><ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Dulzor', v: h.ficha.intensidad.dulzor }"></ng-container></div>
-              <div class="sca-r sca-h-attr"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.dulzor }"></ng-container></div>
-
-              <div class="sca-l">
-                <ng-container *ngTemplateOutlet="scaSlider; context: { titulo: 'Sensación en boca', v: h.ficha.intensidad.sensacion_boca }"></ng-container>
-                <div class="sca-desc sca-desc--boca"><ng-container *ngTemplateOutlet="scaBoca; context: { marcadas: h.ficha.boca }"></ng-container></div>
-              </div>
-              <div class="sca-r"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.boca }"></ng-container></div>
-
-              <div class="sca-l sca-otras sca-full">
-                <span class="sca-bar sca-bar--block">OTRAS NOTAS</span>
-                <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
-              </div>
-            </div>
-          }
-
-          <footer class="sca-legal">
-            Formato modificado para PacamaraQs, basado en el Sistema de Evaluación del Café de la SCA (Versión 2, junio 2024).
-            No es un documento oficial de la SCA.
-          </footer>
-        </article>
-      } @else {
-        <header class="rp-head">
-          <div>
-            <p class="rp-brand">PacamaraQs · Evaluación sensorial SCA CVA</p>
-            <h1 class="rp-title">{{ esExtrinseco() ? 'Ficha técnica del café' : 'Reporte de catación' }}</h1>
-            <p class="rp-sub">{{ r.nombreSesion }} · Formato {{ tituloFormato() }}</p>
-          </div>
-          <p class="rp-meta">Generado: {{ fechaReporte() | date:'medium' }}<br>{{ r.totalMuestras }} muestra(s) · {{ r.catadores.length }} catador(es)</p>
-        </header>
-
-        @if (esAfectivo()) {
-        <section class="rp-section">
-          <h2>Promedio hedónico por muestra (escala 1–9)</h2>
-          <table>
-            <thead><tr><th>#</th><th>Muestra</th><th class="num">Votos</th><th class="num">Promedio</th><th>Valoración</th></tr></thead>
-            <tbody>
-              @for (f of resultadosHedonicos(); track f.numeroMuestra) {
-                <tr>
-                  <td>{{ f.posicion || '—' }}</td>
-                  <td>Muestra {{ f.numeroMuestra }}</td>
-                  <td class="num">{{ f.totalVotos }}</td>
-                  <td class="num rp-score">{{ f.promedio === null ? '—' : (f.promedio | number:'1.2-2') }}</td>
-                  <td>{{ f.etiqueta }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </section>
-        <div class="rp-grid">
-          @for (f of resultadosHedonicos(); track f.numeroMuestra) {
-            <section class="rp-section">
-              <h2>Muestra {{ f.numeroMuestra }} · distribución de votos</h2>
-              <table>
-                <tbody>
-                  @for (d of f.distribucion; track d.valor) {
-                    <tr>
-                      <td style="width: 8%">{{ d.valor }}</td>
-                      <td style="width: 38%" class="rp-muted">{{ d.etiqueta }}</td>
-                      <td><div class="rp-bar"><i [style.width.%]="d.porcentaje"></i></div></td>
-                      <td class="num" style="width: 8%">{{ d.votos }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-              <table style="margin-top: 6px">
-                <thead><tr><th>Atributo</th><th class="num">Calidad (1–9)</th></tr></thead>
-                <tbody>
-                  @for (a of f.atributos; track a.clave) {
-                    <tr><td>{{ a.etiqueta }}</td><td class="num">{{ a.valor === null ? '—' : (a.valor | number:'1.1-1') }}</td></tr>
-                  }
-                </tbody>
-              </table>
-            </section>
-          }
-        </div>
-        } @else if (esExtrinseco()) {
-        @for (ficha of fichasTecnicas(); track $index; let primera = $first) {
-          <article [class.rp-page-break]="!primera">
-            <section class="rp-section">
-              <h2>Muestra {{ ficha.numeroMuestra }}@if (ficha.registradaPor) { · registrada por {{ ficha.registradaPor }} }</h2>
-            </section>
-            <div class="rp-grid">
-              @for (seccion of ficha.secciones; track seccion.titulo) {
-                <section class="rp-section">
-                  <h2>{{ seccion.titulo }}</h2>
-                  <dl class="rp-dl">
-                    @for (campo of seccion.campos; track campo.etiqueta) {
-                      <dt>{{ campo.etiqueta }}</dt><dd>{{ campo.valor }}</dd>
-                    }
-                  </dl>
-                </section>
-              }
-              <section class="rp-section">
-                <h2>Certificaciones</h2>
-                @if (ficha.certificaciones.length > 0) {
-                  <div class="rp-chips">@for (c of ficha.certificaciones; track c) { <span>{{ c }}</span> }</div>
-                } @else {
-                  <p class="rp-muted">Sin certificaciones registradas.</p>
-                }
-              </section>
-            </div>
-            @if (ficha.notas) {
-              <section class="rp-section"><h2>Notas</h2><p>{{ ficha.notas }}</p></section>
-            }
-          </article>
-        }
-              }
-
-        <p class="rp-foot">Metodología SCA Coffee Value Assessment (CVA) · Documento generado por PacamaraQs.</p>
-      }
+      <app-sca-report-template [formato]="formatoReporte()" [hoja]="hojaSca()" [fichasTecnicas]="fichasTecnicas()"
+        [objetivo]="r.nombreSesion" [fecha]="fechaTextoReporte()"></app-sca-report-template>
     </div>
   }
 </ion-content>

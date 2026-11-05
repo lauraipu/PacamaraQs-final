@@ -65,6 +65,12 @@ const escaparHtml = (texto: string): string =>
 export class ImpresionService {
   private readonly document = inject(DOCUMENT);
 
+  /**
+   * Resuelve en cuanto se abre el diálogo de impresión (no al cerrarlo): así el
+   * spinner/botón de la página se libera aunque el navegador no emita
+   * `afterprint`. El iframe se elimina al cerrar el diálogo o, como respaldo, a
+   * los 60 s; en ambos casos se devuelve el foco y se limpian overlays huérfanos.
+   */
   imprimir(titulo: string, contenidoHtml: string): Promise<void> {
     const doc = this.document;
     const iframe = doc.createElement('iframe');
@@ -74,27 +80,35 @@ export class ImpresionService {
       position: 'fixed', right: '0', bottom: '0', width: '0', height: '0', border: '0', visibility: 'hidden'
     });
 
-    return new Promise<void>((resolve, reject) => {
-      let terminado = false;
-      const limpiar = (): void => {
-        if (terminado) return;
-        terminado = true;
-        iframe.remove();
-        resolve();
-      };
+    let eliminado = false;
+    let respaldo: ReturnType<typeof setTimeout> | undefined;
+    const limpiar = (): void => {
+      if (eliminado) return;
+      eliminado = true;
+      if (respaldo) clearTimeout(respaldo);
+      iframe.remove();
+      doc.defaultView?.focus();
+      this.limpiarOverlaysHuerfanos();
+    };
 
+    return new Promise<void>((resolve, reject) => {
       iframe.onload = () => {
         const ventana = iframe.contentWindow;
         if (!ventana || typeof ventana.print !== 'function') {
-          iframe.remove();
+          limpiar();
           reject(new Error('Este dispositivo no permite imprimir desde la app. Abre PacamaraQs en un navegador de escritorio.'));
           return;
         }
-        ventana.addEventListener('afterprint', () => setTimeout(limpiar, 0), { once: true });
-        ventana.focus();
-        ventana.print();
-        // Respaldo para navegadores que no emiten `afterprint`.
-        setTimeout(limpiar, 60_000);
+        try {
+          ventana.addEventListener('afterprint', () => setTimeout(limpiar, 0), { once: true });
+          respaldo = setTimeout(limpiar, 60_000);
+          ventana.focus();
+          ventana.print();
+          resolve();
+        } catch (error) {
+          limpiar();
+          reject(error instanceof Error ? error : new Error('No se pudo abrir el diálogo de impresión.'));
+        }
       };
 
       iframe.srcdoc = `<!doctype html><html lang="es"><head><meta charset="utf-8">`
@@ -102,5 +116,22 @@ export class ImpresionService {
         + `<body>${contenidoHtml}</body></html>`;
       doc.body.appendChild(iframe);
     });
+  }
+
+  /**
+   * Si no queda ningún overlay de Ionic presentado, quita lo que un cierre a
+   * medias pudo dejar: `ion-backdrop` sueltos, el bloqueo de scroll del body y
+   * `inert`/`aria-hidden` en la app (la pantalla quedaba sin responder).
+   */
+  private limpiarOverlaysHuerfanos(): void {
+    const doc = this.document;
+    const overlays = 'ion-modal, ion-action-sheet, ion-popover, ion-alert, ion-loading, ion-picker';
+    const abiertos = Array.from(doc.querySelectorAll<HTMLElement>(overlays))
+      .some(o => !o.classList.contains('overlay-hidden') && o.getAttribute('aria-hidden') !== 'true' && o.offsetParent !== null);
+    if (abiertos) return;
+    doc.querySelectorAll('ion-backdrop').forEach(b => { if (!b.closest(overlays + ', ion-menu')) b.remove(); });
+    doc.body.classList.remove('backdrop-no-scroll');
+    doc.querySelectorAll('ion-app [inert], ion-app > [aria-hidden="true"], ion-router-outlet[aria-hidden="true"]')
+      .forEach(e => { e.removeAttribute('inert'); e.removeAttribute('aria-hidden'); });
   }
 }

@@ -6,11 +6,12 @@ import { ActivatedRoute } from '@angular/router';
 import {
   IonAccordion, IonAccordionGroup, IonBackButton, IonBadge, IonButton, IonButtons, IonCard, IonCardContent,
   IonCheckbox, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonModal, IonRow, IonSegment,
-  IonSegmentButton, IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar, NavController, ToastController
+  IonSegmentButton, IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToggle, IonToolbar, ActionSheetController, NavController,
+  ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
-  checkmarkCircleOutline, closeOutline, documentTextOutline, downloadOutline, hourglassOutline, lockClosedOutline,
+  checkmarkCircleOutline, closeOutline, documentTextOutline, downloadOutline, gridOutline, hourglassOutline, lockClosedOutline,
   medalOutline, ribbonOutline, trophyOutline
 } from 'ionicons/icons';
 import { ETIQUETAS_HEDONICAS } from '../../../core/cva/cva';
@@ -26,6 +27,9 @@ import { ImpresionService } from '../../../core/services/impresion';
 import { ResultsService } from '../../../core/services/results';
 import { codigoDeError, mensajeDeError } from '../../../core/utils/errores';
 import { CupperResultCardComponent } from '../../../shared/components/cupper-result-card/cupper-result-card.component';
+import {
+  FormatoReporteSca, ScaReportTemplateComponent
+} from '../../../shared/components/sca-report-template/sca-report-template.component';
 
 export interface Clasificacion {
   etiqueta: string;
@@ -91,6 +95,43 @@ export interface PerfilDescriptivo {
 export interface PuntoMedidor { x: number; y: number; }
 export interface ArcoMedidor { d: string; clase: string; }
 export type ModoExportacion = 'panel' | 'catador';
+
+/* ── Gráficas de radar (SVG puro) ─────────────────────────────────────── */
+export interface EjeRadar { x: number; y: number; lx: number; ly: number; etiqueta: string; anchor: string; }
+export interface GraficoRadar {
+  id: 'calidad' | 'intensidad';
+  titulo: string;
+  escala: string;
+  ejes: EjeRadar[];
+  anillos: string[];
+  panel: string | null;
+  catador: string | null;
+}
+const RADAR_C = { x: 150, y: 120 };
+const RADAR_R = 82;
+
+function puntoRadar(i: number, fraccion: number, radio = RADAR_R): { x: number; y: number } {
+  const angulo = (-90 + (i * 360) / ATRIBUTOS_CVA.length) * (Math.PI / 180);
+  return {
+    x: Math.round((RADAR_C.x + Math.cos(angulo) * radio * fraccion) * 10) / 10,
+    y: Math.round((RADAR_C.y + Math.sin(angulo) * radio * fraccion) * 10) / 10
+  };
+}
+
+/** Polígono SVG; null si no hay ningún valor (no se dibuja la línea). */
+function poligonoRadar(valores: (number | null)[], max: number): string | null {
+  if (valores.every(v => v === null)) return null;
+  return valores
+    .map((v, i) => puntoRadar(i, Math.min(1, Math.max(0, (v ?? 0) / max))))
+    .map(p => `${p.x},${p.y}`)
+    .join(' ');
+}
+
+/** Celda CSV (separador `;` para Excel en español). */
+const celdaCsv = (v: unknown): string => {
+  const texto = v === null || v === undefined ? '' : typeof v === 'number' ? String(v).replace('.', ',') : String(v);
+  return /[;"\n\r]/.test(texto) ? `"${texto.replace(/"/g, '""')}"` : texto;
+};
 
 /** Orden y etiquetas de los atributos CVA (claves del CHECK de evaluacion_atributos). */
 export const ATRIBUTOS_CVA: readonly { clave: AtributoCva; etiqueta: string }[] = [
@@ -208,7 +249,7 @@ function atributosDeFicha(atributos: Partial<Record<string, ValorAtributo>>): At
     IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonBackButton, IonButtons,
     IonIcon, IonSpinner, IonCard, IonCardContent, IonGrid, IonRow, IonCol, IonBadge, IonList,
     IonAccordionGroup, IonAccordion, IonItem, IonLabel, IonModal, IonSegment, IonSegmentButton,
-    IonSelect, IonSelectOption, IonCheckbox, CupperResultCardComponent, CommonModule
+    IonSelect, IonSelectOption, IonCheckbox, IonToggle, CupperResultCardComponent, ScaReportTemplateComponent, CommonModule
   ]
 })
 export class ResultsPage implements OnInit {
@@ -217,6 +258,7 @@ export class ResultsPage implements OnInit {
   private readonly impresion = inject(ImpresionService);
   private readonly navCtrl = inject(NavController);
   private readonly toastCtrl = inject(ToastController);
+  private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly injector = inject(Injector);
   private sesionId = '';
 
@@ -231,6 +273,7 @@ export class ResultsPage implements OnInit {
 
   /** Plantilla oculta con el reporte en HTML plano que se envía a imprimir. */
   private readonly reporteImprimible = viewChild<ElementRef<HTMLElement>>('reporteImprimible');
+  private readonly modalExportar = viewChild<IonModal>('modalExportar');
 
   readonly atributosCva = ATRIBUTOS_CVA;
 
@@ -399,6 +442,67 @@ export class ResultsPage implements OnInit {
   /* ── Vista Extrínseco ─────────────────────────────────────────────────── */
   readonly fichasTecnicas = computed(() => this.resultados()?.fichasTecnicas ?? []);
 
+  /* ── Gráficas de perfil (radar) ───────────────────────────────────────── */
+  readonly mostrarGraficas = signal(false);
+  private readonly muestraRadarNumero = signal<number | null>(null);
+  readonly muestraRadar = computed(() =>
+    this.muestraRadarNumero() ?? this.muestraEnMedidor()?.numeroMuestra ?? this.numerosMuestra()[0] ?? null
+  );
+  /** Catadores con ficha (los mismos de la tarjeta "Reporte de sesión individual"). */
+  readonly catadoresConFichas = computed(() => this.resultados()?.catadores.filter(c => c.puntajesPorMuestra.length > 0) ?? []);
+
+  readonly graficasRadar = computed<GraficoRadar[]>(() => {
+    const r = this.resultados();
+    const muestra = this.muestraRadar();
+    if (!r || muestra === null) return [];
+    const tipos: GraficoRadar['id'][] = this.esAfectivo() ? ['calidad']
+      : this.esDescriptivo() ? ['intensidad']
+      : this.esCombinado() ? ['calidad', 'intensidad'] : [];
+
+    const promedios = r.atributosPorMuestra.filter(a => a.numeroMuestra === muestra);
+    const ficha = this.catadorReporte()?.puntajesPorMuestra.find(p => p.numeroMuestra === muestra);
+
+    return tipos.map(id => {
+      const max = id === 'calidad' ? 9 : 15;
+      const ejes = ATRIBUTOS_CVA.map(({ etiqueta }, i) => {
+        const fin = puntoRadar(i, 1);
+        const rotulo = puntoRadar(i, 1, RADAR_R + 14);
+        const anchor = Math.abs(rotulo.x - RADAR_C.x) < 4 ? 'middle' : rotulo.x > RADAR_C.x ? 'start' : 'end';
+        return { ...fin, lx: rotulo.x, ly: rotulo.y + 3, etiqueta, anchor };
+      });
+      const anillos = [0.25, 0.5, 0.75, 1].map(f =>
+        ATRIBUTOS_CVA.map((_, i) => puntoRadar(i, f)).map(p => `${p.x},${p.y}`).join(' ')
+      );
+      const valorPanel = (clave: AtributoCva) => {
+        const p = promedios.find(a => a.atributo === clave);
+        return (id === 'calidad' ? p?.calidadPromedio : p?.intensidadPromedio) ?? null;
+      };
+      const valorCatador = (clave: AtributoCva) => ficha?.atributos[clave]?.[id] ?? null;
+      return {
+        id,
+        titulo: id === 'calidad' ? 'Perfil de calidad (afectivo)' : 'Perfil de intensidad (descriptivo)',
+        escala: id === 'calidad' ? 'Escala 1 – 9' : 'Escala 0 – 15',
+        ejes,
+        anillos,
+        panel: poligonoRadar(ATRIBUTOS_CVA.map(a => valorPanel(a.clave)), max),
+        catador: poligonoRadar(ATRIBUTOS_CVA.map(a => valorCatador(a.clave)), max)
+      };
+    });
+  });
+
+  alternarGraficas(valor: boolean): void {
+    this.mostrarGraficas.set(valor);
+  }
+
+  seleccionarMuestraRadar(valor: unknown): void {
+    const n = Number(valor);
+    if (Number.isFinite(n)) this.muestraRadarNumero.set(n);
+  }
+
+  seleccionarCatadorRadar(valor: unknown): void {
+    if (typeof valor === 'string') this.catadorReporteId.set(valor);
+  }
+
   /* ── Modal de exportación (Combinado) ─────────────────────────────────── */
   readonly modalExportarAbierto = signal(false);
   readonly modoExportacion = signal<ModoExportacion>('panel');
@@ -414,8 +518,14 @@ export class ResultsPage implements OnInit {
 
   /** Formatos que se exportan con la hoja SCA (los demás usan su reporte propio). */
   readonly formatoHoja = computed<FormatoHoja | null>(() =>
-    this.esCombinado() ? 'combinado' : this.esDescriptivo() ? 'descriptivo' : null
+    this.esCombinado() ? 'combinado' : this.esDescriptivo() ? 'descriptivo' : this.esAfectivo() ? 'afectivo' : null
   );
+
+  /** Los 4 formatos se imprimen con la hoja SCA (ScaReportTemplateComponent). */
+  readonly formatoReporte = computed<FormatoReporteSca | null>(() =>
+    this.esExtrinseco() ? 'extrinseca' : this.formatoHoja()
+  );
+  readonly fechaTextoReporte = computed(() => formatearFecha(this.fechaReporte()));
 
   readonly escala9 = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
   readonly descriptoresSca = DESCRIPTORES_SCA;
@@ -475,7 +585,7 @@ export class ResultsPage implements OnInit {
     const muestra = r.muestras.find(m => m.numeroMuestra === numero);
     const base = {
       formato,
-      titulo: formato === 'combinado' ? 'Formato Combinado' : 'Formato Descriptivo',
+      titulo: formato === 'combinado' ? 'Formato Combinado' : formato === 'afectivo' ? 'Formato Afectivo' : 'Formato Descriptivo',
       objetivo: r.nombreSesion,
       numeroMuestra: numero,
       nivelTueste: muestra?.nivelTueste ?? null
@@ -506,17 +616,16 @@ export class ResultsPage implements OnInit {
     const resumen = [
       `Consolidado de ${incluidos.length} ficha(s): ${incluidos.map(x => x.catador.nombre).join(', ')}.`,
       excluidos.length ? `Excluidos por el organizador: ${excluidos.map(x => x.catador.nombre).join(', ')}.` : '',
-      'Notas y descriptores libres: ver el reporte individual de cada catador.'
     ].filter(Boolean).join(' ');
 
     const puntajes = incluidos.map(x => x.ficha.puntaje).filter(p => p > 0);
-    const puntaje = formato === 'combinado' ? puntajePanel(puntajes) : null;
+    const puntaje = formato !== 'descriptivo' ? puntajePanel(puntajes) : null;
     return {
       ...base,
       esPanel: true,
       nombre: 'Consolidado del Panel',
       fecha: formatearFecha(this.fechaReporte()),
-      ficha: consolidarFichas(incluidos.map(x => leerFichaSca(x.ficha)), resumen),
+      ficha: consolidarFichas(incluidos.map(x => leerFichaSca(x.ficha)), resumen, incluidos.map(x => x.catador.nombre)),
       resumenPanel: {
         puntaje,
         clasificacion: puntaje === null ? '' : clasificarPuntaje(puntaje).etiqueta,
@@ -546,7 +655,7 @@ export class ResultsPage implements OnInit {
 
   constructor() {
     addIcons({
-      checkmarkCircleOutline, closeOutline, documentTextOutline, downloadOutline, hourglassOutline, lockClosedOutline,
+      checkmarkCircleOutline, closeOutline, documentTextOutline, downloadOutline, gridOutline, hourglassOutline, lockClosedOutline,
       medalOutline, ribbonOutline, trophyOutline
     });
   }
@@ -657,8 +766,85 @@ export class ResultsPage implements OnInit {
 
   async confirmarExportar(): Promise<void> {
     if (!this.puedeConfirmarExportar()) return;
+    // Cerrar el modal y esperar su animación ANTES de imprimir: si el diálogo
+    // de impresión se abre con el modal en transición, el backdrop queda
+    // bloqueando la pantalla al volver.
+    await this.modalExportar()?.dismiss().catch(() => undefined);
     this.cerrarExportar();
     await this.exportarPDF();
+  }
+
+  /** Botón "Exportar": elige PDF o Excel (.csv). */
+  async abrirMenuExportar(): Promise<void> {
+    if (!this.resultados() || this.imprimiendo()) return;
+    const menu = await this.actionSheetCtrl.create({
+      header: '¿En qué formato deseas exportar?',
+      buttons: [
+        { text: 'PDF', icon: 'document-text-outline', role: 'pdf' },
+        { text: 'Excel (.csv)', icon: 'grid-outline', role: 'csv' },
+        { text: 'Cancelar', role: 'cancel', icon: 'close-outline' }
+      ]
+    });
+    await menu.present();
+    // Se actúa cuando el menú YA se cerró: abrir el modal o el diálogo de
+    // impresión con el action sheet aún animándose dejaba un backdrop encima.
+    const { role } = await menu.onDidDismiss();
+    if (role === 'pdf') this.exportarPdfSegunFormato();
+    else if (role === 'csv') this.exportarCsv();
+  }
+
+  /** Combinado/Descriptivo abren el modal de la hoja SCA; los demás imprimen directo. */
+  exportarPdfSegunFormato(): void {
+    if (this.formatoHoja()) this.abrirExportar();
+    else void this.exportarPDF();
+  }
+
+  /**
+   * CSV nativo (sin librerías): una fila por catador y muestra con el promedio
+   * del panel, el puntaje del catador y sus atributos. BOM UTF-8 + `;` para
+   * que Excel en español abra tildes y columnas correctamente.
+   */
+  exportarCsv(): void {
+    const r = this.resultados();
+    if (!r) return;
+    const filas: unknown[][] = [];
+    if (this.esExtrinseco()) {
+      filas.push(['Muestra', 'Sección', 'Campo', 'Valor']);
+      for (const f of r.fichasTecnicas) {
+        for (const s of f.secciones) for (const c of s.campos) filas.push([f.numeroMuestra, s.titulo, c.etiqueta, c.valor]);
+        filas.push([f.numeroMuestra, 'Certificaciones', '', f.certificaciones.join(', ')]);
+        if (f.notas) filas.push([f.numeroMuestra, 'Notas', '', f.notas]);
+      }
+    } else {
+      filas.push([
+        'Muestra', 'Nivel de tueste', 'Promedio panel', 'Catador', 'Rol', 'Puntaje catador', 'Impresión global',
+        'Tazas no uniformes', 'Tazas defectuosas',
+        ...ATRIBUTOS_CVA.flatMap(a => [`${a.etiqueta} intensidad`, `${a.etiqueta} calidad`])
+      ]);
+      for (const m of [...r.muestras].sort((a, b) => a.numeroMuestra - b.numeroMuestra)) {
+        const panel = m.puntajePromedioPanel > 0 ? m.puntajePromedioPanel : null;
+        const fichas = r.catadores.flatMap(c =>
+          c.puntajesPorMuestra.filter(p => p.numeroMuestra === m.numeroMuestra).map(p => ({ c, p }))
+        );
+        if (fichas.length === 0) filas.push([m.numeroMuestra, m.nivelTueste, panel, 'Sin fichas']);
+        for (const { c, p } of fichas) {
+          filas.push([
+            m.numeroMuestra, m.nivelTueste, panel, c.nombre, c.esOrganizador ? 'Organizador' : 'Catador',
+            p.puntaje > 0 ? p.puntaje : null, p.impresionGlobal, p.tazasNoUniformes, p.tazasDefectuosas,
+            ...ATRIBUTOS_CVA.flatMap(a => [p.atributos[a.clave]?.intensidad ?? null, p.atributos[a.clave]?.calidad ?? null])
+          ]);
+        }
+      }
+    }
+    const csv = '\uFEFF' + filas.map(f => f.map(celdaCsv).join(';')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = `${this.tituloReporte().replace(/[\\/:*?"<>|]+/g, '-')}.csv`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   /**
