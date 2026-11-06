@@ -73,11 +73,25 @@
             </tr>
           </thead>
           <tbody>
-            @for (a of f.atributos; track a.atributo) {
+            @for (a of atributosEditables(); track a.atributo) {
               <tr>
                 <td>{{ a.etiqueta }}</td>
-                @if (f.formato !== 'afectivo') { <td class="sc-num">{{ a.intensidad === null ? '—' : (a.intensidad | number:'1.0-1') }}</td> }
-                @if (f.formato !== 'descriptivo') { <td class="sc-num">{{ a.calidad ?? '—' }}</td> }
+                @if (usaIntensidad()) {
+                  <td class="sc-num">
+                    <ion-input type="number" inputmode="decimal" min="0" max="15" step="0.5" placeholder="0–15"
+                      [attr.aria-label]="a.etiqueta + ' intensidad'" [value]="a.intensidad"
+                      [style.--border-color]="a.intensidad === null ? '#f59e0b' : null" fill="outline" style="min-height:36px;max-width:84px;margin-left:auto"
+                      (ionChange)="cambiarAtributo(a.atributo, 'intensidad', $event.detail.value)"></ion-input>
+                  </td>
+                }
+                @if (usaCalidad()) {
+                  <td class="sc-num">
+                    <ion-input type="number" inputmode="numeric" min="1" max="9" step="1" placeholder="1–9"
+                      [attr.aria-label]="a.etiqueta + ' calidad'" [value]="a.calidad"
+                      [style.--border-color]="a.calidad === null ? '#f59e0b' : null" fill="outline" style="min-height:36px;max-width:72px;margin-left:auto"
+                      (ionChange)="cambiarAtributo(a.atributo, 'calidad', $event.detail.value)"></ion-input>
+                  </td>
+                }
               </tr>
             }
           </tbody>
@@ -85,9 +99,23 @@
 
         @if (f.formato !== 'descriptivo') {
           <div class="sc-kpis">
-            <div><strong>{{ f.impresionGlobal ?? '—' }}</strong><span>Impresión global</span></div>
-            <div><strong>{{ f.tazasNoUniformes }} / {{ f.tazasDefectuosas }}</strong><span>Tazas u / d</span></div>
-            <div class="sc-kpis__score"><strong>{{ f.puntaje === null ? '—' : (f.puntaje | number:'1.2-2') }}</strong><span>Puntaje CVA</span></div>
+            <div>
+              <ion-input type="number" inputmode="numeric" min="1" max="9" step="1" placeholder="1–9" fill="outline"
+                aria-label="Impresión global" [value]="impresionEditable()" style="min-height:36px"
+                [style.--border-color]="impresionEditable() === null ? '#f59e0b' : null"
+                (ionChange)="cambiarImpresion($event.detail.value)"></ion-input>
+              <span>Impresión global (1–9)</span>
+            </div>
+            <div>
+              <div style="display:flex;gap:6px">
+                <ion-input type="number" inputmode="numeric" min="0" max="5" step="1" fill="outline" aria-label="Tazas no uniformes"
+                  [value]="tazasUEditable()" style="min-height:36px" (ionChange)="cambiarTazas('u', $event.detail.value)"></ion-input>
+                <ion-input type="number" inputmode="numeric" min="0" max="5" step="1" fill="outline" aria-label="Tazas defectuosas"
+                  [value]="tazasDEditable()" style="min-height:36px" (ionChange)="cambiarTazas('d', $event.detail.value)"></ion-input>
+              </div>
+              <span>Tazas no unif. / defect. (0–5)</span>
+            </div>
+            <div class="sc-kpis__score"><strong>{{ puntajeEditado() === null ? '—' : (puntajeEditado() | number:'1.2-2') }}</strong><span>Puntaje CVA</span></div>
           </div>
         }
 

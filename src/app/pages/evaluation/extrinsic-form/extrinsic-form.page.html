@@ -33,105 +33,146 @@
   <main class="cva-main">
     <div class="cva-main__grid">
       <div class="cva-main__column">
+        <!-- 1. CULTIVO -->
         <article class="attr-card">
           <h3 class="attr-card__title">1. Información de cultivo (Farming)</h3>
           <div class="form-fields">
-            <label class="form-field">
+            <div class="form-field">
               <span class="intensity-slider__label">País</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.country" placeholder="Ej: Colombia">
-            </label>
-            <label class="form-field">
-              <span class="intensity-slider__label">Región / Departamento</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.region" placeholder="Ej: Huila">
-            </label>
+              <app-selector-buscable titulo="País" placeholder="Ej: Colombia" [permitirOtro]="true"
+                [opciones]="opcionesPaises" [valor]="formulario.farming.country" (valorChange)="cambiarPais($event)">
+              </app-selector-buscable>
+            </div>
+            <div class="form-field">
+              <span class="intensity-slider__label">{{ etiquetaRegion() }}</span>
+              @if (opcionesRegiones().length > 0) {
+                <app-selector-buscable [titulo]="etiquetaRegion()" [placeholder]="'Ej: ' + opcionesRegiones()[0].etiqueta" [permitirOtro]="true"
+                  [opciones]="opcionesRegiones()" [valor]="formulario.farming.region" (valorChange)="formulario.farming.region = $event">
+                </app-selector-buscable>
+              } @else {
+                <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.region"
+                  [placeholder]="formulario.farming.country ? 'Ej: región de ' + formulario.farming.country : 'Primero elige el país'">
+              }
+            </div>
             <label class="form-field">
               <span class="intensity-slider__label">Nombre de la finca o cooperativa</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.farmName" placeholder="Ej: Finca El Mirador">
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.farmName"
+                (blur)="normalizarNombres()" placeholder="Ej: Finca El Mirador">
             </label>
             <label class="form-field">
               <span class="intensity-slider__label">Productor(es)</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.producers" placeholder="Nombre(s) de productores">
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.producers"
+                (blur)="normalizarNombres()" placeholder="Ej: Ana Gómez, Luis Pérez">
             </label>
             <label class="form-field">
               <span class="intensity-slider__label">Especie</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.species" placeholder="Ej: Arábica">
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.species" placeholder="Ej: Coffea arabica">
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">Variedad</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.variety" placeholder="Ej: Geisha">
+              <span class="intensity-slider__label">Variedad(es)</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.variety" placeholder="Ej: Pacamara">
             </label>
             <label class="form-field">
               <span class="intensity-slider__label">Fecha de cosecha</span>
-              <input class="notes-panel__textarea" type="date" [(ngModel)]="formulario.farming.harvestDate">
+              <input class="notes-panel__textarea" type="date" [(ngModel)]="formulario.farming.harvestDate" placeholder="Ej: 2026-05-15">
             </label>
             <label class="form-field">
               <span class="intensity-slider__label">Otra información de cultivo</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.other">
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.other" placeholder="Ej: Altitud 1.750 msnm, sombrío de guamo">
             </label>
           </div>
         </article>
 
+        <!-- 2. PROCESAMIENTO -->
         <article class="attr-card">
           <h3 class="attr-card__title">2. Información de procesamiento</h3>
           <div class="form-fields">
             <label class="form-field">
               <span class="intensity-slider__label">Nombre del procesador</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.processorName">
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.processorName"
+                (blur)="normalizarNombres()" placeholder="Ej: Beneficio La Esperanza">
             </label>
-            <label class="form-field">
-              <span class="intensity-slider__label">Beneficio húmedo</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.wetMill">
-            </label>
-            <label class="form-field">
-              <span class="intensity-slider__label">Beneficio seco</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.dryMill">
-            </label>
+            <div class="form-field">
+              <label class="intensity-slider__label" for="campo-wetMill">Beneficio húmedo</label>
+              <div class="money-input">
+                <input id="campo-wetMill" class="money-input__control" type="text" [(ngModel)]="formulario.processing.wetMill"
+                  (blur)="normalizarNombres()" placeholder="Ej: Beneficio central Pitalito">
+                <span class="money-input__suffix" aria-hidden="true">nombre / lugar</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="intensity-slider__label" for="campo-dryMill">Beneficio seco (trilladora)</label>
+              <div class="money-input">
+                <input id="campo-dryMill" class="money-input__control" type="text" [(ngModel)]="formulario.processing.dryMill"
+                  (blur)="normalizarNombres()" placeholder="Ej: Trilladora del Huila">
+                <span class="money-input__suffix" aria-hidden="true">nombre / lugar</span>
+              </div>
+            </div>
             <label class="form-field">
               <span class="intensity-slider__label">Tipo de proceso</span>
               <select class="notes-panel__textarea" [(ngModel)]="formulario.processing.processType">
-                <option value="">Seleccionar</option>
-                <option value="lavado">Lavado</option>
-                <option value="natural">Natural</option>
-                <option value="otro">Otro</option>
+                <option value="">Seleccionar (Ej: Lavado)</option>
+                @for (t of tiposProceso; track t.valor) { <option [value]="t.valor">{{ t.etiqueta }}</option> }
               </select>
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">Otro proceso</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.other">
+              <span class="intensity-slider__label">Descafeinado</span>
+              <select class="notes-panel__textarea" [(ngModel)]="formulario.processing.decaf">
+                <option value="">No aplica</option>
+                <option value="Agua (Swiss Water)">Agua (Swiss Water)</option>
+                <option value="CO₂ supercrítico">CO₂ supercrítico</option>
+                <option value="Acetato de etilo (Caña)">Acetato de etilo (Caña)</option>
+                <option value="Cloruro de metileno">Cloruro de metileno</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Descripción del proceso</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.description"
+                placeholder="Ej: 72 h de fermentación en tanque cerrado, secado en camas africanas 18 días">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Otra información de proceso</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.other" placeholder="Ej: Humedad final 10,5 %">
             </label>
           </div>
         </article>
 
+        <!-- 3. COMERCIO -->
         <article class="attr-card">
           <h3 class="attr-card__title">3. Información de comercio (Trading)</h3>
           <div class="form-fields">
             <label class="form-field">
+              <span class="intensity-slider__label">Importador</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.importer"
+                (blur)="normalizarNombres()" placeholder="Ej: Green Coffee Imports">
+            </label>
+            <label class="form-field">
+              <span class="intensity-slider__label">Exportador</span>
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.exporter"
+                (blur)="normalizarNombres()" placeholder="Ej: Café Origen S.A.S.">
+            </label>
+            <label class="form-field">
               <span class="intensity-slider__label">Grado (Size Grade / Other Grade)</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.grade" placeholder="Ej: Supremo">
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.grade" placeholder="Ej: Supremo malla 17/18">
             </label>
             <label class="form-field">
               <span class="intensity-slider__label">Número ICO</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.icoNumber">
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.icoNumber" placeholder="Ej: 3-0123-0456">
             </label>
             <div class="form-field">
               <label class="intensity-slider__label" for="campo-farmPrice">Precio en finca</label>
               <div class="money-input" [class.money-input--error]="errorCampo('farmPrice')">
                 <span class="money-input__prefix" aria-hidden="true">$</span>
-                <input
-                  id="campo-farmPrice"
-                  class="money-input__control"
-                  type="text"
-                  inputmode="decimal"
-                  autocomplete="off"
+                <input id="campo-farmPrice" class="money-input__control" type="text" inputmode="decimal" autocomplete="off"
                   placeholder="Ej: 25.000"
-                  [attr.aria-invalid]="!!errorCampo('farmPrice')"
-                  [attr.aria-describedby]="'error-farmPrice'"
+                  [attr.aria-invalid]="!!errorCampo('farmPrice')" [attr.aria-describedby]="'error-farmPrice'"
                   [value]="textoCampo('farmPrice')"
-                  (focus)="alEnfocarNumero('farmPrice')"
-                  (keydown)="alPresionarTeclaNumero('farmPrice', $event)"
-                  (input)="alEscribirNumero('farmPrice', $event)"
-                  (blur)="alSalirNumero('farmPrice')">
-                <span class="money-input__suffix" aria-hidden="true">COP</span>
+                  (focus)="alEnfocarNumero('farmPrice')" (keydown)="alPresionarTeclaNumero('farmPrice', $event)"
+                  (input)="alEscribirNumero('farmPrice', $event)" (blur)="alSalirNumero('farmPrice')">
+                <app-selector-buscable class="money-input__currency" titulo="Moneda" placeholder="COP"
+                  [opciones]="opcionesMonedas" [valor]="formulario.trading.currency || 'COP'"
+                  (valorChange)="formulario.trading.currency = $event">
+                </app-selector-buscable>
               </div>
               @if (errorCampo('farmPrice'); as mensaje) {
                 <p id="error-farmPrice" class="money-input__error" role="alert">{{ mensaje }}</p>
@@ -140,21 +181,12 @@
             <div class="form-field">
               <label class="intensity-slider__label" for="campo-lotSizeKg">Tamaño del lote</label>
               <div class="money-input" [class.money-input--error]="errorCampo('lotSizeKg')">
-                
-                <input
-                  id="campo-lotSizeKg"
-                  class="money-input__control"
-                  type="text"
-                  inputmode="decimal"
-                  autocomplete="off"
+                <input id="campo-lotSizeKg" class="money-input__control" type="text" inputmode="decimal" autocomplete="off"
                   placeholder="Ej: 690"
-                  [attr.aria-invalid]="!!errorCampo('lotSizeKg')"
-                  [attr.aria-describedby]="'error-lotSizeKg'"
+                  [attr.aria-invalid]="!!errorCampo('lotSizeKg')" [attr.aria-describedby]="'error-lotSizeKg'"
                   [value]="textoCampo('lotSizeKg')"
-                  (focus)="alEnfocarNumero('lotSizeKg')"
-                  (keydown)="alPresionarTeclaNumero('lotSizeKg', $event)"
-                  (input)="alEscribirNumero('lotSizeKg', $event)"
-                  (blur)="alSalirNumero('lotSizeKg')">
+                  (focus)="alEnfocarNumero('lotSizeKg')" (keydown)="alPresionarTeclaNumero('lotSizeKg', $event)"
+                  (input)="alEscribirNumero('lotSizeKg', $event)" (blur)="alSalirNumero('lotSizeKg')">
                 <span class="money-input__suffix" aria-hidden="true">kg</span>
               </div>
               @if (errorCampo('lotSizeKg'); as mensaje) {
@@ -163,11 +195,12 @@
             </div>
             <label class="form-field">
               <span class="intensity-slider__label">Otra información comercial</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.other">
+              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.other" placeholder="Ej: Contrato directo, 10 sacos de 69 kg">
             </label>
           </div>
         </article>
 
+        <!-- 4. CERTIFICACIONES -->
         <article class="attr-card">
           <h3 class="attr-card__title">4. Certificaciones</h3>
           <div class="mouthfeel__list">
@@ -186,7 +219,8 @@
       <aside class="cva-main__sidebar">
         <div class="notes-panel">
           <div class="notes-panel__header">Notas extrínsecas</div>
-          <textarea class="notes-panel__textarea" rows="5" [(ngModel)]="formulario.notes" placeholder="Otra información relevante..."></textarea>
+          <textarea class="notes-panel__textarea" rows="5" [(ngModel)]="formulario.notes"
+            placeholder="Ej: Lote ganador de concurso regional; cosecha selectiva de cerezas maduras"></textarea>
         </div>
         <div class="sample-navigation">
           <button

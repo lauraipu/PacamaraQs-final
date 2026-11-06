@@ -7,6 +7,8 @@ import { arrowBackOutline } from 'ionicons/icons';
 import { BaseCataForm } from '../../../core/cva/base-cata-form';
 import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
 import { CARACTERES_NUMERICOS, formatearNumeroEs, parsearNumeroEs } from '../../../core/utils/numeros';
+import { aTitulo, divisionDe, MONEDAS, PAISES_CAFE, regionesDe, TIPOS_PROCESO } from '../../../core/cva/origenes';
+import { OpcionBuscable, SelectorBuscableComponent } from '../../../shared/components/selector-buscable/selector-buscable.component';
 
 /** Campos numéricos del bloque de comercio. */
 type CampoNumerico = 'farmPrice' | 'lotSizeKg';
@@ -34,13 +36,20 @@ interface FormularioExtrinseco {
     wetMill: string;
     dryMill: string;
     processType: string;
+    /** Método de descafeinado ('' = no aplica). */
+    decaf: string;
+    description: string;
     other: string;
   };
   trading: {
+    importer: string;
+    exporter: string;
     grade: string;
     icoNumber: string;
-    /** Precio en finca en COP. Solo el número (sin $ ni separadores). */
+    /** Precio en finca. Solo el número (sin $ ni separadores). */
     farmPrice: number | null;
+    /** Código ISO 4217 del precio (COP por defecto). */
+    currency: string;
     /** Tamaño del lote en kg. */
     lotSizeKg: number | null;
     other: string;
@@ -60,7 +69,7 @@ interface FormularioExtrinseco {
   templateUrl: './extrinsic-form.page.html',
   styleUrls: ['./extrinsic-form.page.scss'],
   standalone: true,
-  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent]
+  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, SelectorBuscableComponent]
 })
 export class ExtrinsicFormPage extends BaseCataForm<FormularioExtrinseco> {
   override formulario: FormularioExtrinseco = this.crearFormularioVacio();
@@ -82,9 +91,11 @@ export class ExtrinsicFormPage extends BaseCataForm<FormularioExtrinseco> {
         wetMill: '',
         dryMill: '',
         processType: '',
+        decaf: '',
+        description: '',
         other: ''
       },
-      trading: { grade: '', icoNumber: '', farmPrice: null, lotSizeKg: null, other: '' },
+      trading: { importer: '', exporter: '', grade: '', icoNumber: '', farmPrice: null, currency: 'COP', lotSizeKg: null, other: '' },
       certifications: {
         c4: false,
         fairTrade: false,
@@ -94,6 +105,38 @@ export class ExtrinsicFormPage extends BaseCataForm<FormularioExtrinseco> {
       },
       notes: ''
     };
+  }
+
+  /* ── Catálogos (país → región dinámica, moneda, proceso) ──────────────── */
+  readonly opcionesPaises: OpcionBuscable[] = PAISES_CAFE.map(p => ({ valor: p.nombre, etiqueta: p.nombre }));
+  readonly opcionesMonedas: OpcionBuscable[] = MONEDAS.map(m => ({ valor: m.codigo, etiqueta: m.codigo, detalle: m.nombre }));
+  readonly tiposProceso = TIPOS_PROCESO;
+
+  /** "Departamento" en Colombia, "Estado" en EE. UU./Brasil/México… */
+  etiquetaRegion(): string {
+    return divisionDe(this.formulario.farming.country);
+  }
+
+  opcionesRegiones(): OpcionBuscable[] {
+    return regionesDe(this.formulario.farming.country).map(r => ({ valor: r, etiqueta: r }));
+  }
+
+  cambiarPais(pais: string): void {
+    this.formulario.farming.country = pais;
+    const regiones = regionesDe(pais);
+    if (regiones.length > 0 && !regiones.includes(this.formulario.farming.region)) this.formulario.farming.region = '';
+  }
+
+  /** Nombres propios en Title Case, escriba como escriba el usuario. */
+  normalizarNombres(): void {
+    const { farming: f, processing: p, trading: t } = this.formulario;
+    f.farmName = aTitulo(f.farmName ?? '');
+    f.producers = aTitulo(f.producers ?? '');
+    p.processorName = aTitulo(p.processorName ?? '');
+    p.wetMill = aTitulo(p.wetMill ?? '');
+    p.dryMill = aTitulo(p.dryMill ?? '');
+    t.importer = aTitulo(t.importer ?? '');
+    t.exporter = aTitulo(t.exporter ?? '');
   }
 
   /* ── Campos numéricos (precio y lote) ─────────────────────────────────
@@ -163,6 +206,8 @@ export class ExtrinsicFormPage extends BaseCataForm<FormularioExtrinseco> {
 
   /** "Siguiente" queda bloqueado mientras haya un número inválido en pantalla. */
   protected override esRespuestaCompleta(_respuesta: FormularioExtrinseco): boolean {
+    this.normalizarNombres();
+    this.formulario.trading.currency ||= 'COP';
     const errores = this.erroresNumericos();
     return !errores.farmPrice && !errores.lotSizeKg;
   }

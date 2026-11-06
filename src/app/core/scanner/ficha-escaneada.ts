@@ -1,4 +1,5 @@
 import { RUEDA_SABORES } from '../cva/cva';
+import { aTitulo, TIPOS_PROCESO } from '../cva/origenes';
 import { parsearNumeroEs } from '../utils/numeros';
 
 export { parsearNumeroEs };
@@ -100,7 +101,7 @@ export function sanearCalidad(v: unknown): number | null {
   return r >= 1 && r <= 9 ? r : null;
 }
 
-const sanearTazas = (v: unknown): number => {
+export const sanearTazas = (v: unknown): number => {
   const n = numero(v);
   return n === null ? 0 : Math.min(5, Math.max(0, Math.round(n)));
 };
@@ -240,13 +241,15 @@ export function sanearFicha(crudo: Registro, formato: FormatoEscaneo, simulada: 
     const tipo = texto(p['processType'], 20).toLowerCase();
     formulario = {
       farming: Object.fromEntries(['country', 'region', 'farmName', 'producers', 'species', 'variety', 'harvestDate', 'other']
-        .map(k => [k, texto(f[k], 120)])),
+        .map(k => [k, ['farmName', 'producers'].includes(k) ? aTitulo(texto(f[k], 120)) : texto(f[k], 120)])),
       processing: {
-        processorName: texto(p['processorName'], 120), wetMill: texto(p['wetMill'], 120), dryMill: texto(p['dryMill'], 120),
-        processType: ['lavado', 'natural', 'otro'].includes(tipo) ? tipo : '', other: texto(p['other'], 200)
+        processorName: aTitulo(texto(p['processorName'], 120)), wetMill: texto(p['wetMill'], 120), dryMill: texto(p['dryMill'], 120),
+        processType: TIPOS_PROCESO.some(x => x.valor === tipo) ? tipo : '',
+        decaf: texto(p['decaf'], 60), description: texto(p['description'], 200), other: texto(p['other'], 200)
       },
       trading: {
-        grade: texto(t['grade'], 60), icoNumber: texto(t['icoNumber'], 60),
+        importer: aTitulo(texto(t['importer'], 120)), exporter: aTitulo(texto(t['exporter'], 120)),
+        grade: texto(t['grade'], 60), icoNumber: texto(t['icoNumber'], 60), currency: texto(t['currency'], 3).toUpperCase() || 'COP',
         farmPrice: sanearNumeroPositivo(t['farmPrice']), lotSizeKg: sanearNumeroPositivo(t['lotSizeKg'], 1e9),
         other: texto(t['other'], 200)
       },
@@ -283,6 +286,65 @@ export function sanearFicha(crudo: Registro, formato: FormatoEscaneo, simulada: 
 }
 
 /** Cuerpo para la RPC registrar_ficha_personal (el servidor vuelve a validar y recalcula el puntaje). */
+/** Valores corregidos a mano en la pantalla de revisión del escáner. */
+export interface CorreccionFicha {
+  atributos: { atributo: AtributoDb; intensidad: number | null; calidad: number | null }[];
+  impresionGlobal: number | null;
+  tazasNoUniformes: number;
+  tazasDefectuosas: number;
+}
+
+/**
+ * Aplica las correcciones del usuario a la ficha: atributos, impresión global
+ * y tazas se escriben en `formulario` con la misma forma que cada formulario
+ * de la app, y el puntaje CVA se recalcula (nunca se confía en el de la IA).
+ */
+export function aplicarCorrecciones(ficha: FichaEscaneada, c: CorreccionFicha): FichaEscaneada {
+  if (ficha.formato === 'extrinseca') return ficha;
+  const formulario: Registro = structuredClone(ficha.formulario);
+  const conCalidad = ficha.formato !== 'descriptivo';
+  const conIntensidad = ficha.formato !== 'afectivo';
+  const faltantes: string[] = [];
+
+  const atributos = ATRIBUTOS.map(a => {
+    const original = ficha.atributos.find(x => x.atributo === a.db);
+    const editado = c.atributos.find(x => x.atributo === a.db);
+    const intensidad = conIntensidad ? sanearIntensidad(editado?.intensidad ?? null) : null;
+    const calidad = conCalidad ? sanearCalidad(editado?.calidad ?? null) : null;
+    if (conIntensidad && intensidad === null) faltantes.push(`${a.etiqueta} · intensidad`);
+    if (conCalidad && calidad === null) faltantes.push(`${a.etiqueta} · calidad`);
+
+    if (ficha.formato === 'afectivo') {
+      formulario[a.form] = calidad;
+    } else {
+      const raiz = ficha.formato === 'combinado' ? reg(formulario['atributos']) : formulario;
+      const bloque = reg(raiz[a.form]);
+      raiz[a.form] = conCalidad ? { ...bloque, intensidad, calidad } : { ...bloque, intensidad };
+      if (ficha.formato === 'combinado') formulario['atributos'] = raiz;
+    }
+    return { atributo: a.db, etiqueta: original?.etiqueta ?? a.etiqueta, intensidad, calidad };
+  });
+
+  const impresion = conCalidad ? sanearCalidad(c.impresionGlobal) : null;
+  const u = conCalidad ? sanearTazas(c.tazasNoUniformes) : 0;
+  const d = conCalidad ? sanearTazas(c.tazasDefectuosas) : 0;
+  if (conCalidad) {
+    if (impresion === null) faltantes.push('Impresión global');
+    formulario['impresionGlobal'] = impresion;
+    formulario['defectos'] = { tazasNoUniformes: u, tazasDefectuosas: d };
+  }
+  return {
+    ...ficha,
+    formulario,
+    atributos,
+    impresionGlobal: impresion,
+    tazasNoUniformes: u,
+    tazasDefectuosas: d,
+    puntaje: conCalidad ? calcularPuntajeCva(atributos.map(a => a.calidad), impresion, u, d) : null,
+    camposFaltantes: faltantes
+  };
+}
+
 export function payloadFichaPersonal(ficha: FichaEscaneada): Registro {
   return {
     impresion_global: ficha.impresionGlobal,

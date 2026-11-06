@@ -18,11 +18,11 @@ describe('construirFichasTecnicas', () => {
 
     expect(ficha.numeroMuestra).toBe(1);
     expect(ficha.registradaPor).toBe('Ana');
-    expect(campo('Origen y cultivo', 'País')).toBe('Colombia');
-    expect(campo('Origen y cultivo', 'Variedad')).toBe('Pacamara');
-    expect(campo('Origen y cultivo', 'Productores')).toBe('—');
+    expect(campo('Cultivo', 'País')).toBe('Colombia');
+    expect(campo('Cultivo', 'Variedad')).toBe('Pacamara');
+    expect(campo('Cultivo', 'Productores')).toBe('—');
     expect(campo('Procesamiento', 'Tipo de proceso')).toBe('Lavado');
-    expect(campo('Comercialización', 'Precio en finca')).toBe('—');
+    expect(campo('Comercio', 'Precio en finca')).toBe('—');
     expect(ficha.certificaciones).toEqual(['Bird Friendly', 'Fair Trade', 'Orgánico']);
     expect(ficha.notas).toBe('Lote de prueba');
   });
@@ -35,7 +35,7 @@ describe('construirFichasTecnicas', () => {
     const campos = ficha.secciones.flatMap(s => s.campos);
 
     expect(campos.find(c => c.etiqueta === 'País')?.valor).toBe('El Salvador');
-    expect(campos.find(c => c.etiqueta === 'Región')?.valor).toBe('Huila');
+    expect(campos.find(c => c.etiqueta === 'Departamento')?.valor).toBe('Huila');
     expect(campos.find(c => c.etiqueta === 'Precio en finca')?.valor).toBe('$ 4,5 COP');
     expect(ficha.secciones.at(-1)?.titulo).toBe('Información adicional');
     expect(ficha.certificaciones).toContain('Rainforest Alliance');

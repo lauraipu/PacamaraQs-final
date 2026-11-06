@@ -6,6 +6,12 @@ import {
 } from '../../../core/cva/hoja-sca';
 import { FichaTecnica } from '../../../core/models/session-results.model';
 
+/** Recuadro de notas de la hoja que corresponde a cada atributo. */
+const NOTA_DE_ATRIBUTO: Readonly<Record<AtributoHoja, 'olfativo' | 'gustativo' | 'acidez' | 'dulzor' | 'boca'>> = {
+  fragancia: 'olfativo', aroma: 'olfativo', sabor: 'gustativo', sabor_residual: 'gustativo',
+  acidez: 'acidez', dulzor: 'dulzor', sensacion_boca: 'boca'
+};
+
 export type FormatoReporteSca = 'combinado' | 'descriptivo' | 'afectivo' | 'extrinseca';
 
 const ETIQUETA_ATRIBUTO: Readonly<Record<AtributoHoja, string>> = {
@@ -54,6 +60,19 @@ export class ScaReportTemplateComponent {
       })
       .filter(Boolean)
       .join(' · ');
+  }
+
+  /** Casillas de certificación de la hoja SCA (mismas etiquetas que el mapper). */
+  readonly certificacionesSca = ['4C', 'Fair Trade', 'Orgánico', 'Rainforest Alliance'] as const;
+
+  otrasCertificaciones(lista: readonly string[]): string {
+    return lista.filter(c => !(this.certificacionesSca as readonly string[]).includes(c)).join(', ');
+  }
+
+  /** Columna NOTAS del Afectivo: valor hedónico + nota escrita de ese atributo. */
+  notaAfectiva(hoja: HojaSca, atributo: AtributoHoja): string {
+    const campo = NOTA_DE_ATRIBUTO[atributo];
+    return [this.etiquetasAfectivas(hoja, [atributo]), campo ? hoja.ficha.notas[campo] : ''].filter(Boolean).join(' · ');
   }
 
   /** Cajas de tazas (0–5) que se marcan: entero más cercano. */

@@ -43,3 +43,7 @@
   color: var(--app-error-text, #991b1b);
   font-size: 12px;
 }
+
+/* Moneda con buscador dentro del campo de precio */
+.money-input__currency { flex: 0 0 auto; min-width: 74px; }
+.money-input__currency .selector-buscable { border: none; background: transparent; padding: 0 4px; font-weight: 600; }

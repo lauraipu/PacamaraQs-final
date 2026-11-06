@@ -1,4 +1,5 @@
 import { FichaTecnica, FichaTecnicaSeccion } from '../models/session-results.model';
+import { divisionDe, etiquetaProceso, formatearPrecio } from '../cva/origenes';
 
 /** Ficha extrínseca serializada en evaluaciones.notas (formulario de ExtrinsicFormPage). */
 export interface FichaExtrinsecaDto {
@@ -40,10 +41,8 @@ export function textoDeCampo(valor: unknown): string {
 
 /** 25000 → "$ 25.000 COP". */
 export function formatearCop(valor: number): string {
-  return `$ ${valor.toLocaleString('es-CO', { maximumFractionDigits: 2 })} COP`;
+  return formatearPrecio(valor, 'COP');
 }
-
-const capitalizar = (texto: string): string => texto ? texto.charAt(0).toUpperCase() + texto.slice(1) : texto;
 
 /**
  * Une las dos fuentes posibles de la ficha técnica de una muestra:
@@ -88,14 +87,17 @@ function construirFicha(
 
   const precioNumero = typeof tabla['precio_finca'] === 'number' ? tabla['precio_finca']
     : typeof comercio['farmPrice'] === 'number' ? comercio['farmPrice'] : null;
-  const precio = precioNumero === null ? '' : formatearCop(precioNumero);
+  const moneda = textoDeCampo(comercio['currency']) || 'COP';
+  const precio = precioNumero === null ? '' : formatearPrecio(precioNumero, moneda);
+  const pais = valor('pais', cultivo['country']);
+  const tipoProceso = valor('tipo_proceso', proceso['processType']);
   const loteKg = typeof comercio['lotSizeKg'] === 'number' ? `${comercio['lotSizeKg'].toLocaleString('es-CO')} kg` : '';
   const secciones: FichaTecnicaSeccion[] = [
     {
-      titulo: 'Origen y cultivo',
+      titulo: 'Cultivo',
       campos: [
-        { etiqueta: 'País', valor: valor('pais', cultivo['country']) },
-        { etiqueta: 'Región', valor: valor('region', cultivo['region']) },
+        { etiqueta: 'País', valor: pais },
+        { etiqueta: divisionDe(pais), valor: valor('region', cultivo['region']) },
         { etiqueta: 'Finca / Cooperativa', valor: valor('finca_o_coop', cultivo['farmName']) },
         { etiqueta: 'Productores', valor: valor('productores', cultivo['producers']) },
         { etiqueta: 'Especie', valor: valor('especie', cultivo['species']) },
@@ -110,19 +112,19 @@ function construirFicha(
         { etiqueta: 'Procesador', valor: valor('nombre_procesador', proceso['processorName']) },
         { etiqueta: 'Beneficio húmedo', valor: valor('beneficio_humedo', proceso['wetMill']) },
         { etiqueta: 'Beneficio seco', valor: valor('beneficio_seco', proceso['dryMill']) },
-        { etiqueta: 'Tipo de proceso', valor: capitalizar(valor('tipo_proceso', proceso['processType'])) },
-        { etiqueta: 'Descafeinado', valor: valor('descafeinado') },
-        { etiqueta: 'Descripción del proceso', valor: valor('descripcion_proceso') },
+        { etiqueta: 'Tipo de proceso', valor: tipoProceso === SIN_DATO ? SIN_DATO : etiquetaProceso(tipoProceso) },
+        { etiqueta: 'Descafeinado', valor: valor('descafeinado', proceso['decaf']) },
+        { etiqueta: 'Descripción del proceso', valor: valor('descripcion_proceso', proceso['description']) },
         { etiqueta: 'Otros (proceso)', valor: valor('otro_procesamiento', proceso['other']) }
       ]
     },
     {
-      titulo: 'Comercialización',
+      titulo: 'Comercio',
       campos: [
         { etiqueta: 'Grado', valor: valor('grado', comercio['grade']) },
         { etiqueta: 'Número ICO', valor: valor('numero_ico', comercio['icoNumber']) },
-        { etiqueta: 'Importador', valor: valor('importador') },
-        { etiqueta: 'Exportador', valor: valor('exportador') },
+        { etiqueta: 'Importador', valor: valor('importador', comercio['importer']) },
+        { etiqueta: 'Exportador', valor: valor('exportador', comercio['exporter']) },
         { etiqueta: 'Precio en finca', valor: precio || SIN_DATO },
         { etiqueta: 'Tamaño de lote', valor: valor('tamano_lote', loteKg) },
         { etiqueta: 'Otros (comercial)', valor: valor('otro_comercial', comercio['other']) }

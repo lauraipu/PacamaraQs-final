@@ -12,7 +12,8 @@ import {
 import { casillasDeDescriptores, DESCRIPTORES_SCA } from '../../../core/cva/hoja-sca';
 import { EstadoSesion, FormatoCva, getFormatoById } from '../../../core/models/sesion.model';
 import {
-  FichaEscaneada, FORMATOS_ESCANEO, FormatoEscaneo, tituloFormatoEscaneo
+  aplicarCorrecciones, AtributoEscaneado, calcularPuntajeCva, FichaEscaneada, FORMATOS_ESCANEO, FormatoEscaneo,
+  parsearNumeroEs, sanearCalidad, sanearIntensidad, sanearTazas, tituloFormatoEscaneo
 } from '../../../core/scanner/ficha-escaneada';
 import { AuthService } from '../../../core/services/auth';
 import { ImagenPreparada, ScannerService } from '../../../core/services/scanner';
@@ -20,6 +21,10 @@ import { SesionConRol, SesionService } from '../../../core/services/sesion';
 import { mensajeDeError } from '../../../core/utils/errores';
 
 export type ModoEscaneo = 'sesion' | 'muestra';
+
+/** Valor de ion-input → número (acepta coma decimal); vacío → null. */
+const aNumero = (v: unknown): number | null =>
+  v === null || v === undefined || String(v).trim() === '' ? null : parsearNumeroEs(String(v));
 
 /** Resultado con el que se cierra el modal (role 'guardado'). */
 export interface ResultadoEscaneo {
@@ -77,6 +82,20 @@ export class ScannerModalComponent implements OnInit {
     const f = this.ficha()?.formato;
     return f === 'combinado' || f === 'descriptivo';
   });
+  /* Valores numéricos editables (lo leído por la IA es solo el punto de partida). */
+  readonly atributosEditables = signal<AtributoEscaneado[]>([]);
+  readonly impresionEditable = signal<number | null>(null);
+  readonly tazasUEditable = signal(0);
+  readonly tazasDEditable = signal(0);
+  readonly usaCalidad = computed(() => !!this.ficha() && this.ficha()!.formato !== 'descriptivo' && this.ficha()!.formato !== 'extrinseca');
+  readonly usaIntensidad = computed(() => !!this.ficha() && this.ficha()!.formato !== 'afectivo' && this.ficha()!.formato !== 'extrinseca');
+  /** Puntaje CVA recalculado en vivo con los valores corregidos. */
+  readonly puntajeEditado = computed(() =>
+    this.usaCalidad()
+      ? calcularPuntajeCva(this.atributosEditables().map(a => a.calidad), this.impresionEditable(), this.tazasUEditable(), this.tazasDEditable())
+      : null
+  );
+
   /** Qué no pudo leer la IA (se calcula sobre lo leído, no sobre lo editado). */
   readonly avisoLectura = signal<string | null>(null);
 
@@ -174,6 +193,23 @@ export class ScannerModalComponent implements OnInit {
   }
 
   /* ── Paso D: revisión editable ────────────────────────────────────────── */
+  /** Intensidad 0–15 en pasos de 0.5 · calidad 1–9 entera (acepta coma decimal). */
+  cambiarAtributo(atributo: string, campo: 'intensidad' | 'calidad', valor: unknown): void {
+    const n = aNumero(valor);
+    const limpio = n === null ? null : campo === 'intensidad' ? sanearIntensidad(n) : sanearCalidad(n);
+    this.atributosEditables.update(lista => lista.map(a => (a.atributo === atributo ? { ...a, [campo]: limpio } : a)));
+  }
+
+  cambiarImpresion(valor: unknown): void {
+    const n = aNumero(valor);
+    this.impresionEditable.set(n === null ? null : sanearCalidad(n));
+  }
+
+  cambiarTazas(tipo: 'u' | 'd', valor: unknown): void {
+    const n = sanearTazas(aNumero(valor));
+    (tipo === 'u' ? this.tazasUEditable : this.tazasDEditable).set(n);
+  }
+
   cambiarNotas(valor: unknown): void {
     this.notasEditables.set(typeof valor === 'string' ? valor : '');
   }
@@ -251,6 +287,10 @@ export class ScannerModalComponent implements OnInit {
     const conDescriptores = ficha.formato === 'combinado' || ficha.formato === 'descriptivo';
     this.notasEditables.set(notas);
     this.descriptoresMarcados.set(marcados);
+    this.atributosEditables.set(ficha.atributos.map(a => ({ ...a })));
+    this.impresionEditable.set(ficha.impresionGlobal);
+    this.tazasUEditable.set(ficha.tazasNoUniformes);
+    this.tazasDEditable.set(ficha.tazasDefectuosas);
     const faltan = [!notas && 'notas', conDescriptores && marcados.size === 0 && 'descriptores'].filter(Boolean);
     this.avisoLectura.set(faltan.length
       ? `La IA no pudo leer ${faltan.join(' ni ')}. Por favor, agrégalos manualmente.`
@@ -262,7 +302,15 @@ export class ScannerModalComponent implements OnInit {
    * + descriptores (etiquetas SCA marcadas). Las listas por atributo se filtran
    * para no conservar casillas que el usuario desmarcó.
    */
-  private aplicarEdicion(ficha: FichaEscaneada): FichaEscaneada {
+  private aplicarEdicion(original: FichaEscaneada): FichaEscaneada {
+    // 1. Números corregidos → formulario + atributos + puntaje recalculado.
+    const ficha = aplicarCorrecciones(original, {
+      atributos: this.atributosEditables(),
+      impresionGlobal: this.impresionEditable(),
+      tazasNoUniformes: this.tazasUEditable(),
+      tazasDefectuosas: this.tazasDEditable()
+    });
+    // 2. Notas y descriptores corregidos.
     const formulario: Record<string, unknown> = structuredClone(ficha.formulario);
     formulario[ficha.formato === 'extrinseca' ? 'notes' : 'notas'] = this.notasEditables().trim();
     if (!this.usaDescriptores()) return { ...ficha, formulario };

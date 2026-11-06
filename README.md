@@ -44,7 +44,7 @@ Su objetivo es facilitar el trabajo coordinado de administradores, organizadores
 | Backend y autenticación | Supabase | Autenticación, acceso a datos y funciones RPC de PostgreSQL. |
 | Base de datos | PostgreSQL en Supabase | Usuarios, sesiones, evaluaciones, atributos y resultados. |
 | Visión e interpretación de fichas | Gemini Vision (API multimodal) | Analiza una imagen de ficha y devuelve los campos reconocidos en formato JSON. |
-| Reportes PDF | HTML/CSS, iframe aislado y API de impresión del navegador | Compone el reporte y permite imprimirlo o guardarlo como PDF desde el dispositivo. |
+| Reportes PDF | HTML/CSS, iframe aislado y API de impresión del navegador | Compone el reporte e invoca el diálogo de impresión. La descarga y el compartir PDF nativos en Android aún no están implementados. |
 | Pruebas y calidad | Vitest, Angular ESLint | Pruebas unitarias y análisis estático. |
 
 ## Arquitectura de datos y seguridad
@@ -56,13 +56,20 @@ La aplicación utiliza Supabase como cliente de la base de datos. El modelo refe
 - `evaluaciones`: respuestas y puntajes de cada catador y muestra.
 - `evaluacion_atributos`: atributos sensoriales registrados para las evaluaciones.
 
-Las rutas de la aplicación comprueban la autenticación y los roles, mientras que **Row Level Security (RLS)** debe proteger también el acceso a los datos en PostgreSQL. La autorización del cliente no sustituye a RLS: configure y verifique las políticas en el proyecto Supabase para que cada usuario solo pueda realizar las operaciones permitidas por su rol y participación en la sesión.
+Las rutas de la aplicación comprueban la autenticación y los roles, pero esa autorización del cliente no protege la base de datos. El repositorio no contiene el esquema base completo ni las políticas RLS de las tablas; por tanto, **no permite confirmar que el proyecto Supabase desplegado impida el acceso cruzado a los datos**. No anuncie privacidad o aislamiento garantizados hasta auditar las políticas efectivas en Supabase y probar, con cuentas y roles distintos, lecturas y escrituras permitidas y denegadas.
 
-Las migraciones versionadas en `supabase/migrations/` son incrementales; incluyen cambios en los resultados por formato y funciones RPC como `get_resumen_panel`, así como flujos de sesión personal para fichas escaneadas. `get_resumen_panel` centraliza la lectura agregada del panel de resultados. Las migraciones también definen funciones de servidor como `registrar_ficha_personal` y `unirse_sesion`. Revise cada migración y el esquema base del proyecto antes de aplicarlos: estos archivos no sustituyen una copia completa del esquema y las políticas RLS existentes.
+Las migraciones versionadas en `supabase/migrations/` son incrementales; incluyen cambios en los resultados por formato y funciones RPC como `get_resumen_panel`, así como flujos de sesión personal para fichas escaneadas. `get_resumen_panel` centraliza la lectura agregada del panel de resultados. Las migraciones también definen funciones de servidor como `registrar_ficha_personal` y `unirse_sesion`. Revise cada migración y el esquema base del proyecto antes de aplicarlos: estos archivos no sustituyen una copia completa del esquema ni definen las políticas RLS base.
+
+### Estado de seguridad y publicación
+
+- **Gemini:** el cliente invoca `analizar-ficha`, una Supabase Edge Function que exige un usuario autenticado no anónimo y lee `GEMINI_API_KEY` del entorno del servidor. La clave no debe incluirse en los archivos `environment` ni en el bundle. La autenticación por sí sola no limita el gasto: antes de ofrecer planes de pago, establezca límites de uso por usuario, monitorización y alertas de cuota/coste.
+- **RLS:** pendiente de verificación contra el proyecto Supabase real. Las comprobaciones de roles del frontend y las funciones RPC no sustituyen políticas RLS correctas.
+- **Android:** `capacitor.config.ts` y `applicationId` usan `com.pacamaraqs.app`, pero el `namespace` de Gradle y el paquete de `MainActivity` todavía usan `io.ionic.starter`. Revise y alinee estos identificadores antes de distribuir la aplicación.
+- **PDF en Android:** la implementación actual abre el diálogo de impresión del navegador. No crea un archivo PDF mediante `@capacitor/filesystem` ni lo comparte mediante `@capacitor/share`; el flujo de descarga/compartición nativa sigue pendiente.
 
 ### Arquitectura de reportes
 
-Los reportes se componen en HTML con estilos de impresión y se abren en un `iframe` aislado. Desde ahí se invoca el diálogo de impresión del navegador o sistema operativo, donde el usuario puede elegir **Guardar como PDF**. Los formatos combinado y descriptivo incluyen una presentación basada en la hoja CVA/SCA correspondiente. La generación del PDF ocurre en el dispositivo; no depende de un servicio de renderizado PDF en el backend.
+Los reportes se componen en HTML con estilos de impresión y se abren en un `iframe` aislado. Desde ahí se invoca el diálogo de impresión del navegador o sistema operativo, donde el usuario puede elegir **Guardar como PDF** si el dispositivo ofrece esa opción. Los formatos combinado y descriptivo incluyen una presentación basada en la hoja CVA/SCA correspondiente. Esta implementación no genera un archivo PDF compartible mediante las APIs nativas de Capacitor; en particular, el flujo requerido para guardar y compartir el PDF desde Android todavía debe implementarse.
 
 ## Estructura del proyecto
 
@@ -89,7 +96,9 @@ PacamaraQs/
 │   │       └── components/          # Componentes compartidos, incluido el escáner
 │   └── environments/                # Configuración de desarrollo y producción
 ├── supabase/
+│   ├── functions/                   # Edge Functions, incluida analizar-ficha
 │   └── migrations/                  # Migraciones SQL incrementales
+├── ios/                             # Proyecto nativo de iOS (Capacitor)
 ├── capacitor.config.ts              # Configuración de Capacitor
 ├── ionic.config.json                # Configuración de Ionic
 └── package.json                     # Dependencias y comandos del proyecto
@@ -102,7 +111,7 @@ PacamaraQs/
 - Node.js y npm en versiones compatibles con Angular 22.
 - Ionic CLI. Si no está instalado: `npm install -g @ionic/cli`.
 - Acceso a un proyecto Supabase configurado con el esquema y las políticas que requiere la aplicación.
-- Una clave de Gemini para probar el análisis real de imágenes. Sin una clave configurada, el escáner puede utilizar su modo simulado.
+- Una clave de Gemini configurada como secreto en Supabase para probar el análisis real. El modo simulado se activa explícitamente mediante `escanerSimulado`; la falta de una clave no activa automáticamente ese modo.
 
 ### 1. Clonar e instalar
 
@@ -121,18 +130,24 @@ export const environment = {
   production: false,
   supabaseUrl: 'https://<tu-proyecto>.supabase.co',
   supabaseKey: '<tu-clave-publicable-de-supabase>',
-  geminiApiKey: '<tu-GEMINI_API_KEY>',
-  geminiModel: '<modelo-gemini-compatible>'
+  escanerSimulado: false
 };
 ```
 
-El ejemplo muestra los nombres de propiedades que consume actualmente el código; reemplaza los valores de ejemplo y conserva la configuración de producción apropiada en `environment.prod.ts`.
+`environment.prod.ts` debe conservar `production: true`. `escanerSimulado: true` devuelve datos de ejemplo y no llama a la IA. La aplicación no consume `geminiApiKey` ni `geminiModel` desde estos archivos.
 
 > **Seguridad de credenciales**
 >
 > - En el cliente utiliza únicamente la clave publicable de Supabase y protege las tablas con RLS. **Nunca** incluyas una clave `service_role` en `environment.ts` ni en archivos distribuidos al navegador.
-> - El escáner actual llama a Gemini directamente desde el cliente. Una `geminiApiKey` real incluida en un `environment.ts` queda expuesta en el bundle de la aplicación: limita este uso a desarrollo y no publiques esa clave.
-> - Para producción, almacena `GEMINI_API_KEY` como secreto de una **Supabase Edge Function** autenticada y envía el análisis a través de esa función. Los secretos de Supabase no son leídos directamente por la aplicación web; configurarlos por sí solos requiere implementar y desplegar esa función. No hay que confundir los secretos del backend con la clave publicable de Supabase que utiliza el cliente.
+> - El escáner ya envía el formato y la imagen a la Edge Function `analizar-ficha`; la función consulta Gemini con el secreto `GEMINI_API_KEY`. No configures una clave de Gemini en el cliente.
+> - Configura el secreto y despliega la función para el proyecto Supabase que corresponda:
+>
+>   ```bash
+>   supabase secrets set GEMINI_API_KEY=<tu-clave>
+>   supabase functions deploy analizar-ficha
+>   ```
+>
+> - La función exige autenticación, pero el código actual no implementa límites de frecuencia o cuota por usuario. Añádelos y prueba los límites de gasto antes de vender planes de pago.
 > - No subas claves privadas al repositorio. Usa valores de prueba o marcadores en los archivos de ejemplo y rota cualquier credencial que se haya expuesto.
 
 Las migraciones de `supabase/migrations/` deben revisarse y aplicarse en el orden previsto sobre el proyecto Supabase antes de utilizar las funciones correspondientes.
@@ -151,9 +166,9 @@ npm start
 
 ## Escáner de fichas físicas e IA
 
-El escáner permite cargar o tomar una fotografía de una ficha física. La aplicación prepara la imagen, la envía a Gemini Vision con instrucciones específicas para el formato seleccionado y procesa la respuesta estructurada. Admite fichas combinadas, descriptivas, afectivas y extrínsecas. Antes de guardar, los datos se normalizan y se presentan para revisión; la evaluación no debe considerarse verificada hasta que la persona usuaria confirme la información reconocida.
+El escáner permite cargar o tomar una fotografía de una ficha física. La aplicación prepara la imagen y la envía, junto con el formato seleccionado, a la Edge Function `analizar-ficha`; esta construye las instrucciones y llama a Gemini Vision. El cliente procesa la respuesta estructurada. Admite fichas combinadas, descriptivas, afectivas y extrínsecas. Antes de guardar, los datos se normalizan y se presentan para revisión; la evaluación no debe considerarse verificada hasta que la persona usuaria confirme la información reconocida.
 
-Si no hay una clave real de Gemini configurada, el servicio puede devolver una ficha de ejemplo en modo simulado para probar el flujo de revisión y guardado. Para proteger la cuota y la clave, las versiones publicadas deben realizar la llamada a la IA desde una función backend autenticada, no desde el navegador.
+Si `escanerSimulado` está activado, el servicio devuelve una ficha de ejemplo para probar el flujo de revisión y guardado. Si el modo simulado está desactivado y la función no tiene configurada la clave, el análisis falla con un error de configuración. Aunque la llamada a Gemini ya se realiza en backend, la función todavía requiere controles de uso y gasto antes de ofrecer el escáner en planes de pago.
 
 ## Pruebas y compilación
 

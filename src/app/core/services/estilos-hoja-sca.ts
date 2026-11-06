@@ -190,16 +190,35 @@ export const ESTILOS_HOJA_SCA = `
   /* ── Pie legal ──────────────────────────────────────────────────────── */
   .sca-legal { margin-top: 1.8mm; color: #555b63; font-size: 5.6pt; line-height: 1.3; }
   app-sca-report-template { display: block; }
-  /* Afectivo (Parte 2) */
-  .sca-afe { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.5mm 4mm; margin-top: 3mm; }
-  .sca-afe__attr { display: flex; flex-direction: column; gap: 1.2mm; }
-  .sca-afe__attr b { font-size: 9.5pt; }
-  .sca-afe__cups { display: flex; gap: 8mm; grid-column: 1 / -1; font-size: 8pt; }
+  /* ── Afectivo (Parte 2): rejilla con recuadros y líneas como la hoja SCA ── */
+  .sca-afe { display: grid; grid-template-columns: 38mm 62mm minmax(0, 1fr); margin-top: 2mm; border: var(--sca-line); }
+  .sca-afe > div { border-bottom: var(--sca-line); }
+  .sca-afe > div:not(:nth-child(3n)):not(.sca-afe__cups):not(.sca-afe__otras) { border-right: var(--sca-line); }
+  .sca-afe__hd { padding: 1.2mm 2.4mm; background: var(--sca-slate); color: #fff; font-size: 7.5pt; font-weight: 700; }
+  .sca-afe__name { display: flex; align-items: center; min-height: 13mm; padding: 0 2.5mm; }
+  .sca-afe__name b { color: var(--sca-slate); font-size: 10pt; font-weight: 800; }
+  .sca-afe__name--global { background: #f3f3f5; }
+  .sca-afe__circ { display: flex; align-items: center; padding: 0 2mm; }
+  .sca-afe__note { padding: 1.5mm 2mm; font-size: 6.5pt; line-height: 1.35;
+    background: repeating-linear-gradient(transparent 0 3.6mm, #c9ccd1 3.6mm 3.8mm); }
+  .sca-afe__cups { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 2mm 8mm; padding: 2mm 2.5mm; font-size: 7pt; }
   .sca-afe__cups > div { display: flex; align-items: center; gap: 2mm; }
-  .sca-afe__full { grid-column: 1 / -1; }
-  /* Extrínseco */
+  .sca-afe__def { flex-wrap: wrap; }
+  .sca-afe__otras { grid-column: 1 / -1; min-height: 32mm; border-bottom: none !important; }
+  .sca-afe__otras .sca-notes__text { padding: 1.5mm 2.5mm; }
+
+  /* ── Extrínseco: recuadros de la hoja oficial (Cultivo, Procesamiento, Comercio, Certificaciones) ── */
   .sca-ext--break { break-before: page; page-break-before: always; }
-  .sca-ext__sec { margin-top: 3mm; break-inside: avoid; }
-  .sca-ext__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 6mm; margin-top: 2mm; }
-  .sca-ext__certs { display: flex; flex-wrap: wrap; gap: 2mm 6mm; margin-top: 2mm; }
+  .sca-ext__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 2mm; }
+  .sca-ext__box { border: 0.4mm solid #000; break-inside: avoid; }
+  .sca-ext__box--full { grid-column: 1 / -1; }
+  .sca-ext__title { margin: 0; padding: 1.2mm 2.4mm; background: var(--sca-slate); color: #fff; font-size: 8pt; font-weight: 700; letter-spacing: .02em; }
+  .sca-ext__table { width: 100%; border-collapse: collapse; }
+  .sca-ext__table th, .sca-ext__table td { height: 7mm; padding: 0.8mm 2mm; border-top: 0.25mm solid #000; vertical-align: bottom; font-size: 7.5pt; text-align: left; }
+  .sca-ext__table th { width: 38%; border-right: 0.25mm solid #000; color: var(--sca-slate); font-weight: 700; text-transform: uppercase; font-size: 6.3pt; }
+  .sca-ext__certs { display: flex; flex-direction: column; gap: 2.2mm; padding: 2.5mm; font-size: 8pt; }
+  .sca-ext__otra { display: flex; gap: 2mm; align-items: baseline; }
+  .sca-ext__otra b { flex: 1; min-height: 4mm; border-bottom: 0.25mm solid #000; font-weight: 500; }
+  .sca-ext__notes { min-height: 30mm; margin: 0; padding: 2mm 2.5mm; font-size: 7.5pt;
+    background: repeating-linear-gradient(transparent 0 5mm, #000 5mm 5.25mm); }
 `;

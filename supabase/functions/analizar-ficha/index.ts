@@ -71,8 +71,10 @@ const ESQUEMAS: Record<string, { titulo: string; esquema: string }> = {
   "farming":    { "country": string, "region": string, "farmName": string, "producers": string,
                   "species": string, "variety": string, "harvestDate": string, "other": string },
   "processing": { "processorName": string, "wetMill": string, "dryMill": string,
-                  "processType": "lavado"|"natural"|"otro"|"", "other": string },
-  "trading":    { "grade": string, "icoNumber": string, "farmPrice": number|null, "lotSizeKg": number|null, "other": string },
+                  "processType": "lavado"|"natural"|"honey"|"honey_amarillo"|"honey_rojo"|"honey_negro"|"semilavado"|"descascarado_humedo"|"anaerobico"|"fermentacion_lactica"|"maceracion_carbonica"|"doble_fermentacion"|"infusionado"|"otro"|"",
+                  "decaf": string, "description": string, "other": string },
+  "trading":    { "importer": string, "exporter": string, "grade": string, "icoNumber": string,
+                  "farmPrice": number|null, "currency": string, "lotSizeKg": number|null, "other": string },
   "certifications": { "c4": boolean, "fairTrade": boolean, "organic": boolean, "rainforest": boolean, "other": string },
   "notes": string
 }`
@@ -93,7 +95,7 @@ function construirPrompt(formato: string): string {
     '- Calidad e impresión global: entero de 1 a 9 (el círculo marcado).',
     '- Tazas no uniformes / defectuosas: entero de 0 a 5 (casillas marcadas).',
     '- Gustos predominantes: máximo 2 entre "salado", "amargo", "acido", "umami", "dulce".',
-    '- Precio y tamaño de lote: solo el número (sin símbolos de moneda ni unidades).',
+    '- Precio y tamaño de lote: solo el número (sin símbolos de moneda ni unidades). "currency": código ISO de 3 letras de la moneda escrita (COP si no se indica).',
     '- DESCRIPTORES (obligatorio revisar): recorre UNA POR UNA las casillas de las listas Floral, Afrutado (Bayas, Frutas deshidratadas, Cítricos), Ácido/Fermentado (Ácido, Fermentado), Verde/Vegetal, Otra (Químico, Humedad/Tierra, Madera), Tostado (Cereal, Quemado, Tabaco), Nueces/Cacao (Nueces, Cacao), Especias y Dulce (Vainilla, Azúcar morena).',
     '  Una casilla está marcada si tiene ✓, X, relleno, círculo o tachón a mano. En "descriptores" devuelve el nombre exacto de CADA casilla marcada de toda la hoja (sin repetir); si un bloque de atributo tiene su propia lista, repítelo también en su "descriptores".',
     '- Textura y defectos: copia el nombre de cada casilla marcada tal como aparece en la ficha.',
