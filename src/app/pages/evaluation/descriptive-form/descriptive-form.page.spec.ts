@@ -27,8 +27,8 @@ describe('DescriptiveFormPage', () => {
   });
 
   it('starts intensity scales at zero and has no hedonic score', () => {
-    expect(component.formulario.fragancia.intensidad).toBe(0);
-    expect(component.formulario.acidez.intensidad).toBe(0);
+    expect(component.formulario.fragancia.intensidad).toBeNull();
+    expect(component.formulario.acidez.intensidad).toBeNull();
     expect(component.formulario.fragancia.extra).toBe('');
     expect(component).not.toHaveProperty('puntaje');
   });

@@ -30,13 +30,13 @@ addIcons({
 
 // --- INTERFACES Y TIPOS ---
 export interface AtributoConDescriptores {
-  intensidad: number;
+  intensidad: number | null;
   calidad: number;
   descriptores: string[];
   extra: string;
 }
 export interface AtributoSimple {
-  intensidad: number;
+  intensidad: number | null;
   calidad: number;
 }
 export interface AtributosCombinado {
@@ -92,13 +92,13 @@ export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
   override crearFormularioVacio(): FormularioCombinado {
     return {
       atributos: {
-        fragancia: { intensidad: 0, calidad: 0, descriptores: [], extra: '' },
-        aroma: { intensidad: 0, calidad: 0, descriptores: [], extra: '' },
-        sabor: { intensidad: 0, calidad: 0, descriptores: [], extra: '' },
-        saborResidual: { intensidad: 0, calidad: 0, descriptores: [], extra: '' },
-        acidez: { intensidad: 0, calidad: 0 },
-        dulzor: { intensidad: 0, calidad: 0 },
-        sensacionEnBoca: { intensidad: 0, calidad: 0 },
+        fragancia: { intensidad: null, calidad: 0, descriptores: [], extra: '' },
+        aroma: { intensidad: null, calidad: 0, descriptores: [], extra: '' },
+        sabor: { intensidad: null, calidad: 0, descriptores: [], extra: '' },
+        saborResidual: { intensidad: null, calidad: 0, descriptores: [], extra: '' },
+        acidez: { intensidad: null, calidad: 0 },
+        dulzor: { intensidad: null, calidad: 0 },
+        sensacionEnBoca: { intensidad: null, calidad: 0 },
       },
       gustosPredominantes: [],
       impresionGlobal: 0,

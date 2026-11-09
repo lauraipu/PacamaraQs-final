@@ -102,6 +102,8 @@ export class ResultsService {
       formatoCva: sesion.formato,
       fechaCierre: new Date().toISOString(),
       esPersonal: (sesionData as { es_personal?: boolean }).es_personal === true,
+      codigoSesion: sesion.codigoAcceso ?? undefined,
+      creadaEn: sesion.creadaEn ?? undefined,
       totalMuestras: sesion.numeroMuestras,
       totalCatadores: catadores.length,
       muestras,

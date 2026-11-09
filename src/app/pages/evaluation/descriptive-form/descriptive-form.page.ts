@@ -14,7 +14,7 @@ addIcons({ arrowBackOutline, chevronDownOutline, chevronForwardOutline });
 type AtributoAromatico = 'fragancia' | 'aroma' | 'sabor' | 'saborResidual';
 
 interface AtributoConDescriptores {
-  intensidad: number;
+  intensidad: number | null;
   descriptores: string[];
   extra: string;
 }
@@ -24,9 +24,9 @@ interface FormularioDescriptivo {
   aroma: AtributoConDescriptores;
   sabor: AtributoConDescriptores;
   saborResidual: AtributoConDescriptores;
-  acidez: { intensidad: number; nota: string };
-  dulzor: { intensidad: number; nota: string };
-  sensacionEnBoca: { intensidad: number; textura: string[] };
+  acidez: { intensidad: number | null; nota: string };
+  dulzor: { intensidad: number | null; nota: string };
+  sensacionEnBoca: { intensidad: number | null; textura: string[] };
   /** Hoja SCA "Gustos Predominantes (2)": máximo 2 de salado/amargo/acido/umami/dulce. */
   gustosPredominantes: string[];
   notas: string;
@@ -54,15 +54,15 @@ export class DescriptiveFormPage extends BaseCataForm<FormularioDescriptivo> {
   categoriasAbiertas: Record<string, boolean> = { Floral: true };
 
   override crearFormularioVacio(): FormularioDescriptivo {
-    const atributoVacio = (): AtributoConDescriptores => ({ intensidad: 0, descriptores: [], extra: '' });
+    const atributoVacio = (): AtributoConDescriptores => ({ intensidad: null, descriptores: [], extra: '' });
     return {
       fragancia: atributoVacio(),
       aroma: atributoVacio(),
       sabor: atributoVacio(),
       saborResidual: atributoVacio(),
-      acidez: { intensidad: 0, nota: '' },
-      dulzor: { intensidad: 0, nota: '' },
-      sensacionEnBoca: { intensidad: 0, textura: [] },
+      acidez: { intensidad: null, nota: '' },
+      dulzor: { intensidad: null, nota: '' },
+      sensacionEnBoca: { intensidad: null, textura: [] },
       gustosPredominantes: [],
       notas: ''
     };

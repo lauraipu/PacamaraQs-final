@@ -72,6 +72,17 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
 
   respuestas: T[] = [];
   abstract formulario: T;
+
+  /**
+   * Las intensidades arrancan en null ("sin marcar") para distinguir un 0 real
+   * de un control que nadie tocó. Un toque sin arrastrar no dispara `input`,
+   * así que aquí se registra el valor visible del slider.
+   */
+  marcarIntensidad(bloque: { intensidad: number | null }, evento: Event): void {
+    if (bloque.intensidad !== null) return;
+    const valor = Number((evento.target as HTMLInputElement | null)?.value);
+    if (Number.isFinite(valor)) bloque.intensidad = valor;
+  }
   protected sesionId = '';
 
   private sala: SalaRealtime | null = null;

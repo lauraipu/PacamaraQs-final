@@ -65,6 +65,10 @@ export interface SessionResults {
   fechaCierre: string;
   /** Sesión Personal (ficha escaneada): 1 catador, sin panel. */
   esPersonal?: boolean;
+  /** Código de la sesión (para el nombre del archivo exportado). */
+  codigoSesion?: string;
+  /** Fecha de creación de la sesión (ISO). */
+  creadaEn?: string;
   totalMuestras: number;
   totalCatadores: number;
   muestras: SampleConsolidatedResult[];

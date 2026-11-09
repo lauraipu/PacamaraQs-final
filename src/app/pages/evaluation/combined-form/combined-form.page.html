@@ -59,11 +59,11 @@
           <div class="intensity-slider">
             <div class="intensity-slider__header">
               <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.fragancia.intensidad | number:'1.1-1' }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.fragancia.intensidad === null ? 'Sin marcar' : (formulario.atributos.fragancia.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
               <span class="intensity-slider__endpoint">Baja</span>
-              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario.atributos.fragancia.intensidad">
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.fragancia.intensidad === null" [(ngModel)]="formulario.atributos.fragancia.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.fragancia, $event)" (keyup)="marcarIntensidad(formulario.atributos.fragancia, $event)">
               <span class="intensity-slider__endpoint">Alta</span>
             </div>
           </div>
@@ -125,11 +125,11 @@
           <div class="intensity-slider">
             <div class="intensity-slider__header">
               <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.aroma.intensidad | number:'1.1-1' }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.aroma.intensidad === null ? 'Sin marcar' : (formulario.atributos.aroma.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
               <span class="intensity-slider__endpoint">Baja</span>
-              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario.atributos.aroma.intensidad">
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.aroma.intensidad === null" [(ngModel)]="formulario.atributos.aroma.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.aroma, $event)" (keyup)="marcarIntensidad(formulario.atributos.aroma, $event)">
               <span class="intensity-slider__endpoint">Alta</span>
             </div>
           </div>
@@ -150,11 +150,11 @@
           <div class="intensity-slider">
             <div class="intensity-slider__header">
               <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.sabor.intensidad | number:'1.1-1' }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.sabor.intensidad === null ? 'Sin marcar' : (formulario.atributos.sabor.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
               <span class="intensity-slider__endpoint">Baja</span>
-              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario.atributos.sabor.intensidad">
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.sabor.intensidad === null" [(ngModel)]="formulario.atributos.sabor.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.sabor, $event)" (keyup)="marcarIntensidad(formulario.atributos.sabor, $event)">
               <span class="intensity-slider__endpoint">Alta</span>
             </div>
           </div>
@@ -175,11 +175,11 @@
           <div class="intensity-slider">
             <div class="intensity-slider__header">
               <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.saborResidual.intensidad | number:'1.1-1' }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.saborResidual.intensidad === null ? 'Sin marcar' : (formulario.atributos.saborResidual.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
               <span class="intensity-slider__endpoint">Baja</span>
-              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario.atributos.saborResidual.intensidad">
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.saborResidual.intensidad === null" [(ngModel)]="formulario.atributos.saborResidual.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.saborResidual, $event)" (keyup)="marcarIntensidad(formulario.atributos.saborResidual, $event)">
               <span class="intensity-slider__endpoint">Alta</span>
             </div>
           </div>
@@ -210,11 +210,11 @@
           <div class="intensity-slider">
             <div class="intensity-slider__header">
               <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.acidez.intensidad | number:'1.1-1' }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.acidez.intensidad === null ? 'Sin marcar' : (formulario.atributos.acidez.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
               <span class="intensity-slider__endpoint">Baja</span>
-              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario.atributos.acidez.intensidad">
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.acidez.intensidad === null" [(ngModel)]="formulario.atributos.acidez.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.acidez, $event)" (keyup)="marcarIntensidad(formulario.atributos.acidez, $event)">
               <span class="intensity-slider__endpoint">Alta</span>
             </div>
           </div>
@@ -235,11 +235,11 @@
           <div class="intensity-slider">
             <div class="intensity-slider__header">
               <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.dulzor.intensidad | number:'1.1-1' }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.dulzor.intensidad === null ? 'Sin marcar' : (formulario.atributos.dulzor.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
               <span class="intensity-slider__endpoint">Baja</span>
-              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario.atributos.dulzor.intensidad">
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.dulzor.intensidad === null" [(ngModel)]="formulario.atributos.dulzor.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.dulzor, $event)" (keyup)="marcarIntensidad(formulario.atributos.dulzor, $event)">
               <span class="intensity-slider__endpoint">Alta</span>
             </div>
           </div>
@@ -260,11 +260,11 @@
           <div class="intensity-slider">
             <div class="intensity-slider__header">
               <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.sensacionEnBoca.intensidad | number:'1.1-1' }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.sensacionEnBoca.intensidad === null ? 'Sin marcar' : (formulario.atributos.sensacionEnBoca.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
               <span class="intensity-slider__endpoint">Baja</span>
-              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [(ngModel)]="formulario.atributos.sensacionEnBoca.intensidad">
+              <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.sensacionEnBoca.intensidad === null" [(ngModel)]="formulario.atributos.sensacionEnBoca.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.sensacionEnBoca, $event)" (keyup)="marcarIntensidad(formulario.atributos.sensacionEnBoca, $event)">
               <span class="intensity-slider__endpoint">Alta</span>
             </div>
           </div>

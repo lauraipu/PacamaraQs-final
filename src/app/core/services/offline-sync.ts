@@ -308,41 +308,29 @@ export class OfflineSyncService {
     }
   }
 
+  /**
+   * Ficha + atributos en UNA transacción (RPC registrar_evaluacion).
+   * Antes eran dos escrituras: si esta ficha completaba el panel, el trigger
+   * cerraba la sesión entre ambas y RLS rechazaba los atributos (le pasaba
+   * siempre al último en enviar). El puntaje lo recalcula el servidor.
+   */
   private async persistir(ficha: FichaEvaluacion): Promise<void> {
-    const { data, error } = await this.supabase.client
-      .from('evaluaciones')
-      .upsert(
-        {
-          sesion_id: ficha.sesionId,
-          catador_id: ficha.catadorId,
-          numero_muestra: ficha.numeroMuestra,
-          impresion_global: ficha.impresionGlobal,
-          tazas_no_uniformes: ficha.tazasNoUniformes,
-          tazas_defectuosas: ficha.tazasDefectuosas,
-          puntaje_final: ficha.puntajeFinal,
-          notas: ficha.notas
-        },
-        { onConflict: 'sesion_id,catador_id,numero_muestra' }
-      )
-      .select('id')
-      .single();
-
-    if (error) throw error;
-    const evaluacionId = (data as { id?: string } | null)?.id;
-    if (!evaluacionId) throw new Error('Supabase no devolvió el ID de la evaluación.');
-
-    const filas = ficha.atributos
+    const atributos = ficha.atributos
       .map(atributo => this.normalizarAtributo(atributo))
-      .filter((fila): fila is NonNullable<typeof fila> => fila !== null)
-      .map(fila => ({ evaluacion_id: evaluacionId, ...fila }));
+      .filter((fila): fila is NonNullable<typeof fila> => fila !== null);
 
-    if (filas.length === 0) return;
-
-    const { error: errorAtributos } = await this.supabase.client
-      .from('evaluacion_atributos')
-      .upsert(filas, { onConflict: 'evaluacion_id,atributo' });
-
-    if (errorAtributos) throw errorAtributos;
+    const { error } = await this.supabase.client.rpc('registrar_evaluacion', {
+      p_sesion_id: ficha.sesionId,
+      p_numero_muestra: ficha.numeroMuestra,
+      p_ficha: {
+        impresion_global: ficha.impresionGlobal,
+        tazas_no_uniformes: ficha.tazasNoUniformes,
+        tazas_defectuosas: ficha.tazasDefectuosas,
+        atributos,
+        notas: ficha.notas
+      }
+    });
+    if (error) throw error;
   }
 
   private normalizarAtributo(

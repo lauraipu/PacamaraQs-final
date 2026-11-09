@@ -781,7 +781,7 @@ export class ResultsPage implements OnInit {
       header: '¿En qué formato deseas exportar?',
       buttons: [
         { text: 'PDF', icon: 'document-text-outline', role: 'pdf' },
-        { text: 'Excel (.csv)', icon: 'grid-outline', role: 'csv' },
+        { text: 'Excel (.xlsx)', icon: 'grid-outline', role: 'xlsx' },
         { text: 'Cancelar', role: 'cancel', icon: 'close-outline' }
       ]
     });
@@ -790,13 +790,50 @@ export class ResultsPage implements OnInit {
     // impresión con el action sheet aún animándose dejaba un backdrop encima.
     const { role } = await menu.onDidDismiss();
     if (role === 'pdf') this.exportarPdfSegunFormato();
-    else if (role === 'csv') this.exportarCsv();
+    else if (role === 'xlsx') await this.exportarXlsx();
   }
 
   /** Combinado/Descriptivo abren el modal de la hoja SCA; los demás imprimen directo. */
   exportarPdfSegunFormato(): void {
     if (this.formatoHoja()) this.abrirExportar();
     else void this.exportarPDF();
+  }
+
+  /**
+   * Excel por hojas (Sesión, Resumen, Afectivo, Descriptivo, Datos crudos).
+   * Si exceljs no carga (p. ej. sin conexión la primera vez), se ofrece el CSV.
+   */
+  async exportarXlsx(): Promise<void> {
+    const r = this.resultados();
+    if (!r || this.imprimiendo()) return;
+    this.imprimiendo.set(true);
+    try {
+      const { generarReporteXlsx } = await import('../../../core/export/reporte-xlsx');
+      const { blob, nombre } = await generarReporteXlsx(r);
+      this.descargar(blob, nombre);
+    } catch (error) {
+      console.error('[results] xlsx', error);
+      const toast = await this.toastCtrl.create({
+        message: 'No se pudo generar el Excel. Se descargará en formato CSV.',
+        duration: 3000,
+        color: 'warning'
+      });
+      await toast.present();
+      this.exportarCsv();
+    } finally {
+      this.imprimiendo.set(false);
+    }
+  }
+
+  private descargar(blob: Blob, nombre: string): void {
+    const url = URL.createObjectURL(blob);
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = nombre;
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   /**

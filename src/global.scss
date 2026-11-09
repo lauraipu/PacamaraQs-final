@@ -212,3 +212,6 @@ app-create-session {
   font-family: var(--app-font-mono);
   letter-spacing: 0.2em;
 }
+
+/* Slider de intensidad sin marcar (null): se distingue de un 0 real. */
+.intensity-slider__input--vacio { opacity: .45; filter: grayscale(1); }
