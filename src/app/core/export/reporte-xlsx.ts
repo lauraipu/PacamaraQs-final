@@ -1,5 +1,6 @@
 import type { Workbook, Worksheet } from 'exceljs';
 import { CupperResultSummary, SessionResults } from '../models/session-results.model';
+import { tr } from '../i18n/tr';
 
 /**
  * Reporte Excel (.xlsx) de una sesión, de lo general al detalle:
@@ -107,27 +108,27 @@ const bloque = (f: Fila, form: string): Registro => reg(reg(f.formulario['atribu
 const calidadesCompletas = (f: Fila): boolean =>
   ATRIBUTOS.every(a => f.atributos[a.db]?.calidad != null) && f.impresionGlobal != null;
 
-const rol = (c: CupperResultSummary): string => (c.esOrganizador ? 'Organizador' : 'Catador');
+const rol = (c: CupperResultSummary): string => tr(c.esOrganizador ? 'Organizador' : 'Catador');
 
 /* ── Hojas ──────────────────────────────────────────────────────────────── */
 
 function hojaSesion(libro: Workbook, r: SessionResults, codigo: string, exportado: Date, fichas: Fila[]): void {
-  const h = libro.addWorksheet('Sesión');
-  h.columns = [{ header: 'Campo', key: 'campo', width: 24 }, { header: 'Valor', key: 'valor', width: 48 }];
+  const h = libro.addWorksheet(tr('Sesión'));
+  h.columns = [{ header: tr('Campo'), key: 'campo', width: 24 }, { header: tr('Valor'), key: 'valor', width: 48 }];
   const organizador = r.catadores.find(c => c.esOrganizador)?.nombre ?? '';
   const filas: [string, string | number][] = [
-    ['Sesión', r.nombreSesion],
-    ['Código', codigo],
-    ['Formato', TITULO_FORMATO[r.formatoCva] ?? r.formatoCva],
-    ['Fecha de la sesión', r.creadaEn ? new Date(r.creadaEn).toLocaleDateString('es-CO') : ''],
-    ['Exportado el', exportado.toLocaleString('es-CO')],
-    ['Organizador', organizador],
-    ['Catadores', r.catadores.length],
-    ['Muestras', r.totalMuestras],
-    ['Fichas recibidas', fichas.length],
-    ['Nivel de tueste', [...new Set(r.muestras.map(m => m.nivelTueste).filter(Boolean))].join(', ')],
-    ['Metodología', 'SCA Coffee Value Assessment (CVA) v2 · S = 0,65625·Σhᵢ + 52,75 − 2u − 4d'],
-    ['Promedio del panel', 'Incluye al organizador cuando participa como catador. Con 5 o más fichas se descartan máximo y mínimo.']
+    [tr('Sesión'), r.nombreSesion],
+    [tr('Código'), codigo],
+    [tr('Formato'), tr(TITULO_FORMATO[r.formatoCva] ?? r.formatoCva)],
+    [tr('Fecha de la sesión'), r.creadaEn ? new Date(r.creadaEn).toLocaleDateString('es-CO') : ''],
+    [tr('Exportado el'), exportado.toLocaleString('es-CO')],
+    [tr('Organizador'), organizador],
+    [tr('Catadores'), r.catadores.length],
+    [tr('Muestras'), r.totalMuestras],
+    [tr('Fichas recibidas'), fichas.length],
+    [tr('Nivel de tueste'), [...new Set(r.muestras.map(m => m.nivelTueste).filter(Boolean))].join(', ')],
+    [tr('Metodología'), 'SCA Coffee Value Assessment (CVA) v2 · S = 0,65625·Σhᵢ + 52,75 − 2u − 4d'],
+    [tr('Promedio del panel'), tr('Incluye al organizador cuando participa como catador. Con 5 o más fichas se descartan máximo y mínimo.')]
   ];
   filas.forEach(([campo, valor]) => h.addRow({ campo, valor }));
   estilizar(h, false);
@@ -135,18 +136,18 @@ function hojaSesion(libro: Workbook, r: SessionResults, codigo: string, exportad
 }
 
 function hojaResumen(libro: Workbook, r: SessionResults, fichas: Fila[], formato: FormatoId): void {
-  const h = libro.addWorksheet('Resumen por muestra');
+  const h = libro.addWorksheet(tr('Resumen por muestra'));
   h.columns = [
-    { header: 'Muestra', key: 'muestra', width: 9 },
-    { header: 'Nivel de tueste', key: 'tueste', width: 15 },
-    { header: 'Promedio panel', key: 'promedio', width: 15, style: { numFmt: '0.00' } },
-    { header: 'Desv. estándar', key: 'desv', width: 14, style: { numFmt: '0.00' } },
-    { header: 'Mín', key: 'min', width: 9, style: { numFmt: '0.00' } },
-    { header: 'Máx', key: 'max', width: 9, style: { numFmt: '0.00' } },
-    { header: 'Rango', key: 'rango', width: 9, style: { numFmt: '0.00' } },
-    { header: 'Fichas', key: 'n', width: 9 },
-    { header: 'Promedio recortado', key: 'recortado', width: 18 },
-    { header: 'Alertas', key: 'alertas', width: 60 }
+    { header: tr('Muestra'), key: 'muestra', width: 9 },
+    { header: tr('Nivel de tueste'), key: 'tueste', width: 15 },
+    { header: tr('Promedio panel'), key: 'promedio', width: 15, style: { numFmt: '0.00' } },
+    { header: tr('Desv. estándar'), key: 'desv', width: 14, style: { numFmt: '0.00' } },
+    { header: tr('Mín'), key: 'min', width: 9, style: { numFmt: '0.00' } },
+    { header: tr('Máx'), key: 'max', width: 9, style: { numFmt: '0.00' } },
+    { header: tr('Rango'), key: 'rango', width: 9, style: { numFmt: '0.00' } },
+    { header: tr('Fichas'), key: 'n', width: 9 },
+    { header: tr('Promedio recortado'), key: 'recortado', width: 18 },
+    { header: tr('Alertas'), key: 'alertas', width: 60 }
   ];
   for (const m of [...r.muestras].sort((a, b) => a.numeroMuestra - b.numeroMuestra)) {
     const deMuestra = fichas.filter(f => f.numeroMuestra === m.numeroMuestra);
@@ -158,10 +159,10 @@ function hojaResumen(libro: Workbook, r: SessionResults, fichas: Fila[], formato
 
     const alertas: string[] = [];
     const incompletas = formato === 'descriptivo' ? [] : deMuestra.filter(f => f.puntaje !== null && !calidadesCompletas(f));
-    if (incompletas.length) alertas.push(`⚠ Ficha incompleta (sin atributos guardados): ${incompletas.map(f => f.catador.nombre).join(', ')}`);
-    if (usaPuntaje && (m.desviacionEstandar >= DISPERSION_DESV || (rango ?? 0) >= DISPERSION_RANGO)) alertas.push('⚠ Dispersión alta en el panel');
-    if (m.evaluacionesRecibidas < m.evaluacionesEsperadas) alertas.push('Faltan fichas');
-    if (m.cerradaForzada) alertas.push('Cerrada por el organizador');
+    if (incompletas.length) alertas.push(tr('⚠ Ficha incompleta (sin atributos guardados): {{p0}}', { p0: incompletas.map(f => f.catador.nombre).join(', ') }));
+    if (usaPuntaje && (m.desviacionEstandar >= DISPERSION_DESV || (rango ?? 0) >= DISPERSION_RANGO)) alertas.push(tr('⚠ Dispersión alta en el panel'));
+    if (m.evaluacionesRecibidas < m.evaluacionesEsperadas) alertas.push(tr('Faltan fichas'));
+    if (m.cerradaForzada) alertas.push(tr('Cerrada por el organizador'));
 
     h.addRow({
       muestra: m.numeroMuestra,
@@ -170,7 +171,7 @@ function hojaResumen(libro: Workbook, r: SessionResults, fichas: Fila[], formato
       desv: usaPuntaje ? m.desviacionEstandar : null,
       min, max, rango,
       n: `${deMuestra.length} / ${m.evaluacionesEsperadas || r.catadores.length}`,
-      recortado: m.recortado ? 'Sí (N ≥ 5)' : 'No',
+      recortado: m.recortado ? tr('Sí (N ≥ 5)') : tr('No'),
       alertas: alertas.join(' · ') || '—'
     });
   }
@@ -178,19 +179,19 @@ function hojaResumen(libro: Workbook, r: SessionResults, fichas: Fila[], formato
 }
 
 function hojaAfectivo(libro: Workbook, fichas: Fila[]): void {
-  const h = libro.addWorksheet('Afectivo (1-9)');
+  const h = libro.addWorksheet(tr('Afectivo (1-9)'));
   h.columns = [
-    { header: 'Muestra', key: 'muestra', width: 9 },
-    { header: 'Catador', key: 'catador', width: 18 },
-    { header: 'Rol', key: 'rol', width: 12 },
-    ...ATRIBUTOS.map(a => ({ header: a.etiqueta, key: a.db, width: 11 })),
-    { header: 'Impresión global', key: 'ig', width: 11 },
-    { header: 'Σ Calidades', key: 'suma', width: 11 },
-    { header: 'Tazas no unif.', key: 'u', width: 10 },
-    { header: 'Tazas defect.', key: 'd', width: 10 },
-    { header: 'Penalización', key: 'pen', width: 12 },
-    { header: 'Puntaje final', key: 'puntaje', width: 12, style: { numFmt: '0.00' } },
-    { header: 'Estado', key: 'estado', width: 26 }
+    { header: tr('Muestra'), key: 'muestra', width: 9 },
+    { header: tr('Catador'), key: 'catador', width: 18 },
+    { header: tr('Rol'), key: 'rol', width: 12 },
+    ...ATRIBUTOS.map(a => ({ header: tr(a.etiqueta), key: a.db, width: 11 })),
+    { header: tr('Impresión global'), key: 'ig', width: 11 },
+    { header: tr('Σ Calidades'), key: 'suma', width: 11 },
+    { header: tr('Tazas no unif.'), key: 'u', width: 10 },
+    { header: tr('Tazas defect.'), key: 'd', width: 10 },
+    { header: tr('Penalización'), key: 'pen', width: 12 },
+    { header: tr('Puntaje final'), key: 'puntaje', width: 12, style: { numFmt: '0.00' } },
+    { header: tr('Estado'), key: 'estado', width: 26 }
   ];
   for (const f of fichas) {
     const cal = ATRIBUTOS.map(a => f.atributos[a.db]?.calidad ?? null);
@@ -206,39 +207,39 @@ function hojaAfectivo(libro: Workbook, fichas: Fila[]): void {
       d: f.d,
       pen: -(2 * f.u + 4 * f.d),
       puntaje: f.puntaje,
-      estado: completa ? 'Completa' : f.puntaje !== null ? '⚠ Incompleta (no verificable)' : 'Incompleta'
+      estado: tr(completa ? 'Completa' : f.puntaje !== null ? '⚠ Incompleta (no verificable)' : 'Incompleta')
     });
   }
   estilizar(h);
 }
 
 function hojaDescriptivo(libro: Workbook, fichas: Fila[], formato: FormatoId): void {
-  const h = libro.addWorksheet('Descriptivo (0-15)');
+  const h = libro.addWorksheet(tr('Descriptivo (0-15)'));
   h.columns = [
-    { header: 'Muestra', key: 'muestra', width: 9 },
-    { header: 'Catador', key: 'catador', width: 18 },
+    { header: tr('Muestra'), key: 'muestra', width: 9 },
+    { header: tr('Catador'), key: 'catador', width: 18 },
     ...ATRIBUTOS.flatMap(a => [
-      { header: `${a.etiqueta} int.`, key: `${a.db}_i`, width: 11, style: { numFmt: '0.0' } },
-      ...(a.conDescriptores ? [{ header: `${a.etiqueta} descriptores`, key: `${a.db}_d`, width: 26 }] : [])
+      { header: tr('{{p0}} int.', { p0: tr(a.etiqueta) }), key: `${a.db}_i`, width: 11, style: { numFmt: '0.0' } },
+      ...(a.conDescriptores ? [{ header: tr('{{p0}} descriptores', { p0: tr(a.etiqueta) }), key: `${a.db}_d`, width: 26 }] : [])
     ]),
-    { header: 'Gustos predominantes', key: 'gustos', width: 20 },
-    { header: 'Sensación en boca (textura)', key: 'textura', width: 24 },
-    ...(formato === 'combinado' ? [{ header: 'Defectos', key: 'defectos', width: 20 }] : []),
-    { header: 'Comentarios', key: 'comentarios', width: 50 }
+    { header: tr('Gustos predominantes'), key: 'gustos', width: 20 },
+    { header: tr('Sensación en boca (textura)'), key: 'textura', width: 24 },
+    ...(formato === 'combinado' ? [{ header: tr('Defectos'), key: 'defectos', width: 20 }] : []),
+    { header: tr('Comentarios'), key: 'comentarios', width: 50 }
   ];
   for (const f of fichas) {
     const fila: Registro = { muestra: f.numeroMuestra, catador: f.catador.nombre };
     for (const a of ATRIBUTOS) {
       fila[`${a.db}_i`] = f.atributos[a.db]?.intensidad ?? null;
-      if (a.conDescriptores) fila[`${a.db}_d`] = textos(bloque(f, a.form)['descriptores']).join(', ');
+      if (a.conDescriptores) fila[`${a.db}_d`] = textos(bloque(f, a.form)['descriptores']).map(d => tr(d)).join(', ');
     }
     const notasAtributo = ATRIBUTOS
       .map(a => ({ a, t: texto(bloque(f, a.form)['extra']) || texto(bloque(f, a.form)['nota']) }))
       .filter(x => x.t)
-      .map(x => `${x.a.etiqueta}: ${x.t}`);
-    fila['gustos'] = textos(f.formulario['gustosPredominantes']).join(', ');
-    fila['textura'] = [...textos(f.formulario['mouthfeel']), ...textos(bloque(f, 'sensacionEnBoca')['textura'])].join(', ');
-    fila['defectos'] = textos(f.formulario['tiposDefecto']).join(', ');
+      .map(x => `${tr(x.a.etiqueta)}: ${x.t}`);
+    fila['gustos'] = textos(f.formulario['gustosPredominantes']).map(g => tr(g)).join(', ');
+    fila['textura'] = [...textos(f.formulario['mouthfeel']), ...textos(bloque(f, 'sensacionEnBoca')['textura'])].map(t => tr(t)).join(', ');
+    fila['defectos'] = textos(f.formulario['tiposDefecto']).map(t => tr(t)).join(', ');
     fila['comentarios'] = [...notasAtributo, texto(f.formulario['notasMouthfeel']), texto(f.formulario['notas'])].filter(Boolean).join(' | ');
     h.addRow(fila);
   }
@@ -247,7 +248,7 @@ function hojaDescriptivo(libro: Workbook, fichas: Fila[], formato: FormatoId): v
 
 /** Formato largo (una fila por valor) para Power BI / análisis estadístico. */
 function hojaCrudos(libro: Workbook, fichas: Fila[], codigo: string, formato: FormatoId): void {
-  const h = libro.addWorksheet('Datos crudos');
+  const h = libro.addWorksheet(tr('Datos crudos'));
   h.columns = [
     { header: 'sesion', key: 'sesion', width: 12 },
     { header: 'muestra', key: 'muestra', width: 9 },
@@ -279,19 +280,19 @@ function hojaCrudos(libro: Workbook, fichas: Fila[], codigo: string, formato: Fo
 }
 
 function hojaFichasTecnicas(libro: Workbook, r: SessionResults): void {
-  const h = libro.addWorksheet('Fichas técnicas');
+  const h = libro.addWorksheet(tr('Fichas técnicas'));
   h.columns = [
-    { header: 'Muestra', key: 'muestra', width: 9 },
-    { header: 'Registrada por', key: 'por', width: 18 },
-    { header: 'Sección', key: 'seccion', width: 18 },
-    { header: 'Campo', key: 'campo', width: 26 },
-    { header: 'Valor', key: 'valor', width: 48 }
+    { header: tr('Muestra'), key: 'muestra', width: 9 },
+    { header: tr('Registrada por'), key: 'por', width: 18 },
+    { header: tr('Sección'), key: 'seccion', width: 18 },
+    { header: tr('Campo'), key: 'campo', width: 26 },
+    { header: tr('Valor'), key: 'valor', width: 48 }
   ];
   for (const f of r.fichasTecnicas) {
     const base = { muestra: f.numeroMuestra, por: f.registradaPor ?? '' };
-    for (const s of f.secciones) for (const c of s.campos) h.addRow({ ...base, seccion: s.titulo, campo: c.etiqueta, valor: c.valor === '—' ? '' : c.valor });
-    h.addRow({ ...base, seccion: 'Certificaciones', campo: '', valor: f.certificaciones.join(', ') });
-    if (f.notas) h.addRow({ ...base, seccion: 'Notas', campo: '', valor: f.notas });
+    for (const s of f.secciones) for (const c of s.campos) h.addRow({ ...base, seccion: tr(s.titulo), campo: tr(c.etiqueta), valor: c.valor === '—' ? '' : tr(c.valor) });
+    h.addRow({ ...base, seccion: tr('Certificaciones'), campo: '', valor: f.certificaciones.map(c => tr(c)).join(', ') });
+    if (f.notas) h.addRow({ ...base, seccion: tr('Notas'), campo: '', valor: f.notas });
   }
   estilizar(h);
 }

@@ -54,7 +54,7 @@
 </ng-template>
 
 <ng-template #scaNotas let-texto="texto" let-titulo="titulo">
-  <div class="sca-notes"><p class="sca-label">{{ titulo || ('hoja.notas' | transloco) }}</p>@if (texto) {<p class="sca-notes__text">{{ texto }}</p>}</div>
+  <div class="sca-notes"><p class="sca-label">{{ titulo || ('hoja.notas' | transloco) }}</p>@if (texto) {<p class="sca-notes__text">{{ texto | tr }}</p>}</div>
 </ng-template>
 
 <ng-template #scaTazas let-n="n">
@@ -217,7 +217,7 @@
             <!-- Otras notas | Impresión global -->
             <div class="sca-l sca-otras">
               <span class="sca-bar sca-bar--block">{{ 'hoja.otras_notas' | transloco }}</span>
-              <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
+              <p class="sca-notes__text">{{ h.ficha.notas.otras | tr }}</p>
             </div>
             <div class="sca-r sca-global">
               <div class="sca-global__head">
@@ -255,7 +255,7 @@
             @for (a of atributosAfectivos; track a.clave) {
               <div class="sca-afe__name"><b>{{ a.etiqueta | tr }}</b></div>
               <div class="sca-afe__circ"><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad[a.clave] }"></ng-container></div>
-              <div class="sca-afe__note">{{ notaAfectiva(h, a.clave) }}</div>
+              <div class="sca-afe__note">{{ notaAfectiva(h, a.clave) | tr }}</div>
             }
             <div class="sca-afe__name sca-afe__name--global"><b>{{ 'hoja.impresion_global' | transloco }}</b></div>
             <div class="sca-afe__circ"><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.impresionGlobal }"></ng-container></div>
@@ -271,7 +271,7 @@
             </div>
             <div class="sca-afe__otras">
               <span class="sca-bar sca-bar--block">{{ 'hoja.otras_notas' | transloco }}</span>
-              <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
+              <p class="sca-notes__text">{{ h.ficha.notas.otras | tr }}</p>
             </div>
           </div>
         } @else {
@@ -313,7 +313,7 @@
 
             <div class="sca-l sca-otras sca-full">
               <span class="sca-bar sca-bar--block">{{ 'hoja.otras_notas' | transloco }}</span>
-              <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
+              <p class="sca-notes__text">{{ h.ficha.notas.otras | tr }}</p>
             </div>
           </div>
         }

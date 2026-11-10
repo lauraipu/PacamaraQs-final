@@ -33,7 +33,7 @@ import {
 } from '../../../shared/components/sca-report-template/sca-report-template.component';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TrPipe } from '../../../core/i18n/tr';
+import { tr, TrPipe } from '../../../core/i18n/tr';
 export interface Clasificacion {
   etiqueta: string;
   color: string;
@@ -620,7 +620,7 @@ export class ResultsPage implements OnInit {
     const resumen = [
       `Consolidado de ${incluidos.length} ficha(s): ${incluidos.map(x => x.catador.nombre).join(', ')}.`,
       excluidos.length ? `Excluidos por el organizador: ${excluidos.map(x => x.catador.nombre).join(', ')}.` : '',
-    ].filter(Boolean).join(' ');
+    ].filter(Boolean).join(' · ');
 
     const puntajes = incluidos.map(x => x.ficha.puntaje).filter(p => p > 0);
     const puntaje = formato !== 'descriptivo' ? puntajePanel(puntajes) : null;
@@ -749,8 +749,8 @@ export class ResultsPage implements OnInit {
       .map(a => {
         const valor = hoja.ficha.calidad[a];
         if (valor === null) return '';
-        const prefijo = hoja.esPanel && !Number.isInteger(valor) ? `prom. ${valor.toFixed(2)} → ` : '';
-        return `${ETIQUETA_ATRIBUTO[a]}: ${prefijo}${etiquetaCalidad(valor)}`;
+        const prefijo = hoja.esPanel && !Number.isInteger(valor) ? tr('prom. {{p0}} → ', { p0: valor.toFixed(2) }) : '';
+        return `${tr(ETIQUETA_ATRIBUTO[a])}: ${prefijo}${tr(etiquetaCalidad(valor))}`;
       })
       .filter(Boolean)
       .join(' · ');

@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, inject, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { Subscription } from 'rxjs';
+import { PATRONES } from './patrones';
 
 /**
  * Traducción de textos que NO están en las plantillas: datos (nombres de
@@ -23,7 +24,7 @@ export function registrarTraductor(servicio: TranslocoService): void {
 export function claveTexto(texto: string): string {
   const slug = texto
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '')
@@ -37,12 +38,66 @@ export function claveTexto(texto: string): string {
   return `txt.${slug || 't'}_${h.toString(36)}`;
 }
 
-export function tr(texto: string | null | undefined): string {
+/**
+ * Traduce `texto` (español). Con `params`, el texto lleva {{p0}}, {{p1}}…
+ * Sin coincidencia exacta se prueba:
+ *  1. Textos compuestos separados por " · " o " | " → se traduce cada parte.
+ *  2. Patrones con datos ("Ficha guardada en la muestra 3 de…", errores del
+ *     servidor con valores) → se traduce la plantilla y se conservan los datos.
+ * Lo que no tiene traducción (nombres, notas escritas por el usuario) queda igual.
+ */
+export function tr(texto: string | null | undefined, params?: Record<string, unknown>): string {
   if (!texto) return texto ?? '';
+  if (params) return interpolar(traducirClave(texto, params) ?? texto, params);
   if (!transloco) return texto;
+  return traducirClave(texto) ?? porPartes(texto) ?? porPatron(texto) ?? texto;
+}
+
+function traducirClave(texto: string, params?: Record<string, unknown>): string | null {
+  if (!transloco) return null;
   const clave = claveTexto(texto);
-  const traducido = transloco.translate(clave);
-  return traducido && traducido !== clave ? traducido : texto;
+  const traducido = transloco.translate(clave, params);
+  return traducido && traducido !== clave ? traducido : null;
+}
+
+function interpolar(texto: string, params: Record<string, unknown>): string {
+  return texto.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k: string) => String(params[k] ?? ''));
+}
+
+const escapar = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+let patronesCompilados: { fuente: string; re: RegExp; nombres: string[] }[] | null = null;
+
+function porPatron(texto: string): string | null {
+  patronesCompilados ??= PATRONES.map(fuente => {
+    const nombres: string[] = [];
+    const re = new RegExp('^' + escapar(fuente).replace(/\\\{\\\{(p\d+)\\\}\\\}/g, (_, n: string) => {
+      nombres.push(n);
+      return '([\\s\\S]+?)';
+    }) + '$');
+    return { fuente, re, nombres };
+  });
+  for (const { fuente, re, nombres } of patronesCompilados) {
+    const m = re.exec(texto);
+    if (!m) continue;
+    // Los datos también se traducen si son textos conocidos ("notas", listas de descriptores…).
+    const params = Object.fromEntries(nombres.map((n, i) => [n, traducirLista(m[i + 1])]));
+    return interpolar(traducirClave(fuente, params) ?? fuente, params);
+  }
+  return null;
+}
+
+function traducirLista(valor: string): string {
+  const exacto = traducirClave(valor);
+  if (exacto) return exacto;
+  return valor.includes(', ') ? valor.split(', ').map(v => traducirClave(v) ?? v).join(', ') : valor;
+}
+
+function porPartes(texto: string): string | null {
+  const sep = texto.includes(' · ') ? ' · ' : texto.includes(' | ') ? ' | ' : null;
+  if (!sep) return null;
+  const partes = texto.split(sep);
+  const traducidas = partes.map(p => traducirClave(p) ?? porPatron(p) ?? p);
+  return traducidas.some((t, i) => t !== partes[i]) ? traducidas.join(sep) : null;
 }
 
 /** `{{ valor | tr }}`: traduce datos; impuro para reaccionar al cambio de idioma. */

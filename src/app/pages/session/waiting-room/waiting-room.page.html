@@ -102,9 +102,9 @@
                   @if (p.conexion === 'inestable') {
                     <p class="unstable-text">{{ 'sala.conexion_inestable_se_retira' | transloco: { p0: (p.segundosGracia) } }}</p>
                   } @else if (p.conexion === 'desconectado') {
-                    <p>{{ 'sala.desconectado_2' | transloco: { p0: (tiempoDesde(p.unidoEn)) } }}</p>
+                    <p>{{ 'sala.desconectado_2' | transloco: { p0: (tiempoDesde(p.unidoEn) | tr) } }}</p>
                   } @else {
-                    <p>{{ tiempoDesde(p.unidoEn) }}</p>
+                    <p>{{ tiempoDesde(p.unidoEn) | tr }}</p>
                   }
                 </ion-label>
                 <div slot="end" class="status-indicator">

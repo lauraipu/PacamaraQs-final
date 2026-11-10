@@ -7,7 +7,7 @@ import {
 import { FichaTecnica } from '../../../core/models/session-results.model';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TrPipe } from '../../../core/i18n/tr';
+import { tr, TrPipe } from '../../../core/i18n/tr';
 /** Recuadro de notas de la hoja que corresponde a cada atributo. */
 const NOTA_DE_ATRIBUTO: Readonly<Record<AtributoHoja, 'olfativo' | 'gustativo' | 'acidez' | 'dulzor' | 'boca'>> = {
   fragancia: 'olfativo', aroma: 'olfativo', sabor: 'gustativo', sabor_residual: 'gustativo',
@@ -57,8 +57,8 @@ export class ScaReportTemplateComponent {
       .map(a => {
         const valor = hoja.ficha.calidad[a];
         if (valor === null) return '';
-        const prefijo = hoja.esPanel && !Number.isInteger(valor) ? `prom. ${valor.toFixed(2)} → ` : '';
-        return `${ETIQUETA_ATRIBUTO[a]}: ${prefijo}${etiquetaCalidad(valor)}`;
+        const prefijo = hoja.esPanel && !Number.isInteger(valor) ? tr('prom. {{p0}} → ', { p0: valor.toFixed(2) }) : '';
+        return `${tr(ETIQUETA_ATRIBUTO[a])}: ${prefijo}${tr(etiquetaCalidad(valor))}`;
       })
       .filter(Boolean)
       .join(' · ');
