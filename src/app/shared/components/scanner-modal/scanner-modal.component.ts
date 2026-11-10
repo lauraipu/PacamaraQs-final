@@ -20,6 +20,8 @@ import { ImagenPreparada, ScannerService } from '../../../core/services/scanner'
 import { SesionConRol, SesionService } from '../../../core/services/sesion';
 import { mensajeDeError } from '../../../core/utils/errores';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 export type ModoEscaneo = 'sesion' | 'muestra';
 
 /** Valor de ion-input → número (acepta coma decimal); vacío → null. */
@@ -46,7 +48,7 @@ export interface ResultadoEscaneo {
   templateUrl: './scanner-modal.component.html',
   styleUrls: ['./scanner-modal.component.scss'],
   standalone: true,
-  imports: [
+  imports: [TranslocoPipe, TrPipe, 
     CommonModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonSpinner,
     IonSegment, IonSegmentButton, IonLabel, IonSelect, IonSelectOption, IonInput, IonBadge, IonCheckbox, IonTextarea
   ]

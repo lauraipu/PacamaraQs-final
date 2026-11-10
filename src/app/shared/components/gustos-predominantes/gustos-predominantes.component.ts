@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { GUSTOS_PREDOMINANTES, GustoPredominante } from '../../../core/scanner/ficha-escaneada';
 
+import { TrPipe } from '../../../core/i18n/tr';
 const ETIQUETAS: Readonly<Record<GustoPredominante, string>> = {
   salado: 'Salado',
   amargo: 'Amargo',
@@ -17,6 +19,7 @@ const ETIQUETAS: Readonly<Record<GustoPredominante, string>> = {
 @Component({
   selector: 'app-gustos-predominantes',
   standalone: true,
+  imports: [TrPipe, TranslocoPipe],
   templateUrl: './gustos-predominantes.component.html',
   styleUrls: ['./gustos-predominantes.component.scss']
 })

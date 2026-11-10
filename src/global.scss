@@ -119,7 +119,7 @@ body {
   --border-radius: 8px;
   --box-shadow: none;
 
-  height: 48px;
+  min-height: 48px;
   margin: 0;
   font-weight: 600;
   font-size: 14px;
@@ -202,7 +202,7 @@ app-create-session {
   .summary-row strong { overflow-wrap: anywhere; text-align: right; }
   hr { margin: 0; border: 0; border-top: 1px solid var(--app-border); }
   .create-session-footer { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--app-bg-card); box-shadow: 0 -2px 10px rgb(0 0 0 / 5%); }
-  .edit-button { flex: 1; height: 50px; }
+  .edit-button { flex: 1; min-height: 50px; }
   .continue-button { flex: 2; }
 }
 
@@ -215,3 +215,40 @@ app-create-session {
 
 /* Slider de intensidad sin marcar (null): se distingue de un 0 real. */
 .intensity-slider__input--vacio { opacity: .45; filter: grayscale(1); }
+
+
+/* ═══════════════ Accesibilidad ═══════════════
+ * Android aplica el "Tamaño de fuente" del sistema al WebView (textZoom): el
+ * texto crece pero las alturas fijas no. Por eso: alturas mínimas, texto que
+ * salta de línea y zonas de toque de al menos 44 px (WCAG 2.5.8).
+ */
+ion-button:not([size="small"]) { height: auto; min-height: 44px; }
+ion-button::part(native) { white-space: normal; padding-top: 6px; padding-bottom: 6px; line-height: 1.25; }
+ion-toolbar { --min-height: 56px; }
+ion-title .page-title,
+ion-title .page-subtitle { white-space: normal; overflow-wrap: anywhere; }
+ion-badge { white-space: normal; text-align: center; }
+ion-item { --min-height: 48px; }
+:focus-visible { outline: 2px solid var(--app-primary-dark, #283840); outline-offset: 2px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+/* ── Login / registro: idioma y "Continuar con Google" ── */
+.auth-lang { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.oauth-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: var(--app-text-muted); font-size: 13px; }
+.oauth-divider::before, .oauth-divider::after { content: ''; flex: 1; border-top: 1px solid var(--app-border); }
+.btn-google {
+  --border-color: var(--app-border); --color: var(--app-text-main); --background: #ffffff;
+  --border-radius: 8px; --box-shadow: none; min-height: 48px; margin: 0; font-weight: 600; text-transform: none;
+}
+.btn-google__logo { width: 20px; height: 20px; flex: 0 0 auto; margin-right: 10px; }
+.btn-google__text { white-space: normal; }
+.link-politica {
+  display: inline; padding: 0; margin-left: 4px; border: 0; background: none;
+  color: var(--app-primary-dark); font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer;
+}

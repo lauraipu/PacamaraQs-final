@@ -9,6 +9,8 @@ import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/es
 import { GustosPredominantesComponent } from '../../../shared/components/gustos-predominantes/gustos-predominantes.component';
 import { RUEDA_SABORES } from '../../../core/cva/cva';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 addIcons({ arrowBackOutline, chevronDownOutline, chevronForwardOutline });
 
 type AtributoAromatico = 'fragancia' | 'aroma' | 'sabor' | 'saborResidual';
@@ -36,7 +38,7 @@ interface FormularioDescriptivo {
   selector: 'app-descriptive-form',
   templateUrl: './descriptive-form.page.html',
   standalone: true,
-  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, GustosPredominantesComponent]
+  imports: [TrPipe, TranslocoPipe, IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, GustosPredominantesComponent]
 })
 export class DescriptiveFormPage extends BaseCataForm<FormularioDescriptivo> {
   override formulario: FormularioDescriptivo = this.crearFormularioVacio();

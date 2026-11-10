@@ -12,7 +12,19 @@ export const authGuard: CanActivateFn = async (_route, state) => {
 
   try {
     await authService.asegurarInicializado();
-    if (authService.autenticado()) return true;
+    if (authService.autenticado()) {
+      // Ley 1581: sin la política aceptada (versión vigente) no se usa la app.
+      if (state.url.startsWith('/aceptar-politica')) return true;
+      try {
+        if (await authService.requierePolitica()) {
+          return router.createUrlTree(['/aceptar-politica'], { queryParams: { returnUrl: state.url } });
+        }
+      } catch (error) {
+        // Sin rol legible: roleGuard muestra el error correspondiente.
+        console.error('No se pudo verificar la política aceptada:', error);
+      }
+      return true;
+    }
 
     return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
   } catch (error) {

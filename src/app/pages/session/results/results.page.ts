@@ -23,6 +23,7 @@ import { FormatoCva, getFormatoById } from '../../../core/models/sesion.model';
 import {
   AtributoCva, CupperResultSummary, SampleConsolidatedResult, SessionResults, ValorAtributo
 } from '../../../core/models/session-results.model';
+import { ArchivosService } from '../../../core/services/archivos';
 import { ImpresionService } from '../../../core/services/impresion';
 import { ResultsService } from '../../../core/services/results';
 import { codigoDeError, mensajeDeError } from '../../../core/utils/errores';
@@ -31,6 +32,8 @@ import {
   FormatoReporteSca, ScaReportTemplateComponent
 } from '../../../shared/components/sca-report-template/sca-report-template.component';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 export interface Clasificacion {
   etiqueta: string;
   color: string;
@@ -245,7 +248,7 @@ function atributosDeFicha(atributos: Partial<Record<string, ValorAtributo>>): At
   templateUrl: './results.page.html',
   styleUrls: ['./results.page.scss'],
   standalone: true,
-  imports: [
+  imports: [TranslocoPipe, TrPipe, 
     IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonBackButton, IonButtons,
     IonIcon, IonSpinner, IonCard, IonCardContent, IonGrid, IonRow, IonCol, IonBadge, IonList,
     IonAccordionGroup, IonAccordion, IonItem, IonLabel, IonModal, IonSegment, IonSegmentButton,
@@ -259,6 +262,7 @@ export class ResultsPage implements OnInit {
   private readonly navCtrl = inject(NavController);
   private readonly toastCtrl = inject(ToastController);
   private readonly actionSheetCtrl = inject(ActionSheetController);
+  private readonly archivos = inject(ArchivosService);
   private readonly injector = inject(Injector);
   private sesionId = '';
 
@@ -810,7 +814,7 @@ export class ResultsPage implements OnInit {
     try {
       const { generarReporteXlsx } = await import('../../../core/export/reporte-xlsx');
       const { blob, nombre } = await generarReporteXlsx(r);
-      this.descargar(blob, nombre);
+      await this.descargar(blob, nombre);
     } catch (error) {
       console.error('[results] xlsx', error);
       const toast = await this.toastCtrl.create({
@@ -825,16 +829,11 @@ export class ResultsPage implements OnInit {
     }
   }
 
-  private descargar(blob: Blob, nombre: string): void {
-    const url = URL.createObjectURL(blob);
-    const enlace = document.createElement('a');
-    enlace.href = url;
-    enlace.download = nombre;
-    document.body.appendChild(enlace);
-    enlace.click();
-    enlace.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  /** Navegador: descarga. APK: hoja "Compartir" de Android (guardar en Archivos, Drive, WhatsApp…). */
+  private async descargar(blob: Blob, nombre: string): Promise<void> {
+    await this.archivos.entregar(blob, nombre);
   }
+
 
   /**
    * CSV nativo (sin librerías): una fila por catador y muestra con el promedio
@@ -874,14 +873,8 @@ export class ResultsPage implements OnInit {
       }
     }
     const csv = '\uFEFF' + filas.map(f => f.map(celdaCsv).join(';')).join('\r\n');
-    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    const enlace = document.createElement('a');
-    enlace.href = url;
-    enlace.download = `${this.tituloReporte().replace(/[\\/:*?"<>|]+/g, '-')}.csv`;
-    document.body.appendChild(enlace);
-    enlace.click();
-    enlace.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const nombre = `${this.tituloReporte().replace(/[\\/:*?"<>|]+/g, '-')}.csv`;
+    void this.descargar(new Blob([csv], { type: 'text/csv;charset=utf-8' }), nombre);
   }
 
   /**

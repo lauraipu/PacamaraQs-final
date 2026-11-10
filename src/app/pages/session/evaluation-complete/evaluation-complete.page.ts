@@ -8,6 +8,8 @@ import { EstadoSesion, FormatoCva, getFormatoById } from '../../../core/models/s
 import { AuthService } from '../../../core/services/auth';
 import { SesionService } from '../../../core/services/sesion';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 addIcons({ checkmarkCircleOutline, documentTextOutline, hourglassOutline, lockClosedOutline });
 
 /**
@@ -25,7 +27,7 @@ addIcons({ checkmarkCircleOutline, documentTextOutline, hourglassOutline, lockCl
   templateUrl: './evaluation-complete.page.html',
   styleUrls: ['./evaluation-complete.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonContent, IonIcon, IonButton]
+  imports: [TrPipe, TranslocoPipe, CommonModule, IonContent, IonIcon, IonButton]
 })
 export class EvaluationCompletePage implements OnInit {
   private readonly route = inject(ActivatedRoute);

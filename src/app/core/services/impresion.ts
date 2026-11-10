@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import { ESTILOS_HOJA_SCA } from './estilos-hoja-sca';
 
 /**
@@ -71,7 +72,23 @@ export class ImpresionService {
    * `afterprint`. El iframe se elimina al cerrar el diálogo o, como respaldo, a
    * los 60 s; en ambos casos se devuelve el foco y se limpian overlays huérfanos.
    */
-  imprimir(titulo: string, contenidoHtml: string): Promise<void> {
+  async imprimir(titulo: string, contenidoHtml: string): Promise<void> {
+    const documento = `<!doctype html><html lang="es"><head><meta charset="utf-8">`
+      + `<meta name="viewport" content="width=device-width, initial-scale=1">`
+      + `<title>${escaparHtml(titulo)}</title><style>${ESTILOS_REPORTE}${ESTILOS_HOJA_SCA}</style></head>`
+      + `<body>${contenidoHtml}</body></html>`;
+
+    // APK: el WebView de Android ignora window.print(). El plugin usa el
+    // PrintManager nativo, cuyo diálogo incluye "Guardar como PDF".
+    if (Capacitor.isNativePlatform()) {
+      const { Printer } = await import('@capgo/capacitor-printer');
+      await Printer.printHtml({ name: titulo, html: documento });
+      return;
+    }
+    return this.imprimirEnIframe(documento);
+  }
+
+  private imprimirEnIframe(documento: string): Promise<void> {
     const doc = this.document;
     const iframe = doc.createElement('iframe');
     iframe.setAttribute('aria-hidden', 'true');
@@ -111,9 +128,7 @@ export class ImpresionService {
         }
       };
 
-      iframe.srcdoc = `<!doctype html><html lang="es"><head><meta charset="utf-8">`
-        + `<title>${escaparHtml(titulo)}</title><style>${ESTILOS_REPORTE}${ESTILOS_HOJA_SCA}</style></head>`
-        + `<body>${contenidoHtml}</body></html>`;
+      iframe.srcdoc = documento;
       doc.body.appendChild(iframe);
     });
   }

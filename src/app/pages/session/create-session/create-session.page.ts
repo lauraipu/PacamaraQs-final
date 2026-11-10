@@ -25,6 +25,8 @@ import { checkmarkCircle, informationCircleOutline } from 'ionicons/icons';
 import { EstadoSesion, FormatoCva, Sesion } from '../../../core/models/sesion.model';
 import { AuthService } from '../../../core/services/auth';
 import { SesionService } from '../../../core/services/sesion';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 addIcons({ checkmarkCircle, informationCircleOutline });
 
 @Component({
@@ -32,7 +34,7 @@ addIcons({ checkmarkCircle, informationCircleOutline });
   templateUrl: './create-session.page.html',
   styleUrls: ['./create-session.page.scss'],
   standalone: true,
-  imports: [
+  imports: [TrPipe, TranslocoPipe, 
     IonBackButton,
     IonButton,
     IonButtons,

@@ -1,12 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { TranslocoPipe } from '@jsverse/transloco';
 @Component({
   selector: 'app-progress-tracker',
   templateUrl: './progress-tracker.component.html',
   styleUrls: ['./progress-tracker.component.scss'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [TranslocoPipe, CommonModule]
 })
 export class ProgressTrackerComponent {
   @Input() completados = 0;

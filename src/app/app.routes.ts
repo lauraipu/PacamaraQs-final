@@ -21,6 +21,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/auth/registro/registro.page').then(m => m.RegistroPage)
   },
   {
+    // Aceptación obligatoria de la política de datos (p. ej. primer ingreso con Google).
+    path: 'aceptar-politica',
+    loadComponent: () => import('./pages/auth/aceptar-politica/aceptar-politica.page').then(m => m.AceptarPoliticaPage),
+    canActivate: [authGuard]
+  },
+  {
     path: 'dashboard',
     loadComponent: () => import('./pages/dashboard/dashboard/dashboard.page').then(m => m.DashboardPage),
     canActivate: [authGuard, roleGuard],

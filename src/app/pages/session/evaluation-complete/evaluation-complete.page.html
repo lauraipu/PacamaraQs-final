@@ -6,32 +6,32 @@
     </div>
 
     @if (esExtrinseco()) {
-      <h1 class="title">Ficha técnica registrada</h1>
-      <p class="subtitle">La evaluación extrínseca es individual: tus datos de origen, proceso y comercialización quedaron guardados.</p>
+      <h1 class="title">{{ 'completa.ficha_tecnica_registrada' | transloco }}</h1>
+      <p class="subtitle">{{ 'completa.la_evaluacion_extrinseca_es' | transloco }}</p>
     } @else {
-      <h1 class="title">Cata finalizada</h1>
-      <p class="subtitle">Gracias por completar la sesión. Consulta al organizador si necesitas confirmar el registro de tu evaluación.</p>
+      <h1 class="title">{{ 'completa.cata_finalizada' | transloco }}</h1>
+      <p class="subtitle">{{ 'completa.gracias_por_completar_la' | transloco }}</p>
     }
 
     @if (error(); as mensaje) {
-      <p class="subtitle" role="alert">{{ mensaje }}</p>
+      <p class="subtitle" role="alert">{{ mensaje | tr }}</p>
     }
 
     <div class="info-card">
       <div class="info-row">
-        <span class="info-label">Sesión</span>
+        <span class="info-label">{{ 'completa.sesion' | transloco }}</span>
         <span class="info-value">{{ nombreSesion() }}</span>
       </div>
       @if (tituloFormato()) {
         <div class="info-row">
-          <span class="info-label">Formato</span>
-          <span class="info-value">{{ tituloFormato() }}</span>
+          <span class="info-label">{{ 'completa.formato' | transloco }}</span>
+          <span class="info-value">{{ tituloFormato() | tr }}</span>
         </div>
       }
       @if (!cargando() && !esExtrinseco()) {
         <div class="info-row">
-          <span class="info-label">Estado del panel</span>
-          <span class="info-value">{{ panelCerrado() ? 'Cerrado' : 'Abierto' }}</span>
+          <span class="info-label">{{ 'completa.estado_del_panel' | transloco }}</span>
+          <span class="info-value">{{ panelCerrado() ? ('completa.cerrado' | transloco) : ('completa.abierto' | transloco) }}</span>
         </div>
       }
     </div>
@@ -40,32 +40,32 @@
       <div class="privacy-card">
         <ion-icon name="hourglass-outline"></ion-icon>
         <div>
-          <h4>Aún hay catadores evaluando</h4>
-          <p>Los resultados se consolidan cuando todos envían sus fichas. Desde el monitoreo puedes ver el avance o finalizar el panel.</p>
+          <h4>{{ 'completa.aun_hay_catadores_evaluando' | transloco }}</h4>
+          <p>{{ 'completa.los_resultados_se_consolidan' | transloco }}</p>
         </div>
       </div>
     } @else if (!esExtrinseco()) {
       <div class="privacy-card">
         <ion-icon name="lock-closed-outline"></ion-icon>
         <div>
-          <h4>Los resultados permanecen reservados</h4>
-          <p>Para proteger la evaluación ciega, los catadores no tienen acceso a los puntajes hasta que el organizador consolide el panel.</p>
+          <h4>{{ 'completa.los_resultados_permanecen_reservados' | transloco }}</h4>
+          <p>{{ 'completa.para_proteger_la_evaluacion' | transloco }}</p>
         </div>
       </div>
     }
 
     @if (puedeVerResultados()) {
       <ion-button expand="block" class="primary-btn" (click)="irAResultados()">
-        {{ esExtrinseco() ? 'Ver ficha técnica →' : 'Ver resultados del panel →' }}
+        {{ esExtrinseco() ? ('completa.ver_ficha_tecnica' | transloco) : ('completa.ver_resultados_del_panel' | transloco) }}
       </ion-button>
     } @else if (debeFinalizarPanel()) {
       <ion-button expand="block" class="primary-btn" (click)="irAMonitoreo()">
-        Monitorear y finalizar panel →
+        {{ 'completa.monitorear_y_finalizar_panel' | transloco }}
       </ion-button>
     }
 
     <ion-button expand="block" fill="outline" style="--border-color: #E2E8F0; --color: #0F172B;" (click)="volverAlPanel()">
-      Volver al panel principal
+      {{ 'completa.volver_al_panel_principal' | transloco }}
     </ion-button>
 
   </div>

@@ -16,6 +16,8 @@ import { ProgresoPanel, SesionService } from '../../../core/services/sesion';
 import { mensajeDeError } from '../../../core/utils/errores';
 import { ProgressTrackerComponent } from '../../../shared/components/progress-tracker/progress-tracker.component';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 const SONDEO_PROGRESO_MS = 30_000;
 const SONDEO_SIN_SOCKET_MS = 8_000;
 
@@ -46,7 +48,7 @@ export interface FilaCatador {
   templateUrl: './organizer-dashboard.page.html',
   styleUrls: ['./organizer-dashboard.page.scss'],
   standalone: true,
-  imports: [
+  imports: [TranslocoPipe, TrPipe, 
     IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonSpinner,
     CommonModule, ProgressTrackerComponent
   ]

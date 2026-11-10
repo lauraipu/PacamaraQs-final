@@ -2,12 +2,13 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CupperResultSummary } from '../../../core/models/session-results.model';
 
+import { TranslocoPipe } from '@jsverse/transloco';
 @Component({
   selector: 'app-cupper-result-card',
   templateUrl: './cupper-result-card.component.html',
   styleUrls: ['./cupper-result-card.component.scss'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [TranslocoPipe, CommonModule]
 })
 export class CupperResultCardComponent {
   @Input() catador!: CupperResultSummary;

@@ -6,6 +6,8 @@ import {
 } from '../../../core/cva/hoja-sca';
 import { FichaTecnica } from '../../../core/models/session-results.model';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 /** Recuadro de notas de la hoja que corresponde a cada atributo. */
 const NOTA_DE_ATRIBUTO: Readonly<Record<AtributoHoja, 'olfativo' | 'gustativo' | 'acidez' | 'dulzor' | 'boca'>> = {
   fragancia: 'olfativo', aroma: 'olfativo', sabor: 'gustativo', sabor_residual: 'gustativo',
@@ -29,7 +31,7 @@ const ETIQUETA_ATRIBUTO: Readonly<Record<AtributoHoja, string>> = {
   templateUrl: './sca-report-template.component.html',
   standalone: true,
   encapsulation: ViewEncapsulation.None,
-  imports: [CommonModule]
+  imports: [TranslocoPipe, TrPipe, CommonModule]
 })
 export class ScaReportTemplateComponent {
   @Input() formato: FormatoReporteSca | null = null;

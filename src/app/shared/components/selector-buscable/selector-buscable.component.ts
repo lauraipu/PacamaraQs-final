@@ -3,6 +3,8 @@ import {
   IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonModal, IonSearchbar, IonTitle, IonToolbar
 } from '@ionic/angular';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 export interface OpcionBuscable { valor: string; etiqueta: string; detalle?: string; }
 
 const normalizar = (t: string): string => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -16,10 +18,10 @@ const normalizar = (t: string): string => t.normalize('NFD').replace(/[̀-ͯ]/g,
 @Component({
   selector: 'app-selector-buscable',
   standalone: true,
-  imports: [IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonSearchbar, IonList, IonItem, IonLabel],
+  imports: [TranslocoPipe, TrPipe, IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonSearchbar, IonList, IonItem, IonLabel],
   template: `
     <button type="button" class="selector-buscable notes-panel__textarea" [attr.aria-label]="titulo" (click)="abierto.set(true)">
-      <span [class.selector-buscable__ph]="!valor">{{ etiquetaActual() || placeholder }}</span>
+      <span [class.selector-buscable__ph]="!valor">{{ (etiquetaActual() | tr) || placeholder }}</span>
       <span aria-hidden="true">▾</span>
     </button>
     <ion-modal [isOpen]="abierto()" (didDismiss)="cerrar()">
@@ -27,24 +29,24 @@ const normalizar = (t: string): string => t.normalize('NFD').replace(/[̀-ͯ]/g,
         <ion-header>
           <ion-toolbar>
             <ion-title>{{ titulo }}</ion-title>
-            <ion-buttons slot="end"><ion-button (click)="cerrar()">Cerrar</ion-button></ion-buttons>
+            <ion-buttons slot="end"><ion-button (click)="cerrar()">{{ 'comun.cerrar' | transloco }}</ion-button></ion-buttons>
           </ion-toolbar>
           <ion-toolbar>
-            <ion-searchbar placeholder="Buscar…" [debounce]="100" (ionInput)="busqueda.set($event.detail.value ?? '')"></ion-searchbar>
+            <ion-searchbar [placeholder]="'comun.buscar' | transloco" [debounce]="100" (ionInput)="busqueda.set($event.detail.value ?? '')"></ion-searchbar>
           </ion-toolbar>
         </ion-header>
         <ion-content>
           <ion-list>
             @if (permitirOtro && busqueda().trim() && !coincidenciaExacta()) {
-              <ion-item button [detail]="false" (click)="elegir(busqueda().trim())"><ion-label>Usar "{{ busqueda().trim() }}"</ion-label></ion-item>
+              <ion-item button [detail]="false" (click)="elegir(busqueda().trim())"><ion-label>{{ 'comun.usar' | transloco: { p0: busqueda().trim() } }}</ion-label></ion-item>
             }
             @for (o of filtradas(); track o.valor) {
               <ion-item button [detail]="false" (click)="elegir(o.valor)">
-                <ion-label>{{ o.etiqueta }}@if (o.detalle) {<p>{{ o.detalle }}</p>}</ion-label>
-                @if (o.valor === valor) { <span slot="end" aria-label="Seleccionado">✓</span> }
+                <ion-label>{{ o.etiqueta | tr }}@if (o.detalle) {<p>{{ o.detalle | tr }}</p>}</ion-label>
+                @if (o.valor === valor) { <span slot="end" [attr.aria-label]="'comun.seleccionado' | transloco">✓</span> }
               </ion-item>
             } @empty {
-              <ion-item lines="none"><ion-label color="medium">Sin resultados</ion-label></ion-item>
+              <ion-item lines="none"><ion-label color="medium">{{ 'comun.sin_resultados' | transloco }}</ion-label></ion-item>
             }
           </ion-list>
         </ion-content>

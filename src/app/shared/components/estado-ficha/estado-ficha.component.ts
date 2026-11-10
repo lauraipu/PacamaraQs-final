@@ -1,5 +1,7 @@
 import { Component, input, output } from '@angular/core';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 /**
  * Aviso de sincronización de fichas CVA (offline-first) y de muestra cerrada.
  * Se coloca al inicio de los 4 formularios de evaluación.
@@ -7,29 +9,29 @@ import { Component, input, output } from '@angular/core';
 @Component({
   selector: 'app-estado-ficha',
   standalone: true,
+  imports: [TranslocoPipe, TrPipe],
   template: `
     @if (muestraCerrada()) {
       <div class="estado-ficha estado-ficha--cerrada" role="status">
-        Esta muestra fue cerrada por el organizador: ya no se aceptan cambios.
+        {{ 'estado.esta_muestra_fue_cerrada' | transloco }}
       </div>
     }
     @if (pendientes() > 0) {
       <div class="estado-ficha estado-ficha--pendiente" role="status">
         <span>
-          Guardado localmente. Reintentando…
-          ({{ pendientes() }} ficha{{ pendientes() === 1 ? '' : 's' }}{{ enLinea() ? '' : ' · sin conexión' }})
+          {{ 'estado.guardado_localmente_reintentando_ficha' | transloco: { p0: (pendientes()), p1: (pendientes() === 1 ? '' : 's'), p2: (enLinea() ? '' : ('estado.sin_conexion' | transloco)) } }}
         </span>
-        <button type="button" (click)="reintentar.emit()">Reintentar ahora</button>
+        <button type="button" (click)="reintentar.emit()">{{ 'estado.reintentar_ahora' | transloco }}</button>
       </div>
     }
     @if (esperandoFinalizar()) {
       <div class="estado-ficha estado-ficha--pendiente" role="status">
-        <span>Terminaste la cata. Las fichas se enviarán solas al recuperar la conexión.</span>
-        <button type="button" (click)="salir.emit()">Salir ahora</button>
+        <span>{{ 'estado.terminaste_la_cata_las' | transloco }}</span>
+        <button type="button" (click)="salir.emit()">{{ 'estado.salir_ahora' | transloco }}</button>
       </div>
     }
     @if (rechazo(); as mensaje) {
-      <div class="estado-ficha estado-ficha--error" role="alert">{{ mensaje }}</div>
+      <div class="estado-ficha estado-ficha--error" role="alert">{{ mensaje | tr }}</div>
     }
   `,
   styles: [`

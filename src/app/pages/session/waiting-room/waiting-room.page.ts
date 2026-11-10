@@ -18,6 +18,8 @@ import { EventoSala, GRACE_PERIOD_MS, RealtimeService, SalaRealtime } from '../.
 import { SesionService } from '../../../core/services/sesion';
 import { mensajeDeError } from '../../../core/utils/errores';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 const MINIMO_CATADORES = 3;
 const TIEMPO_MAXIMO_CARGA_MS = 15_000;
 const SONDEO_SIN_SOCKET_MS = 10_000;
@@ -63,7 +65,7 @@ function conTiempoLimite<T>(promesa: Promise<T>, ms: number): Promise<T> {
   templateUrl: './waiting-room.page.html',
   styleUrls: ['./waiting-room.page.scss'],
   standalone: true,
-  imports: [
+  imports: [TrPipe, TranslocoPipe, 
     IonBackButton, IonBadge, IonButton, IonButtons, IonContent, IonHeader,
     IonIcon, IonItem, IonLabel, IonList, IonSpinner, IonTitle, IonToolbar, CommonModule
   ]

@@ -5,21 +5,22 @@ import {
 } from '@ionic/angular';
 import { AuthService } from '../../core/services/auth';
 
+import { TranslocoPipe } from '@jsverse/transloco';
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [IonButton, IonContent, IonHeader, IonTitle, IonToolbar],
+  imports: [TranslocoPipe, IonButton, IonContent, IonHeader, IonTitle, IonToolbar],
   template: `
     <ion-header>
       <ion-toolbar>
-        <ion-title>Panel administrador</ion-title>
+        <ion-title>{{ 'admin.panel_administrador' | transloco }}</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
-      <h1>Administración</h1>
-      <p>Tu cuenta tiene el rol de administrador.</p>
+      <h1>{{ 'admin.administracion' | transloco }}</h1>
+      <p>{{ 'admin.tu_cuenta_tiene_el' | transloco }}</p>
       <ion-button expand="block" fill="outline" (click)="cerrarSesion()" [disabled]="cerrandoSesion">
-        Cerrar sesión
+        {{ 'admin.cerrar_sesion' | transloco }}
       </ion-button>
     </ion-content>
   `

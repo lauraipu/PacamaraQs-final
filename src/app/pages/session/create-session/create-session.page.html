@@ -5,10 +5,10 @@
     </ion-buttons>
     <ion-title>
       <div class="page-title">
-        {{ pasoActual === 1 ? 'Crear sesión' : (formatoSeleccionado === 'extrinseca' ? 'Sesión creada' : 'Código de acceso') }}
+        {{ pasoActual === 1 ? ('crear.crear_sesion' | transloco) : (formatoSeleccionado === 'extrinseca' ? ('crear.sesion_creada' | transloco) : ('crear.codigo_de_acceso' | transloco)) }}
       </div>
       <div class="page-subtitle">
-        {{ pasoActual === 1 ? 'Paso 1 — Configuración' : 'Sesión configurada' }}
+        {{ pasoActual === 1 ? ('crear.paso_1_configuracion' | transloco) : ('crear.sesion_configurada' | transloco) }}
       </div>
     </ion-title>
   </ion-toolbar>
@@ -17,28 +17,28 @@
 <ion-content class="ion-padding create-session-content">
   <main class="create-session-container">
     @if (error) {
-      <div class="error-message" role="alert">{{ error }}</div>
+      <div class="error-message" role="alert">{{ error | tr }}</div>
     }
 
     @if (pasoActual === 1) {
       <section class="cupping-card">
-        <h2 class="section-title">Información general</h2>
+        <h2 class="section-title">{{ 'crear.informacion_general' | transloco }}</h2>
         <div class="session-field">
-          <label class="input-label" for="session-name">Nombre de la sesión</label>
+          <label class="input-label" for="session-name">{{ 'crear.nombre_de_la_sesion' | transloco }}</label>
           <ion-input
             id="session-name"
             [(ngModel)]="nombreSesion"
-            placeholder="Ej.: Cosecha de mayo — Colombia"
+            [placeholder]="'crear.ej_cosecha_de_mayo' | transloco"
             class="custom-input"
             required
           ></ion-input>
         </div>
         <div>
-          <label class="input-label" for="session-notes">Notas adicionales</label>
+          <label class="input-label" for="session-notes">{{ 'crear.notas_adicionales' | transloco }}</label>
           <ion-textarea
             id="session-notes"
             [(ngModel)]="notasSesion"
-            placeholder="Información sobre origen, proceso..."
+            [placeholder]="'crear.informacion_sobre_origen_proceso' | transloco"
             class="custom-input"
             [autoGrow]="true"
             rows="3"
@@ -47,8 +47,8 @@
       </section>
 
       <section class="cupping-card">
-        <h2 class="section-title">Formato CVA</h2>
-        <p class="help-text">Selecciona el tipo de evaluación según la metodología SCA CVA v2.</p>
+        <h2 class="section-title">{{ 'crear.formato_cva' | transloco }}</h2>
+        <p class="help-text">{{ 'crear.selecciona_el_tipo_de' | transloco }}</p>
 
         @for (formato of formatosList; track formato.id) {
           <button
@@ -59,31 +59,31 @@
             (click)="formatoSeleccionado = formato.id"
           >
             <span class="format-heading">
-              <span class="format-name">{{ formato.titulo }}</span>
+              <span class="format-name">{{ formato.titulo | tr }}</span>
               @if (formatoSeleccionado === formato.id) {
                 <ion-icon
                   class="selected-mark"
                   name="checkmark-circle"
-                  aria-label="Seleccionado"
+                  [attr.aria-label]="'crear.seleccionado' | transloco"
                 ></ion-icon>
               }
             </span>
-            <span class="format-description">{{ formato.desc }}</span>
-            <span class="format-tag">{{ formato.tag }}</span>
+            <span class="format-description">{{ formato.desc | tr }}</span>
+            <span class="format-tag">{{ formato.tag | tr }}</span>
           </button>
         }
       </section>
 
       <section class="cupping-card" *ngIf="formatoSeleccionado !== 'extrinseca'">
-        <h2 class="section-title">Parámetros del panel</h2>
+        <h2 class="section-title">{{ 'crear.parametros_del_panel' | transloco }}</h2>
 
         <div class="slider-header">
-          <span class="slider-label">Número de muestras</span>
+          <span class="slider-label">{{ 'crear.numero_de_muestras' | transloco }}</span>
           <span class="slider-value">{{ numeroMuestras }}</span>
         </div>
         <ion-range
           [(ngModel)]="numeroMuestras"
-          aria-label="Número de muestras"
+          [attr.aria-label]="'crear.numero_de_muestras' | transloco"
           [min]="1"
           [max]="20"
           [step]="1"
@@ -93,38 +93,38 @@
         </div>
 
         <div class="slider-header">
-          <span class="slider-label">Catadores objetivo</span>
+          <span class="slider-label">{{ 'crear.catadores_objetivo' | transloco }}</span>
           <span class="slider-value">{{ catadoresObjetivo }}</span>
         </div>
         <ion-range
           [(ngModel)]="catadoresObjetivo"
-          aria-label="Catadores objetivo"
+          [attr.aria-label]="'crear.catadores_objetivo' | transloco"
           [min]="3"
           [max]="15"
           [step]="1"
         ></ion-range>
         <div class="slider-limits">
-          <span>3 (mín.)</span><span>15</span>
+          <span>{{ 'crear.t_3_min' | transloco }}</span><span>15</span>
         </div>
 
         <hr class="divider">
 
         <div class="participar-container">
           <div class="participar-text">
-            <div class="participar-title">¿Participarás como catador?</div>
-            <div class="participar-desc">Tu evaluación contará igual en el promedio recortado del panel.</div>
+            <div class="participar-title">{{ 'crear.participaras_como_catador' | transloco }}</div>
+            <div class="participar-desc">{{ 'crear.tu_evaluacion_contara_igual' | transloco }}</div>
           </div>
           <ion-toggle
             [(ngModel)]="participaComoCatador"
             class="custom-toggle"
-            aria-label="Participar como catador"
+            [attr.aria-label]="'crear.participar_como_catador' | transloco"
           ></ion-toggle>
         </div>
 
         <div class="info-box" role="note">
           <ion-icon name="information-circle-outline" class="info-icon" aria-hidden="true"></ion-icon>
           <span class="info-text">
-            La sesión requiere mínimo 3 catadores para iniciar. El código expira cuando el organizador inicia la cata.
+            {{ 'crear.la_sesion_requiere_minimo' | transloco }}
           </span>
         </div>
       </section>
@@ -132,15 +132,14 @@
       @if (formatoSeleccionado === 'extrinseca') {
         <!-- Extrínseco: evaluación individual, sin código ni sala de espera. -->
         <section class="cupping-card">
-          <h2 class="section-title">Evaluación individual</h2>
+          <h2 class="section-title">{{ 'crear.evaluacion_individual' | transloco }}</h2>
           <p class="help-text">
-            El formato extrínseco no usa código de acceso: registras tú mismo la ficha técnica del café
-            (origen, proceso y comercialización). Al enviarla, la sesión se cierra y puedes ver o exportar la ficha.
+            {{ 'crear.el_formato_extrinseco_no' | transloco }}
           </p>
         </section>
       } @else {
       <section class="cupping-card code-card">
-        <h2 class="section-title">Código de sesión</h2>
+        <h2 class="section-title">{{ 'crear.codigo_de_sesion' | transloco }}</h2>
         <div class="code-display">
           <strong>{{ codigoGenerado }}</strong>
           <ion-button
@@ -150,43 +149,43 @@
             [disabled]="isCopying"
           >
             @if (copiado) {
-              Copiado
+              {{ 'crear.copiado' | transloco }}
             } @else if (isCopying) {
-              Copiando…
+              {{ 'crear.copiando' | transloco }}
             } @else {
-              Copiar código
+              {{ 'crear.copiar_codigo' | transloco }}
             }
           </ion-button>
         </div>
-        <p class="help-text">Comparte este código con los catadores.</p>
+        <p class="help-text">{{ 'crear.comparte_este_codigo_con' | transloco }}</p>
       </section>
       }
 
       <section class="cupping-card">
-        <h2 class="section-title">Resumen de la sesión</h2>
-        <div class="summary-row"><span>Nombre</span><strong>{{ nombreSesion || 'Sin nombre' }}</strong></div>
+        <h2 class="section-title">{{ 'crear.resumen_de_la_sesion' | transloco }}</h2>
+        <div class="summary-row"><span>{{ 'crear.nombre' | transloco }}</span><strong>{{ nombreSesion || ('crear.sin_nombre' | transloco) }}</strong></div>
         <hr>
-        <div class="summary-row"><span>Formato CVA</span><strong>{{ getTituloFormato() }}</strong></div>
+        <div class="summary-row"><span>{{ 'crear.formato_cva' | transloco }}</span><strong>{{ getTituloFormato() | tr }}</strong></div>
         <hr>
         <div class="summary-row">
-          <span>Muestras</span>
+          <span>{{ 'crear.muestras' | transloco }}</span>
           <strong>{{ formatoSeleccionado === 'extrinseca' ? 1 : numeroMuestras }}</strong>
         </div>
         <hr>
         @if (formatoSeleccionado === 'extrinseca') {
           <div class="summary-row">
-            <span>Modalidad</span>
-            <strong>Individual · sin código</strong>
+            <span>{{ 'crear.modalidad' | transloco }}</span>
+            <strong>{{ 'crear.individual_sin_codigo' | transloco }}</strong>
           </div>
         } @else {
           <div class="summary-row">
-            <span>Catadores objetivo</span>
+            <span>{{ 'crear.catadores_objetivo' | transloco }}</span>
             <strong>{{ catadoresObjetivo }}</strong>
           </div>
           <hr>
           <div class="summary-row">
-            <span>Organizador catador</span>
-            <strong>{{ participaComoCatador ? 'Sí' : 'No' }}</strong>
+            <span>{{ 'crear.organizador_catador' | transloco }}</span>
+            <strong>{{ participaComoCatador ? ('crear.si' | transloco) : ('crear.no' | transloco) }}</strong>
           </div>
         }
       </section>
@@ -205,7 +204,7 @@
       @if (isLoading) {
         <ion-spinner name="crescent"></ion-spinner>
       } @else {
-        {{ formatoSeleccionado === 'extrinseca' ? 'Crear sesión →' : 'Generar código de acceso →' }}
+        {{ formatoSeleccionado === 'extrinseca' ? ('crear.crear_sesion_2' | transloco) : ('crear.generar_codigo_de_acceso' | transloco) }}
       }
     </ion-button>
   } @else {
@@ -216,7 +215,7 @@
         routerLink="/dashboard"
         [disabled]="isLoading"
       >
-        Salir
+        {{ 'crear.salir' | transloco }}
       </ion-button>
       <ion-button
         expand="block"
@@ -224,7 +223,7 @@
         (click)="irASalaDeEspera()"
         [disabled]="isLoading"
       >
-        {{ formatoSeleccionado === 'extrinseca' ? 'Ir a la evaluación →' : 'Ir a sala de espera →' }}
+        {{ formatoSeleccionado === 'extrinseca' ? ('crear.ir_a_la_evaluacion' | transloco) : ('crear.ir_a_sala_de' | transloco) }}
       </ion-button>
     </div>
   }

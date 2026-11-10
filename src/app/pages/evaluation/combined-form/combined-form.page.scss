@@ -41,7 +41,7 @@ app-extrinsic-form {
   padding: 0 16px;
 
   &__inner {
-    max-width: 1280px; margin: 0 auto; height: 64px;
+    max-width: 1280px; margin: 0 auto; min-height: 64px;
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
   }
 

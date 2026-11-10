@@ -1,17 +1,35 @@
 <ion-content class="ion-padding register-content">
   <main class="register-container">
+    <div class="auth-lang"><app-selector-idioma></app-selector-idioma></div>
     <div class="logo-box">
-      <img src="assets/icon/logopacamara.png" alt="Logo de Pacamara">
+      <img src="assets/icon/logopacamara.png" [alt]="'login.logo_alt' | transloco">
     </div>
-    <a class="back-link" routerLink="/login">Volver al inicio de sesión</a>
-    <h1 class="title">Crear cuenta</h1>
-    <p class="subtitle">Regístrate para comenzar a catar.</p>
+    <a class="back-link" routerLink="/login">{{ 'registro.volver' | transloco }}</a>
+    <h1 class="title">{{ 'registro.titulo' | transloco }}</h1>
+    <p class="subtitle">{{ 'registro.subtitulo' | transloco }}</p>
+
+    <ion-button expand="block" fill="outline" class="btn-google" type="button" [disabled]="cargandoGoogle()" (click)="entrarConGoogle()">
+      @if (cargandoGoogle()) {
+        <ion-spinner name="crescent"></ion-spinner>
+        <span class="btn-google__text">{{ 'comun.google_abriendo' | transloco }}</span>
+      } @else {
+        <svg class="btn-google__logo" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span class="btn-google__text">{{ 'comun.google' | transloco }}</span>
+      }
+    </ion-button>
+    <div class="oauth-divider" aria-hidden="true"><span>{{ 'comun.o' | transloco }}</span></div>
+
 
     <form class="register-form" (ngSubmit)="registro()">
       <ion-input
         [(ngModel)]="nombre"
         name="nombre"
-        label="Nombre"
+        [label]="'registro.nombre' | transloco"
         labelPlacement="stacked"
         autocomplete="name"
         fill="outline"
@@ -21,7 +39,7 @@
       <ion-input
         [(ngModel)]="email"
         name="email"
-        label="Correo"
+        [label]="'registro.correo' | transloco"
         labelPlacement="stacked"
         type="email"
         autocomplete="email"
@@ -33,7 +51,7 @@
       <ion-input
         [(ngModel)]="password"
         name="password"
-        label="Contraseña"
+        [label]="'registro.contrasena' | transloco"
         labelPlacement="stacked"
         [type]="showPassword ? 'text' : 'password'"
         autocomplete="new-password"
@@ -45,15 +63,15 @@
         type="button"
         fill="clear"
         class="password-toggle"
-        [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        [attr.aria-label]="(showPassword ? 'registro.ocultar_aria' : 'registro.mostrar_aria') | transloco"
         (click)="showPassword = !showPassword"
       >
-        {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+        {{ (showPassword ? 'registro.ocultar' : 'registro.mostrar') | transloco }}
       </ion-button>
       <ion-input
         [(ngModel)]="confirmPassword"
         name="confirmPassword"
-        label="Confirmar contraseña"
+        [label]="'registro.confirmar' | transloco"
         labelPlacement="stacked"
         [type]="showPassword ? 'text' : 'password'"
         autocomplete="new-password"
@@ -69,7 +87,8 @@
           name="politicaAceptada"
         ></ion-checkbox>
         <ion-label class="ion-text-wrap">
-          Acepto los términos y la política de privacidad para crear y usar mi cuenta.
+          {{ 'registro.acepto' | transloco }}
+          <button type="button" class="link-politica" (click)="politicaAbierta.set(true)">{{ 'registro.ver_politica' | transloco }}</button>
         </ion-label>
       </ion-item>
 
@@ -77,13 +96,27 @@
         @if (isLoading()) {
           <ion-spinner name="crescent"></ion-spinner>
         } @else {
-          <span>Crear cuenta</span>
+          <span>{{ 'registro.crear' | transloco }}</span>
         }
       </ion-button>
     </form>
     <p class="register-link">
-      ¿Ya tienes cuenta?
-      <a routerLink="/login">Inicia sesión</a>
+      {{ 'registro.ya_tienes' | transloco }}
+      <a routerLink="/login">{{ 'registro.inicia' | transloco }}</a>
     </p>
+
+    <ion-modal [isOpen]="politicaAbierta()" (didDismiss)="politicaAbierta.set(false)">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>{{ 'politica.titulo' | transloco }}</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="politicaAbierta.set(false)">OK</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding"><app-texto-politica></app-texto-politica></ion-content>
+      </ng-template>
+    </ion-modal>
   </main>
 </ion-content>

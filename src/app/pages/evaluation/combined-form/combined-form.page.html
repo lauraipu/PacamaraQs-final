@@ -9,32 +9,32 @@
     (salir)="salirConPendientes()">
   </app-estado-ficha>
   @if (error(); as mensaje) {
-    <div class="evaluation-error" role="alert">{{ mensaje }}</div>
+    <div class="evaluation-error" role="alert">{{ mensaje | tr }}</div>
   }
   
   <!-- HEADER -->
   <header class="cva-header">
     <div class="cva-header__inner">
       <div class="cva-header__left">
-        <button class="cva-header__back-btn" (click)="volver()">
+        <button class="cva-header__back-btn" [attr.aria-label]="'combinado.volver' | transloco" (click)="volver()">
           <ion-icon name="arrow-back-outline"></ion-icon>
         </button>
         <div class="cva-header__meta">
-          <p class="cva-header__session-name">Evaluación Combinada</p>
-          <p class="cva-header__sample-label">Muestra {{ muestraActual() }} <span>de {{ totalMuestras() }}</span></p>
+          <p class="cva-header__session-name">{{ 'combinado.evaluacion_combinada' | transloco }}</p>
+          <p class="cva-header__sample-label">{{ 'combinado.muestra' | transloco: { p0: (muestraActual()) } }} <span>{{ 'combinado.de' | transloco: { p0: (totalMuestras()) } }}</span></p>
         </div>
       </div>
       <div class="cva-header__right">
         <div class="cva-header__blind-badge">
-          <ion-icon name="lock-closed-outline"></ion-icon> Ciego
+          <ion-icon name="lock-closed-outline"></ion-icon> {{ 'combinado.ciego' | transloco }}
         </div>
-        <span class="cva-header__format-badge">Combinado</span>
+        <span class="cva-header__format-badge">{{ 'combinado.combinado' | transloco }}</span>
         
         <!-- Puntaje en vivo -->
         <div class="cva-header__live-score" [style.border-color]="clasificacion.border" [style.background]="clasificacion.bg">
-          <span class="cva-header__live-score-label">CVA</span>
+          <span class="cva-header__live-score-label">{{ 'combinado.cva' | transloco }}</span>
           <span class="cva-header__live-score-value" [style.color]="clasificacion.color">
-            {{ puntaje === null ? 'Pendiente' : (puntaje | number:'1.2-2') }}
+            {{ puntaje === null ? ('combinado.pendiente' | transloco) : (puntaje | number:'1.2-2') }}
           </span>
         </div>
       </div>
@@ -55,24 +55,24 @@
 
         <!-- FRAGANCIA -->
         <article class="attr-card">
-          <h3 class="attr-card__title">Fragancia</h3>
+          <h3 class="attr-card__title">{{ 'combinado.fragancia' | transloco }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.fragancia.intensidad === null ? 'Sin marcar' : (formulario.atributos.fragancia.intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'combinado.intensidad_fisica' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.fragancia.intensidad === null ? ('combinado.sin_marcar' | transloco) : (formulario.atributos.fragancia.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.fragancia.intensidad === null" [(ngModel)]="formulario.atributos.fragancia.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.fragancia, $event)" (keyup)="marcarIntensidad(formulario.atributos.fragancia, $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.alta' | transloco }}</span>
             </div>
           </div>
 
           <div class="hedonic-buttons">
             <div class="hedonic-buttons__header">
-              <span class="hedonic-buttons__label">Calidad hedónica</span>
+              <span class="hedonic-buttons__label">{{ 'combinado.calidad_hedonica' | transloco }}</span>
               <span class="hedonic-buttons__descriptor">
-                {{ formulario.atributos.fragancia.calidad ? etiquetas[formulario.atributos.fragancia.calidad] : 'Selecciona una opción' }}
+                {{ formulario.atributos.fragancia.calidad ? etiquetas[formulario.atributos.fragancia.calidad] : ('combinado.selecciona_una_opcion' | transloco) }}
               </span>
             </div>
             <div class="hedonic-buttons__grid">
@@ -87,13 +87,13 @@
 
           <!-- Rueda de Sabores -->
           <div class="flavor-tree">
-            <p class="flavor-tree__section-label">Descriptores aromáticos</p>
+            <p class="flavor-tree__section-label">{{ 'combinado.descriptores_aromaticos' | transloco }}</p>
             <div class="flavor-tree__category" *ngFor="let cat of ruedaKeys">
               <button class="flavor-tree__category-btn" (click)="toggleCategoria(cat)">
                 <span class="flavor-tree__category-left">
                   <ion-icon [name]="categoriasAbiertas[cat] ? 'chevron-down-outline' : 'chevron-forward-outline'" class="flavor-tree__chevron"></ion-icon>
                   <span class="flavor-tree__swatch" [style.background]="ruedaSabores[cat].color"></span>
-                  {{ cat }}
+                  {{ cat | tr }}
                 </span>
                 <span class="flavor-tree__count-badge" *ngIf="formulario.atributos.fragancia.descriptores.length > 0 && categoriasAbiertas[cat]">
                   {{ formulario.atributos.fragancia.descriptores.length }}
@@ -106,37 +106,37 @@
                         [style.background]="isDescriptorSelected('fragancia', sub) ? ruedaSabores[cat].color : ''"
                         [style.color]="isDescriptorSelected('fragancia', sub) ? 'white' : ''"
                         (click)="toggleDescriptor('fragancia', sub)">
-                  {{ sub }}
+                  {{ sub | tr }}
                 </button>
               </div>
             </div>
             <input
               type="text"
               class="extra-descriptor"
-              aria-label="Descriptor personalizado para fragancia"
-              placeholder="Agregar descriptor personalizado..."
+              [attr.aria-label]="'combinado.descriptor_personalizado_para_fragancia' | transloco"
+              [placeholder]="'combinado.agregar_descriptor_personalizado' | transloco"
               [(ngModel)]="formulario.atributos.fragancia.extra">
           </div>
         </article>
 
         <!-- AROMA EN TAZA -->
         <article class="attr-card">
-          <h3 class="attr-card__title">Aroma (en taza)</h3>
+          <h3 class="attr-card__title">{{ 'combinado.aroma_en_taza' | transloco }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.aroma.intensidad === null ? 'Sin marcar' : (formulario.atributos.aroma.intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'combinado.intensidad_fisica' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.aroma.intensidad === null ? ('combinado.sin_marcar' | transloco) : (formulario.atributos.aroma.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.aroma.intensidad === null" [(ngModel)]="formulario.atributos.aroma.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.aroma, $event)" (keyup)="marcarIntensidad(formulario.atributos.aroma, $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.alta' | transloco }}</span>
             </div>
           </div>
           <div class="hedonic-buttons">
             <div class="hedonic-buttons__header">
-              <span class="hedonic-buttons__label">Calidad hedónica</span>
-              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.aroma.calidad ? etiquetas[formulario.atributos.aroma.calidad] : 'Selecciona una opción' }}</span>
+              <span class="hedonic-buttons__label">{{ 'combinado.calidad_hedonica' | transloco }}</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.aroma.calidad ? etiquetas[formulario.atributos.aroma.calidad] : ('combinado.selecciona_una_opcion' | transloco) }}</span>
             </div>
             <div class="hedonic-buttons__grid">
               <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.aroma.calidad === i}" (click)="seleccionarCalidad('aroma', i)">{{ i }}</button>
@@ -146,22 +146,22 @@
 
         <!-- SABOR -->
         <article class="attr-card">
-          <h3 class="attr-card__title">Sabor</h3>
+          <h3 class="attr-card__title">{{ 'combinado.sabor' | transloco }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.sabor.intensidad === null ? 'Sin marcar' : (formulario.atributos.sabor.intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'combinado.intensidad_fisica' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.sabor.intensidad === null ? ('combinado.sin_marcar' | transloco) : (formulario.atributos.sabor.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.sabor.intensidad === null" [(ngModel)]="formulario.atributos.sabor.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.sabor, $event)" (keyup)="marcarIntensidad(formulario.atributos.sabor, $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.alta' | transloco }}</span>
             </div>
           </div>
           <div class="hedonic-buttons">
             <div class="hedonic-buttons__header">
-              <span class="hedonic-buttons__label">Calidad hedónica</span>
-              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.sabor.calidad ? etiquetas[formulario.atributos.sabor.calidad] : 'Selecciona una opción' }}</span>
+              <span class="hedonic-buttons__label">{{ 'combinado.calidad_hedonica' | transloco }}</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.sabor.calidad ? etiquetas[formulario.atributos.sabor.calidad] : ('combinado.selecciona_una_opcion' | transloco) }}</span>
             </div>
             <div class="hedonic-buttons__grid">
               <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.sabor.calidad === i}" (click)="seleccionarCalidad('sabor', i)">{{ i }}</button>
@@ -171,22 +171,22 @@
 
         <!-- SABOR RESIDUAL -->
         <article class="attr-card">
-          <h3 class="attr-card__title">Sabor Residual</h3>
+          <h3 class="attr-card__title">{{ 'combinado.sabor_residual' | transloco }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.saborResidual.intensidad === null ? 'Sin marcar' : (formulario.atributos.saborResidual.intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'combinado.intensidad_fisica' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.saborResidual.intensidad === null ? ('combinado.sin_marcar' | transloco) : (formulario.atributos.saborResidual.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.saborResidual.intensidad === null" [(ngModel)]="formulario.atributos.saborResidual.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.saborResidual, $event)" (keyup)="marcarIntensidad(formulario.atributos.saborResidual, $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.alta' | transloco }}</span>
             </div>
           </div>
           <div class="hedonic-buttons">
             <div class="hedonic-buttons__header">
-              <span class="hedonic-buttons__label">Calidad hedónica</span>
-              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.saborResidual.calidad ? etiquetas[formulario.atributos.saborResidual.calidad] : 'Selecciona una opción' }}</span>
+              <span class="hedonic-buttons__label">{{ 'combinado.calidad_hedonica' | transloco }}</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.saborResidual.calidad ? etiquetas[formulario.atributos.saborResidual.calidad] : ('combinado.selecciona_una_opcion' | transloco) }}</span>
             </div>
             <div class="hedonic-buttons__grid">
               <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.saborResidual.calidad === i}" (click)="seleccionarCalidad('saborResidual', i)">{{ i }}</button>
@@ -196,7 +196,7 @@
 
         <!-- GUSTOS PREDOMINANTES (2) — hoja SCA, bloque de Sabor / Sabor residual -->
         <article class="attr-card">
-          <h3 class="attr-card__title">Gustos Predominantes (2)</h3>
+          <h3 class="attr-card__title">{{ 'combinado.gustos_predominantes_2' | transloco }}</h3>
           <app-gustos-predominantes
             [seleccion]="formulario.gustosPredominantes"
             [deshabilitado]="muestraActualCerrada()"
@@ -206,22 +206,22 @@
 
         <!-- ACIDEZ -->
         <article class="attr-card">
-          <h3 class="attr-card__title">Acidez</h3>
+          <h3 class="attr-card__title">{{ 'combinado.acidez' | transloco }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.acidez.intensidad === null ? 'Sin marcar' : (formulario.atributos.acidez.intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'combinado.intensidad_fisica' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.acidez.intensidad === null ? ('combinado.sin_marcar' | transloco) : (formulario.atributos.acidez.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.acidez.intensidad === null" [(ngModel)]="formulario.atributos.acidez.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.acidez, $event)" (keyup)="marcarIntensidad(formulario.atributos.acidez, $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.alta' | transloco }}</span>
             </div>
           </div>
           <div class="hedonic-buttons">
             <div class="hedonic-buttons__header">
-              <span class="hedonic-buttons__label">Calidad hedónica</span>
-              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.acidez.calidad ? etiquetas[formulario.atributos.acidez.calidad] : 'Selecciona una opción' }}</span>
+              <span class="hedonic-buttons__label">{{ 'combinado.calidad_hedonica' | transloco }}</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.acidez.calidad ? etiquetas[formulario.atributos.acidez.calidad] : ('combinado.selecciona_una_opcion' | transloco) }}</span>
             </div>
             <div class="hedonic-buttons__grid">
               <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.acidez.calidad === i}" (click)="seleccionarCalidad('acidez', i)">{{ i }}</button>
@@ -231,22 +231,22 @@
 
         <!-- DULZOR -->
         <article class="attr-card">
-          <h3 class="attr-card__title">Dulzor</h3>
+          <h3 class="attr-card__title">{{ 'combinado.dulzor' | transloco }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.dulzor.intensidad === null ? 'Sin marcar' : (formulario.atributos.dulzor.intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'combinado.intensidad_fisica' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.dulzor.intensidad === null ? ('combinado.sin_marcar' | transloco) : (formulario.atributos.dulzor.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.dulzor.intensidad === null" [(ngModel)]="formulario.atributos.dulzor.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.dulzor, $event)" (keyup)="marcarIntensidad(formulario.atributos.dulzor, $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.alta' | transloco }}</span>
             </div>
           </div>
           <div class="hedonic-buttons">
             <div class="hedonic-buttons__header">
-              <span class="hedonic-buttons__label">Calidad hedónica</span>
-              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.dulzor.calidad ? etiquetas[formulario.atributos.dulzor.calidad] : 'Selecciona una opción' }}</span>
+              <span class="hedonic-buttons__label">{{ 'combinado.calidad_hedonica' | transloco }}</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.dulzor.calidad ? etiquetas[formulario.atributos.dulzor.calidad] : ('combinado.selecciona_una_opcion' | transloco) }}</span>
             </div>
             <div class="hedonic-buttons__grid">
               <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.dulzor.calidad === i}" (click)="seleccionarCalidad('dulzor', i)">{{ i }}</button>
@@ -256,22 +256,22 @@
 
         <!-- SENSACIÓN EN BOCA -->
         <article class="attr-card">
-          <h3 class="attr-card__title">Sensación en Boca</h3>
+          <h3 class="attr-card__title">{{ 'combinado.sensacion_en_boca' | transloco }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física</span>
-              <span class="intensity-slider__value">{{ formulario.atributos.sensacionEnBoca.intensidad === null ? 'Sin marcar' : (formulario.atributos.sensacionEnBoca.intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'combinado.intensidad_fisica' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario.atributos.sensacionEnBoca.intensidad === null ? ('combinado.sin_marcar' | transloco) : (formulario.atributos.sensacionEnBoca.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.atributos.sensacionEnBoca.intensidad === null" [(ngModel)]="formulario.atributos.sensacionEnBoca.intensidad" (pointerup)="marcarIntensidad(formulario.atributos.sensacionEnBoca, $event)" (keyup)="marcarIntensidad(formulario.atributos.sensacionEnBoca, $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'combinado.alta' | transloco }}</span>
             </div>
           </div>
           <div class="hedonic-buttons">
             <div class="hedonic-buttons__header">
-              <span class="hedonic-buttons__label">Calidad hedónica</span>
-              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.sensacionEnBoca.calidad ? etiquetas[formulario.atributos.sensacionEnBoca.calidad] : 'Selecciona una opción' }}</span>
+              <span class="hedonic-buttons__label">{{ 'combinado.calidad_hedonica' | transloco }}</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.atributos.sensacionEnBoca.calidad ? etiquetas[formulario.atributos.sensacionEnBoca.calidad] : ('combinado.selecciona_una_opcion' | transloco) }}</span>
             </div>
             <div class="hedonic-buttons__grid">
               <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.atributos.sensacionEnBoca.calidad === i}" (click)="seleccionarCalidad('sensacionEnBoca', i)">{{ i }}</button>
@@ -280,11 +280,11 @@
 
           <!-- Mouthfeel -->
           <div class="mouthfeel">
-            <p class="flavor-tree__section-label">Descriptores táctiles</p>
+            <p class="flavor-tree__section-label">{{ 'combinado.descriptores_tactiles' | transloco }}</p>
             <div class="mouthfeel__list">
               <label class="mouthfeel__item" *ngFor="let opcion of mouthfeelOptions">
                 <input type="checkbox" [checked]="formulario.mouthfeel.includes(opcion)" (change)="toggleMouthfeel(opcion)">
-                {{ opcion }}
+                {{ opcion | tr }}
               </label>
             </div>
           </div>
@@ -292,12 +292,12 @@
 
         <!-- IMPRESIÓN GLOBAL -->
         <article class="attr-card">
-          <h3 class="attr-card__title">Impresión Global</h3>
-          <p style="font-size:12px; color:var(--gray-500); margin-bottom:16px;">Evaluación hedónica general de la muestra</p>
+          <h3 class="attr-card__title">{{ 'combinado.impresion_global' | transloco }}</h3>
+          <p style="font-size:12px; color:var(--gray-500); margin-bottom:16px;">{{ 'combinado.evaluacion_hedonica_general_de' | transloco }}</p>
           <div class="hedonic-buttons">
             <div class="hedonic-buttons__header">
-              <span class="hedonic-buttons__label">Calidad hedónica</span>
-              <span class="hedonic-buttons__descriptor">{{ formulario.impresionGlobal ? etiquetas[formulario.impresionGlobal] : 'Selecciona una opción' }}</span>
+              <span class="hedonic-buttons__label">{{ 'combinado.calidad_hedonica' | transloco }}</span>
+              <span class="hedonic-buttons__descriptor">{{ formulario.impresionGlobal ? etiquetas[formulario.impresionGlobal] : ('combinado.selecciona_una_opcion' | transloco) }}</span>
             </div>
             <div class="hedonic-buttons__grid">
               <button *ngFor="let i of [1,2,3,4,5,6,7,8,9]" class="hedonic-buttons__btn" [ngClass]="{'hedonic-buttons__btn--active': formulario.impresionGlobal === i}" (click)="seleccionarCalidad('impresionGlobal', i)">{{ i }}</button>
@@ -311,22 +311,22 @@
         
         <!-- PUNTAJE EN VIVO -->
         <div class="score-panel" [style.background]="clasificacion.bg" [style.border-color]="clasificacion.border">
-          <span class="score-panel__label">Puntaje CVA</span>
+          <span class="score-panel__label">{{ 'combinado.puntaje_cva' | transloco }}</span>
           <span class="score-panel__value" [style.color]="clasificacion.color">
             {{ puntaje === null ? '—' : (puntaje | number:'1.2-2') }}
           </span>
-          <span class="score-panel__classification" [style.color]="clasificacion.color">{{ clasificacion.label }}</span>
+          <span class="score-panel__classification" [style.color]="clasificacion.color">{{ clasificacion.label | tr }}</span>
           <p class="score-panel__formula">S = 0.65625 × Σhᵢ + 52.75 − 2u − 4d</p>
         </div>
 
         <!-- DEFECTOS -->
         <div class="defect-panel">
-          <span class="label-micro" style="display:block; margin-bottom:16px;">Defectos</span>
+          <span class="label-micro" style="display:block; margin-bottom:16px;">{{ 'combinado.defectos' | transloco }}</span>
           
           <div class="defect-counter">
             <div class="defect-counter__info">
-              <span class="defect-counter__label">Tazas no uniformes</span>
-              <span class="defect-counter__sublabel">−2 pts por taza</span>
+              <span class="defect-counter__label">{{ 'combinado.tazas_no_uniformes' | transloco }}</span>
+              <span class="defect-counter__sublabel">{{ 'combinado.t_2_pts_por_taza' | transloco }}</span>
             </div>
             <div class="defect-counter__controls">
               <button class="defect-counter__btn" (click)="ajustarDefecto('uniformes', 'restar')">−</button>
@@ -337,8 +337,8 @@
 
           <div class="defect-counter" style="margin-top: 16px;">
             <div class="defect-counter__info">
-              <span class="defect-counter__label">Tazas defectuosas</span>
-              <span class="defect-counter__sublabel">−4 pts por taza</span>
+              <span class="defect-counter__label">{{ 'combinado.tazas_defectuosas' | transloco }}</span>
+              <span class="defect-counter__sublabel">{{ 'combinado.t_4_pts_por_taza' | transloco }}</span>
             </div>
             <div class="defect-counter__controls">
               <button class="defect-counter__btn" (click)="ajustarDefecto('defectuosas', 'restar')">−</button>
@@ -348,16 +348,16 @@
           </div>
 
           <div class="defect-penalty">
-            <span class="defect-penalty__label">Penalización total</span>
-            <span class="defect-penalty__value">−{{ penalizacionTotal }} pts</span>
+            <span class="defect-penalty__label">{{ 'combinado.penalizacion_total' | transloco }}</span>
+            <span class="defect-penalty__value">{{ 'combinado.pts' | transloco: { p0: (penalizacionTotal) } }}</span>
           </div>
 
           <div class="defect-types">
-            <span class="defect-types__label">Tipo de defecto</span>
-            <span class="defect-types__hint">Al marcar un tipo se cuenta al menos una taza defectuosa.</span>
+            <span class="defect-types__label">{{ 'combinado.tipo_de_defecto' | transloco }}</span>
+            <span class="defect-types__hint">{{ 'combinado.al_marcar_un_tipo' | transloco }}</span>
             <label class="defect-types__item" *ngFor="let tipo of defectosOptions">
               <input type="checkbox" [checked]="formulario.tiposDefecto.includes(tipo)" (change)="toggleTipoDefecto(tipo)">
-              {{ tipo }}
+              {{ tipo | tr }}
             </label>
           </div>
         </div>
@@ -365,9 +365,9 @@
         <!-- NOTAS -->
         <div class="notes-panel">
           <div class="notes-panel__header">
-            <ion-icon name="document-text-outline"></ion-icon> Notas adicionales
+            <ion-icon name="document-text-outline"></ion-icon> {{ 'combinado.notas_adicionales' | transloco }}
           </div>
-          <textarea class="notes-panel__textarea" rows="5" [(ngModel)]="formulario.notas" placeholder="Observaciones..."></textarea>
+          <textarea class="notes-panel__textarea" rows="5" [(ngModel)]="formulario.notas" [placeholder]="'combinado.observaciones' | transloco"></textarea>
         </div>
 
         <div class="sample-navigation">
@@ -376,14 +376,14 @@
             type="button"
             class="submit-btn sample-navigation__previous"
             (click)="irAMuestraAnterior()">
-            ← Anterior
+            {{ 'combinado.anterior' | transloco }}
           </button>
           <button
             type="button"
             class="submit-btn"
             (click)="irAMuestraSiguiente()"
             [disabled]="guardando()">
-            {{ guardando() ? 'Guardando…' : (muestraActual() === totalMuestras() ? 'Terminar cata' : 'Siguiente muestra →') }}
+            {{ guardando() ? ('combinado.guardando' | transloco) : (muestraActual() === totalMuestras() ? ('combinado.terminar_cata' | transloco) : ('combinado.siguiente_muestra' | transloco)) }}
           </button>
         </div>
       </aside>

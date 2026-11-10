@@ -1,15 +1,15 @@
 <div class="progress-container">
   <div class="progress-header">
-    <span class="label">Catadores que han terminado</span>
-    <span class="value">{{ completados }} de {{ total }}</span>
+    <span class="label">{{ 'progreso.catadores_que_han_terminado' | transloco }}</span>
+    <span class="value">{{ 'progreso.de' | transloco: { p0: (completados), p1: (total) } }}</span>
   </div>
   <div class="progress-bar-bg">
     <div class="progress-bar-fill" [style.width.%]="porcentaje"></div>
   </div>
   @if (completados < total) {
-    <p class="progress-hint">Esperando a que los demás terminen...</p>
+    <p class="progress-hint">{{ 'progreso.esperando_a_que_los' | transloco }}</p>
   }
   @if (completados === total && total > 0) {
-    <p class="progress-hint success">¡Todos han terminado!</p>
+    <p class="progress-hint success">{{ 'progreso.todos_han_terminado' | transloco }}</p>
   }
 </div>

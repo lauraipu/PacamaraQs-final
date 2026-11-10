@@ -1,0 +1,29 @@
+<ion-content class="ion-padding politica-content">
+  <main class="politica-container">
+    <div class="politica-top">
+      <app-selector-idioma></app-selector-idioma>
+    </div>
+    <h1 class="politica-title">{{ 'politica.titulo' | transloco }}</h1>
+
+    <section class="politica-card">
+      <app-texto-politica></app-texto-politica>
+    </section>
+
+    <label class="politica-check">
+      <ion-checkbox [(ngModel)]="aceptada" labelPlacement="end" justify="start">
+        <span class="politica-check__text">{{ 'politica.check' | transloco }}</span>
+      </ion-checkbox>
+    </label>
+
+    <ion-button expand="block" class="primary-btn" [disabled]="guardando()" (click)="aceptar()">
+      @if (guardando()) {
+        <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+        {{ 'politica.aceptar' | transloco }}
+      }
+    </ion-button>
+    <ion-button expand="block" fill="clear" color="medium" [disabled]="guardando()" (click)="rechazar()">
+      {{ 'politica.rechazar' | transloco }}
+    </ion-button>
+  </main>
+</ion-content>

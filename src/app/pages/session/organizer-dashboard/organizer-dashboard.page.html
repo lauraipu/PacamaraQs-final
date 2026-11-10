@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="od-toolbar">
     <ion-title>
-      <div class="od-title">Sala de control</div>
+      <div class="od-title">{{ 'monitoreo.sala_de_control' | transloco }}</div>
       <div class="od-subtitle">{{ nombreSesion() }}</div>
     </ion-title>
   </ion-toolbar>
@@ -12,12 +12,12 @@
     @if (sinConexion()) {
       <div class="od-banner" role="status">
         <ion-icon name="cloud-offline-outline" aria-hidden="true"></ion-icon>
-        Reconectando… el progreso se actualiza cada pocos segundos mientras tanto.
+        {{ 'monitoreo.reconectando_el_progreso_se' | transloco }}
       </div>
     }
 
     @if (error(); as mensaje) {
-      <div class="od-error" role="alert">{{ mensaje }}</div>
+      <div class="od-error" role="alert">{{ mensaje | tr }}</div>
     }
 
     @if (cargando()) {
@@ -28,26 +28,26 @@
       @if (panelEnProgreso() && numeroMuestras() > 1) {
         <section class="cupping-card od-guide">
           <div>
-            <h2 class="od-section-title">Guiar al panel</h2>
-            <p class="od-hint">Lleva a todos los catadores a la misma muestra.</p>
+            <h2 class="od-section-title">{{ 'monitoreo.guiar_al_panel' | transloco }}</h2>
+            <p class="od-hint">{{ 'monitoreo.lleva_a_todos_los' | transloco }}</p>
           </div>
           <div class="od-stepper">
             <ion-button fill="outline" size="small" [disabled]="muestraGuiada() <= 1" (click)="guiarPanel(-1)">←</ion-button>
-            <span class="od-stepper__value">Muestra {{ muestraGuiada() }}</span>
+            <span class="od-stepper__value">{{ 'monitoreo.muestra' | transloco: { p0: (muestraGuiada()) } }}</span>
             <ion-button fill="outline" size="small" [disabled]="muestraGuiada() >= numeroMuestras()" (click)="guiarPanel(1)">
-              <ion-icon name="play-forward-outline" aria-label="Siguiente muestra"></ion-icon>
+              <ion-icon name="play-forward-outline" [attr.aria-label]="'monitoreo.siguiente_muestra' | transloco"></ion-icon>
             </ion-button>
           </div>
         </section>
       }
 
       <section class="cupping-card">
-        <h2 class="od-section-title">Fichas por catador</h2>
+        <h2 class="od-section-title">{{ 'monitoreo.fichas_por_catador' | transloco }}</h2>
         <div class="od-table-wrap">
           <table class="od-table">
             <thead>
               <tr>
-                <th scope="col">Catador</th>
+                <th scope="col">{{ 'monitoreo.catador' | transloco }}</th>
                 @for (n of muestras(); track n) {
                   <th scope="col">M{{ n }}</th>
                 }
@@ -62,9 +62,9 @@
                       [class.od-presence--online]="fila.conexion === 'en_linea'"
                       [class.od-presence--unstable]="fila.conexion === 'inestable'"></span>
                     <span class="od-name">{{ fila.nombre }}</span>
-                    @if (fila.esOrganizador) { <span class="od-tag">org.</span> }
+                    @if (fila.esOrganizador) { <span class="od-tag">{{ 'monitoreo.org' | transloco }}</span> }
                     @if (fila.conexion === 'inestable') {
-                      <span class="od-grace">inestable · {{ fila.segundosGracia }} s</span>
+                      <span class="od-grace">{{ 'monitoreo.inestable_s' | transloco: { p0: (fila.segundosGracia) } }}</span>
                     }
                   </th>
                   @for (celda of fila.celdas; track $index) {
@@ -78,13 +78,13 @@
                   }
                 </tr>
               } @empty {
-                <tr><td class="od-empty" [attr.colspan]="numeroMuestras() + 1">Nadie se ha unido aún.</td></tr>
+                <tr><td class="od-empty" [attr.colspan]="numeroMuestras() + 1">{{ 'monitoreo.nadie_se_ha_unido' | transloco }}</td></tr>
               }
             </tbody>
             @if (panelEnProgreso()) {
               <tfoot>
                 <tr>
-                  <th scope="row">Desbloquear</th>
+                  <th scope="row">{{ 'monitoreo.desbloquear' | transloco }}</th>
                   @for (m of pendientesPorMuestra(); track m.numero) {
                     <td>
                       @if (!m.cerrada && m.pendientes > 0) {
@@ -93,7 +93,7 @@
                           class="od-close-btn"
                           [disabled]="accionEnCurso() !== null"
                           (click)="forzarCierreMuestra(m.numero, m.pendientes)">
-                          Cerrar ({{ m.pendientes }})
+                          {{ 'monitoreo.cerrar' | transloco: { p0: (m.pendientes) } }}
                         </button>
                       }
                     </td>
@@ -103,16 +103,16 @@
             }
           </table>
         </div>
-        <p class="od-hint">Por evaluación ciega solo ves el avance, nunca los puntajes. Un catador desconectado más de 45 s se retira automáticamente si no ha entregado todas sus fichas.</p>
+        <p class="od-hint">{{ 'monitoreo.por_evaluacion_ciega_solo' | transloco }}</p>
       </section>
 
       <ion-button expand="block" class="primary-btn" [disabled]="accionEnCurso() !== null" (click)="finalizarSesion()">
         @if (accionEnCurso() === 'finalizar') {
           <ion-spinner name="crescent"></ion-spinner>
         } @else if (panelCerrado()) {
-          Ver resultados del panel →
+          {{ 'monitoreo.ver_resultados_del_panel' | transloco }}
         } @else {
-          Finalizar panel y ver resultados
+          {{ 'monitoreo.finalizar_panel_y_ver' | transloco }}
         }
       </ion-button>
     }

@@ -4,16 +4,16 @@
       <ion-back-button defaultHref="/dashboard" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>
-      <div class="rs-title">{{ esExtrinseco() ? 'Ficha técnica' : 'Resultados finales' }}</div>
+      <div class="rs-title">{{ esExtrinseco() ? ('resultados.ficha_tecnica' | transloco) : ('resultados.resultados_finales' | transloco) }}</div>
       @if (resultados(); as rs) {
-        <div class="rs-subtitle">{{ rs.nombreSesion }} · {{ tituloFormato() }}</div>
+        <div class="rs-subtitle">{{ rs.nombreSesion }} · {{ tituloFormato() | tr }}</div>
       }
     </ion-title>
     <ion-buttons slot="end">
       <ion-button fill="outline" size="small" [disabled]="!resultados() || imprimiendo()"
         (click)="abrirMenuExportar()">
         <ion-icon name="download-outline" slot="start"></ion-icon>
-        Exportar
+        {{ 'resultados.exportar' | transloco }}
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -24,35 +24,35 @@
         @if (catadorReporte(); as cat) {
           <ion-card class="rc-card">
             <ion-card-content>
-              <h2 class="rs-section-title rc-section-title--tight">Reporte de sesión individual</h2>
+              <h2 class="rs-section-title rc-section-title--tight">{{ 'resultados.reporte_de_sesion_individual' | transloco }}</h2>
               <div class="rc-report__head">
                 <div class="rc-report__who">
                   <span class="rc-avatar" aria-hidden="true">{{ cat.nombre.charAt(0).toUpperCase() }}</span>
                   <div>
                     <p class="rc-report__name">{{ cat.nombre }}</p>
                     <p class="rc-report__meta">
-                      @if (esPersonal()) { Ficha escaneada · sesión personal }
-                      @else { {{ cat.muestrasEvaluadas }} de {{ cat.muestrasAsignadas }} muestras evaluadas · estado {{ cat.estado }} }
+                      @if (esPersonal()) { {{ 'resultados.ficha_escaneada_sesion_personal' | transloco }} }
+                      @else { {{ 'resultados.de_muestras_evaluadas_estado' | transloco: { p0: (cat.muestrasEvaluadas), p1: (cat.muestrasAsignadas), p2: (cat.estado) } }} }
                     </p>
                   </div>
                 </div>
                 <div class="rc-report__score">
                   <strong>{{ cat.puntajePromedio > 0 ? (cat.puntajePromedio | number:'1.2-2') : '—' }}</strong>
-                  <span>{{ esPersonal() ? 'Puntaje CVA' : 'Promedio' }}</span>
+                  <span>{{ esPersonal() ? ('resultados.puntaje_cva' | transloco) : ('resultados.promedio' | transloco) }}</span>
                 </div>
               </div>
 
               @if (fichasReporte().length > 0) {
-                <p class="rs-muted rs-note">Haz clic en una ficha para ver su detalle.</p>
+                <p class="rs-muted rs-note">{{ 'resultados.haz_clic_en_una' | transloco }}</p>
                 <ion-accordion-group class="rc-fichas" [multiple]="false"
                   [value]="esPersonal() ? cat.cupperId + '-' + fichasReporte()[0].numeroMuestra : undefined">
                   @for (ficha of fichasReporte(); track ficha.numeroMuestra) {
                     <ion-accordion [value]="cat.cupperId + '-' + ficha.numeroMuestra" class="rc-ficha">
                       <ion-item slot="header" lines="none" class="rc-ficha__header">
-                        <ion-label>Muestra {{ ficha.numeroMuestra }}</ion-label>
+                        <ion-label>{{ 'resultados.muestra' | transloco: { p0: (ficha.numeroMuestra) } }}</ion-label>
                         @if (!ficha.sinPuntaje) {
                           <ion-badge slot="end" class="rc-chip" [style.--background]="ficha.clasificacion.fondo" [style.--color]="ficha.clasificacion.color">
-                            {{ ficha.clasificacion.etiqueta }}
+                            {{ ficha.clasificacion.etiqueta | tr }}
                           </ion-badge>
                         }
                         <span slot="end" class="rc-ficha__score">{{ ficha.sinPuntaje ? '—' : (ficha.puntaje | number:'1.2-2') }}</span>
@@ -60,11 +60,11 @@
                       <div slot="content" class="rc-ficha__body">
                         @if (ficha.atributos.length > 0) {
                           <div class="rc-ficha__row rc-ficha__row--head">
-                            <span>Atributo</span><span class="rc-ficha__cols"><em>Intensidad</em><em>Calidad</em></span>
+                            <span>{{ 'resultados.atributo' | transloco }}</span><span class="rc-ficha__cols"><em>{{ 'resultados.intensidad' | transloco }}</em><em>{{ 'resultados.calidad' | transloco }}</em></span>
                           </div>
                           @for (a of ficha.atributos; track a.clave) {
                             <div class="rc-ficha__row">
-                              <span>{{ a.etiqueta }}</span>
+                              <span>{{ a.etiqueta | tr }}</span>
                               <span class="rc-ficha__cols">
                                 <strong>{{ a.intensidad === null ? '—' : (a.intensidad | number:'1.0-2') }}</strong>
                                 <strong>{{ a.calidad === null ? '—' : (a.calidad | number:'1.0-2') }}</strong>
@@ -73,26 +73,26 @@
                           }
                         }
                         @if (ficha.impresionGlobal !== null) {
-                          <div class="rc-ficha__row"><span>Impresión global</span><strong>{{ ficha.impresionGlobal | number:'1.0-2' }}</strong></div>
+                          <div class="rc-ficha__row"><span>{{ 'resultados.impresion_global' | transloco }}</span><strong>{{ ficha.impresionGlobal | number:'1.0-2' }}</strong></div>
                         }
-                        <div class="rc-ficha__row"><span>Tazas no uniformes</span><strong>{{ ficha.tazasNoUniformes }}</strong></div>
-                        <div class="rc-ficha__row"><span>Tazas defectuosas</span><strong>{{ ficha.tazasDefectuosas }}</strong></div>
+                        <div class="rc-ficha__row"><span>{{ 'resultados.tazas_no_uniformes' | transloco }}</span><strong>{{ ficha.tazasNoUniformes }}</strong></div>
+                        <div class="rc-ficha__row"><span>{{ 'resultados.tazas_defectuosas' | transloco }}</span><strong>{{ ficha.tazasDefectuosas }}</strong></div>
                         <div class="rc-ficha__row rc-ficha__row--total">
-                          <span>Puntaje final</span><strong>{{ ficha.sinPuntaje ? '—' : (ficha.puntaje | number:'1.2-2') }}</strong>
+                          <span>{{ 'resultados.puntaje_final' | transloco }}</span><strong>{{ ficha.sinPuntaje ? '—' : (ficha.puntaje | number:'1.2-2') }}</strong>
                         </div>
                         @if (ficha.sinPuntaje) {
-                          <p class="rs-muted rs-note">Sin puntaje CVA: faltan calidades o la impresión global en la ficha.</p>
+                          <p class="rs-muted rs-note">{{ 'resultados.sin_puntaje_cva_faltan' | transloco }}</p>
                         }
                         @if (ficha.descriptores.length > 0) {
-                          <div class="rc-ficha__row"><span>Descriptores</span><strong>{{ ficha.descriptores.join(', ') }}</strong></div>
+                          <div class="rc-ficha__row"><span>{{ 'resultados.descriptores' | transloco }}</span><strong>{{ ficha.descriptores.join(', ') }}</strong></div>
                         }
                         @if (ficha.notas) {
-                          <div class="rc-ficha__row"><span>Notas</span><strong style="white-space:pre-line;text-align:right">{{ ficha.notas }}</strong></div>
+                          <div class="rc-ficha__row"><span>{{ 'resultados.notas' | transloco }}</span><strong style="white-space:pre-line;text-align:right">{{ ficha.notas }}</strong></div>
                         }
                         <div class="rc-ficha__actions">
                           <ion-button size="small" fill="outline"
                             (click)="abrirExportar({ numeroMuestra: ficha.numeroMuestra, cupperId: cat.cupperId })">
-                            Exportar PDF
+                            {{ 'resultados.exportar_pdf' | transloco }}
                           </ion-button>
                         </div>
                       </div>
@@ -100,7 +100,7 @@
                   }
                 </ion-accordion-group>
               } @else {
-                <p class="rs-muted rs-note">{{ esPersonal() ? 'La ficha escaneada no se encontró.' : 'Este catador aún no tiene fichas enviadas.' }}</p>
+                <p class="rs-muted rs-note">{{ esPersonal() ? ('resultados.la_ficha_escaneada_no' | transloco) : ('resultados.este_catador_aun_no' | transloco) }}</p>
               }
             </ion-card-content>
           </ion-card>
@@ -112,15 +112,15 @@
   <ion-card class="rc-card">
     <ion-card-content>
       <ion-toggle class="rr-toggle" justify="space-between" [checked]="mostrarGraficas()"
-        (ionChange)="alternarGraficas($event.detail.checked)">Mostrar gráficas de perfil</ion-toggle>
+        (ionChange)="alternarGraficas($event.detail.checked)">{{ 'resultados.mostrar_graficas_de_perfil' | transloco }}</ion-toggle>
       @if (mostrarGraficas()) {
         <div class="rr-filtros">
-          <ion-select interface="popover" label="Muestra" labelPlacement="stacked" fill="outline"
+          <ion-select interface="popover" [label]="'resultados.muestra_2' | transloco" labelPlacement="stacked" fill="outline"
             [value]="muestraRadar()" (ionChange)="seleccionarMuestraRadar($event.detail.value)">
-            @for (n of numerosMuestra(); track n) { <ion-select-option [value]="n">Muestra {{ n }}</ion-select-option> }
+            @for (n of numerosMuestra(); track n) { <ion-select-option [value]="n">{{ 'resultados.muestra' | transloco: { p0: (n) } }}</ion-select-option> }
           </ion-select>
           @if (catadoresConFichas().length > 0) {
-            <ion-select interface="popover" label="Catador" labelPlacement="stacked" fill="outline"
+            <ion-select interface="popover" [label]="'resultados.catador' | transloco" labelPlacement="stacked" fill="outline"
               [value]="catadorReporte()?.cupperId" (ionChange)="seleccionarCatadorRadar($event.detail.value)">
               @for (c of catadoresConFichas(); track c.cupperId) { <ion-select-option [value]="c.cupperId">{{ c.nombre }}</ion-select-option> }
             </ion-select>
@@ -129,23 +129,23 @@
         <div class="rr-grid">
           @for (g of graficasRadar(); track g.id) {
             <figure class="rr-chart">
-              <figcaption><strong>{{ g.titulo }}</strong><span>{{ g.escala }}</span></figcaption>
+              <figcaption><strong>{{ g.titulo | tr }}</strong><span>{{ g.escala | tr }}</span></figcaption>
               <svg viewBox="0 0 300 240" role="img" [attr.aria-label]="g.titulo">
                 @for (a of g.anillos; track $index) { <polygon class="rr-ring" [attr.points]="a"></polygon> }
                 @for (e of g.ejes; track e.etiqueta) {
                   <line class="rr-axis" x1="150" y1="120" [attr.x2]="e.x" [attr.y2]="e.y"></line>
-                  <text class="rr-label" [attr.x]="e.lx" [attr.y]="e.ly" [attr.text-anchor]="e.anchor">{{ e.etiqueta }}</text>
+                  <text class="rr-label" [attr.x]="e.lx" [attr.y]="e.ly" [attr.text-anchor]="e.anchor">{{ e.etiqueta | tr }}</text>
                 }
                 @if (g.panel) { <polygon class="rr-panel" [attr.points]="g.panel"></polygon> }
                 @if (g.catador) { <polygon class="rr-catador" [attr.points]="g.catador"></polygon> }
               </svg>
-              @if (!g.panel && !g.catador) { <p class="rs-muted rs-note">Sin datos de atributos para esta muestra.</p> }
+              @if (!g.panel && !g.catador) { <p class="rs-muted rs-note">{{ 'resultados.sin_datos_de_atributos' | transloco }}</p> }
             </figure>
           }
         </div>
         <p class="rr-legend">
-          <span><i class="rr-legend__panel"></i>Promedio del panel</span>
-          <span><i class="rr-legend__catador"></i>{{ catadorReporte()?.nombre ?? 'Catador' }}</span>
+          <span><i class="rr-legend__panel"></i>{{ 'resultados.promedio_del_panel' | transloco }}</span>
+          <span><i class="rr-legend__catador"></i>{{ catadorReporte()?.nombre ?? ('resultados.catador' | transloco) }}</span>
         </p>
       }
     </ion-card-content>
@@ -165,7 +165,7 @@
         <circle class="rc-gauge__hub" [attr.cx]="centroMedidor.x" [attr.cy]="centroMedidor.y" r="6"></circle>
       </svg>
       <p class="rc-gauge__value">{{ valor | number:'1.2-2' }}</p>
-      <p class="rc-gauge__label">{{ etiqueta }}</p>
+      <p class="rc-gauge__label">{{ etiqueta | tr }}</p>
     </ion-card-content>
   </ion-card>
 </ng-template>
@@ -177,14 +177,14 @@
       <div class="rs-meta__status">
         <p class="rs-meta__headline">
           <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
-          Sesión cerrada · {{ porcentajeCompletado() }}% completada
+          {{ 'resultados.sesion_cerrada_completada' | transloco: { p0: (porcentajeCompletado()) } }}
         </p>
-        <p class="rs-meta__detail">{{ detalle }}</p>
+        <p class="rs-meta__detail">{{ detalle | tr }}</p>
       </div>
       <div class="rs-meta__stats">
-        <div><strong>{{ r.totalMuestras }}</strong><span>Muestras</span></div>
-        <div><strong>{{ r.catadores.length }}</strong><span>Catadores</span></div>
-        <div><strong>{{ tituloFormato() }}</strong><span>Formato</span></div>
+        <div><strong>{{ r.totalMuestras }}</strong><span>{{ 'resultados.muestras' | transloco }}</span></div>
+        <div><strong>{{ r.catadores.length }}</strong><span>{{ 'resultados.catadores' | transloco }}</span></div>
+        <div><strong>{{ tituloFormato() | tr }}</strong><span>{{ 'resultados.formato' | transloco }}</span></div>
       </div>
     </ion-card-content>
   </ion-card>
@@ -194,18 +194,18 @@
 <ng-template #participacion let-r="r">
   <ion-card class="rc-card">
     <ion-card-content>
-      <h2 class="rs-section-title rc-section-title--tight">Participación del panel</h2>
-      <p class="rs-muted rs-note">Fichas enviadas por cada catador.</p>
+      <h2 class="rs-section-title rc-section-title--tight">{{ 'resultados.participacion_del_panel' | transloco }}</h2>
+      <p class="rs-muted rs-note">{{ 'resultados.fichas_enviadas_por_cada' | transloco }}</p>
       <ion-list lines="full" class="rx-list">
         @for (c of r.catadores; track c.cupperId) {
           <ion-item>
             <span slot="start" class="rc-avatar" aria-hidden="true">{{ c.nombre.charAt(0).toUpperCase() }}</span>
             <ion-label>
               <h3 class="rx-list__name">{{ c.nombre }}</h3>
-              <p>{{ c.esOrganizador ? 'Organizador' : 'Catador' }} · {{ c.muestrasEvaluadas }} / {{ c.muestrasAsignadas }} muestras</p>
+              <p>{{ 'resultados.muestras_2' | transloco: { p0: (c.esOrganizador ? ('resultados.organizador' | transloco) : ('resultados.catador' | transloco)), p1: (c.muestrasEvaluadas), p2: (c.muestrasAsignadas) } }}</p>
             </ion-label>
             <ion-badge slot="end" class="rc-chip" [class.rx-chip--ok]="c.estado === 'enviado'" [class.rx-chip--pending]="c.estado !== 'enviado'">
-              {{ c.estado === 'enviado' ? 'Enviado' : 'Pendiente' }}
+              {{ c.estado === 'enviado' ? ('resultados.enviado' | transloco) : ('resultados.pendiente' | transloco) }}
             </ion-badge>
           </ion-item>
         }
@@ -218,7 +218,7 @@
 <ng-template #selectorMuestra let-actual="actual">
   <ion-segment class="rx-samples" scrollable="true" [value]="actual" (ionChange)="seleccionarMuestraDetalle($event.detail.value)">
     @for (n of numerosMuestra(); track n) {
-      <ion-segment-button [value]="n"><ion-label>Muestra {{ n }}</ion-label></ion-segment-button>
+      <ion-segment-button [value]="n"><ion-label>{{ 'resultados.muestra' | transloco: { p0: (n) } }}</ion-label></ion-segment-button>
     }
   </ion-segment>
 </ng-template>
@@ -231,23 +231,22 @@
       <section class="cupping-card rs-center" role="alert">
         @if (accesoDenegado()) {
           <ion-icon name="lock-closed-outline" class="rs-lock" aria-hidden="true"></ion-icon>
-          <h2>Resultados reservados al organizador</h2>
-          <p>{{ mensaje }}</p>
+          <h2>{{ 'resultados.resultados_reservados_al_organizador' | transloco }}</h2>
+          <p>{{ mensaje | tr }}</p>
         } @else if (panelAbierto()) {
           <ion-icon name="hourglass-outline" class="rs-lock" aria-hidden="true"></ion-icon>
-          <h2>El panel sigue abierto</h2>
+          <h2>{{ 'resultados.el_panel_sigue_abierto' | transloco }}</h2>
           <p class="rs-muted">
-            Los resultados se consolidan cuando todos los catadores envían sus fichas.
-            Desde el monitoreo puedes ver quién falta, cerrar muestras o finalizar el panel.
+            {{ 'resultados.los_resultados_se_consolidan' | transloco }}
           </p>
         } @else {
-          <p>{{ mensaje }}</p>
+          <p>{{ mensaje | tr }}</p>
         }
         <div class="rs-actions">
           @if (panelAbierto()) {
-            <ion-button class="primary-btn" (click)="irAMonitoreo()">Monitorear y finalizar panel</ion-button>
+            <ion-button class="primary-btn" (click)="irAMonitoreo()">{{ 'resultados.monitorear_y_finalizar_panel' | transloco }}</ion-button>
           }
-          <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
+          <ion-button fill="outline" (click)="volverAlPanel()">{{ 'resultados.volver_al_panel' | transloco }}</ion-button>
         </div>
       </section>
     } @else if (resultados(); as r) {
@@ -257,10 +256,10 @@
         <ng-container *ngTemplateOutlet="reporteIndividual"></ng-container>
 
         <div class="rs-actions">
-          <ion-button fill="outline" (click)="volverAlPanel()">Volver al inicio</ion-button>
+          <ion-button fill="outline" (click)="volverAlPanel()">{{ 'resultados.volver_al_inicio' | transloco }}</ion-button>
           <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar
+            {{ 'resultados.exportar' | transloco }}
           </ion-button>
         </div>
       } @else if (esCombinado()) {
@@ -290,18 +289,18 @@
         <!-- Ranking -->
         <ion-card class="rc-card">
           <ion-card-content>
-            <h2 class="rs-section-title rc-section-title--tight">Ranking — promedio del panel</h2>
-            <p class="rs-muted rs-note">Haz clic en una muestra para ver su promedio del panel en el medidor.</p>
+            <h2 class="rs-section-title rc-section-title--tight">{{ 'resultados.ranking_promedio_del_panel' | transloco }}</h2>
+            <p class="rs-muted rs-note">{{ 'resultados.haz_clic_en_una_2' | transloco }}</p>
             <div class="rs-table-wrap">
               <table class="rs-table rc-ranking">
                 <thead>
                   <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Muestra</th>
-                    <th scope="col">Fichas</th>
-                    <th scope="col">Mín – Máx</th>
-                    <th scope="col">Puntaje panel</th>
-                    <th scope="col">Clasificación</th>
+                    <th scope="col">{{ 'resultados.muestra_2' | transloco }}</th>
+                    <th scope="col">{{ 'resultados.fichas' | transloco }}</th>
+                    <th scope="col">{{ 'resultados.min_max' | transloco }}</th>
+                    <th scope="col">{{ 'resultados.puntaje_panel' | transloco }}</th>
+                    <th scope="col">{{ 'resultados.clasificacion' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -318,33 +317,33 @@
                         #{{ fila.posicion }}
                       </td>
                       <td>
-                        <span class="rc-ranking__name">Muestra {{ fila.numeroMuestra }}</span>
-                        @if (activa) { <ion-badge class="rc-chip rc-chip--live">en el medidor</ion-badge> }
-                        @if (fila.cerradaForzada) { <span class="rs-tag">cerrada</span> }
+                        <span class="rc-ranking__name">{{ 'resultados.muestra' | transloco: { p0: (fila.numeroMuestra) } }}</span>
+                        @if (activa) { <ion-badge class="rc-chip rc-chip--live">{{ 'resultados.en_el_medidor' | transloco }}</ion-badge> }
+                        @if (fila.cerradaForzada) { <span class="rs-tag">{{ 'resultados.cerrada' | transloco }}</span> }
                       </td>
                       <td>{{ fila.evaluacionesRecibidas }} / {{ fila.evaluacionesEsperadas }}</td>
                       <td class="rs-muted">{{ fila.puntajeMin | number:'1.2-2' }} – {{ fila.puntajeMax | number:'1.2-2' }}</td>
                       <td class="rs-score">
                         {{ fila.puntajePromedioPanel | number:'1.2-2' }}
                         @if (fila.recortado) {
-                          <span class="rs-tag" title="Promedio simple: {{ fila.puntajePromedioSimple | number:'1.2-2' }}">recortado</span>
+                          <span class="rs-tag" title="Promedio simple: {{ fila.puntajePromedioSimple | number:'1.2-2' }}">{{ 'resultados.recortado' | transloco }}</span>
                         }
                       </td>
                       <td>
                         <ion-badge class="rc-chip" [style.--background]="fila.clasificacion.fondo" [style.--color]="fila.clasificacion.color">
-                          {{ fila.clasificacion.etiqueta }}
+                          {{ fila.clasificacion.etiqueta | tr }}
                         </ion-badge>
                       </td>
                     </tr>
                   } @empty {
-                    <tr><td colspan="6" class="rs-muted">Ninguna muestra recibió fichas.</td></tr>
+                    <tr><td colspan="6" class="rs-muted">{{ 'resultados.ninguna_muestra_recibio_fichas' | transloco }}</td></tr>
                   }
                 </tbody>
               </table>
             </div>
             @if (muestrasSinFichas().length > 0) {
               <p class="rs-muted rs-note rc-note-bottom">
-                Sin fichas: {{ muestrasSinFichas().length }} muestra(s) cerradas sin evaluaciones.
+                {{ 'resultados.sin_fichas_muestra_s' | transloco: { p0: (muestrasSinFichas().length) } }}
               </p>
             }
           </ion-card-content>
@@ -354,8 +353,8 @@
 
         <!-- Análisis de catadores -->
         <section class="rc-block">
-          <h2 class="rs-section-title rc-section-title--tight">Análisis de catadores</h2>
-          <p class="rs-muted rs-note">Participación y consistencia individual dentro del panel. Selecciona un catador para ver su reporte.</p>
+          <h2 class="rs-section-title rc-section-title--tight">{{ 'resultados.analisis_de_catadores' | transloco }}</h2>
+          <p class="rs-muted rs-note">{{ 'resultados.participacion_y_consistencia_individual' | transloco }}</p>
           <ion-grid class="rc-grid-flush">
             <ion-row>
               @for (catador of r.catadores; track catador.cupperId) {
@@ -377,18 +376,18 @@
 
         <!-- Fórmula -->
         <section class="rs-formula">
-          <h2 class="rs-section-title">Fórmula CVA aplicada</h2>
+          <h2 class="rs-section-title">{{ 'resultados.formula_cva_aplicada' | transloco }}</h2>
           <p class="rs-formula__expr">S = 0.65625 × Σhᵢ + 52.75 − 2u − 4d</p>
           <p class="rs-muted">
-            El consolidado descarta el valor más alto y el más bajo por muestra cuando hay 5 o más fichas.
+            {{ 'resultados.el_consolidado_descarta_el' | transloco }}
           </p>
         </section>
 
         <div class="rs-actions">
-          <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
+          <ion-button fill="outline" (click)="volverAlPanel()">{{ 'resultados.volver_al_panel' | transloco }}</ion-button>
           <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar
+            {{ 'resultados.exportar' | transloco }}
           </ion-button>
         </div>
       } @else if (esAfectivo()) {
@@ -399,17 +398,17 @@
         <!-- Promedio hedónico por muestra -->
         <ion-card class="rc-card">
           <ion-card-content>
-            <h2 class="rs-section-title rc-section-title--tight">Agrado del panel — escala hedónica (1 a 9)</h2>
-            <p class="rs-muted rs-note">Promedio de la Impresión Global por muestra. Haz clic en una muestra para ver sus votos.</p>
+            <h2 class="rs-section-title rc-section-title--tight">{{ 'resultados.agrado_del_panel_escala' | transloco }}</h2>
+            <p class="rs-muted rs-note">{{ 'resultados.promedio_de_la_impresion' | transloco }}</p>
             <div class="rs-table-wrap">
               <table class="rs-table rc-ranking">
                 <thead>
                   <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Muestra</th>
-                    <th scope="col">Votos</th>
-                    <th scope="col" class="ra-col-bar">Promedio hedónico</th>
-                    <th scope="col">Valoración</th>
+                    <th scope="col">{{ 'resultados.muestra_2' | transloco }}</th>
+                    <th scope="col">{{ 'resultados.votos' | transloco }}</th>
+                    <th scope="col" class="ra-col-bar">{{ 'resultados.promedio_hedonico' | transloco }}</th>
+                    <th scope="col">{{ 'resultados.valoracion' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -420,7 +419,7 @@
                       (keydown.enter)="seleccionarMuestraDetalle(fila.numeroMuestra)"
                       (keydown.space)="$event.preventDefault(); seleccionarMuestraDetalle(fila.numeroMuestra)">
                       <td class="rs-rank">{{ fila.posicion ? '#' + fila.posicion : '—' }}</td>
-                      <td><span class="rc-ranking__name">Muestra {{ fila.numeroMuestra }}</span></td>
+                      <td><span class="rc-ranking__name">{{ 'resultados.muestra' | transloco: { p0: (fila.numeroMuestra) } }}</span></td>
                       <td>{{ fila.totalVotos }}</td>
                       <td class="ra-col-bar">
                         <div class="rx-bar-line">
@@ -428,10 +427,10 @@
                           <strong class="rs-score">{{ fila.promedio === null ? '—' : (fila.promedio | number:'1.2-2') }}</strong>
                         </div>
                       </td>
-                      <td><ion-badge class="rc-chip ra-chip">{{ fila.etiqueta }}</ion-badge></td>
+                      <td><ion-badge class="rc-chip ra-chip">{{ fila.etiqueta | tr }}</ion-badge></td>
                     </tr>
                   } @empty {
-                    <tr><td colspan="5" class="rs-muted">La sesión no tiene muestras.</td></tr>
+                    <tr><td colspan="5" class="rs-muted">{{ 'resultados.la_sesion_no_tiene' | transloco }}</td></tr>
                   }
                 </tbody>
               </table>
@@ -447,24 +446,24 @@
               <ion-col size="12" size-md="6">
                 <ion-card class="rc-card">
                   <ion-card-content>
-                    <h2 class="rs-section-title rc-section-title--tight">Distribución de votos · Muestra {{ sel.numeroMuestra }}</h2>
-                    <p class="rs-muted rs-note">Cuántos catadores eligieron cada punto de la escala (Impresión Global).</p>
+                    <h2 class="rs-section-title rc-section-title--tight">{{ 'resultados.distribucion_de_votos_muestra' | transloco: { p0: (sel.numeroMuestra) } }}</h2>
+                    <p class="rs-muted rs-note">{{ 'resultados.cuantos_catadores_eligieron_cada' | transloco }}</p>
                     @if (sel.totalVotos > 0) {
                       <ul class="ra-dist" role="list">
                         @for (d of sel.distribucion; track d.valor) {
                           <li class="ra-dist__row" [class.ra-dist__row--empty]="d.votos === 0">
                             <span class="ra-dist__value">{{ d.valor }}</span>
-                            <span class="ra-dist__label">{{ d.etiqueta }}</span>
+                            <span class="ra-dist__label">{{ d.etiqueta | tr }}</span>
                             <div class="rx-bar rx-bar--hedonic"><i [style.width.%]="d.porcentaje"></i></div>
                             <strong class="ra-dist__count">{{ d.votos }}</strong>
                           </li>
                         }
                       </ul>
                       <p class="ra-dist__total">
-                        {{ sel.totalVotos }} voto(s) · promedio <strong>{{ sel.promedio | number:'1.2-2' }}</strong> ({{ sel.etiqueta }})
+                        {{ 'resultados.voto_s_promedio' | transloco: { p0: (sel.totalVotos) } }} <strong>{{ sel.promedio | number:'1.2-2' }}</strong> ({{ sel.etiqueta | tr }})
                       </p>
                     } @else {
-                      <p class="rs-muted rs-note">Esta muestra no recibió votos de Impresión Global.</p>
+                      <p class="rs-muted rs-note">{{ 'resultados.esta_muestra_no_recibio' | transloco }}</p>
                     }
                   </ion-card-content>
                 </ion-card>
@@ -473,12 +472,12 @@
               <ion-col size="12" size-md="6">
                 <ion-card class="rc-card">
                   <ion-card-content>
-                    <h2 class="rs-section-title rc-section-title--tight">Calidad por atributo · Muestra {{ sel.numeroMuestra }}</h2>
-                    <p class="rs-muted rs-note">Promedio del panel en la escala hedónica (1 a 9).</p>
+                    <h2 class="rs-section-title rc-section-title--tight">{{ 'resultados.calidad_por_atributo_muestra' | transloco: { p0: (sel.numeroMuestra) } }}</h2>
+                    <p class="rs-muted rs-note">{{ 'resultados.promedio_del_panel_en' | transloco }}</p>
                     <ul class="rx-bars" role="list">
                       @for (a of sel.atributos; track a.clave) {
                         <li class="rx-bars__row">
-                          <span class="rx-bars__label">{{ a.etiqueta }}</span>
+                          <span class="rx-bars__label">{{ a.etiqueta | tr }}</span>
                           <div class="rx-bar rx-bar--hedonic"><i [style.width.%]="a.porcentaje"></i></div>
                           <strong class="rx-bars__value">{{ a.valor === null ? '—' : (a.valor | number:'1.1-1') }}</strong>
                         </li>
@@ -496,10 +495,10 @@
         <ng-container *ngTemplateOutlet="graficasPerfil"></ng-container>
 
         <div class="rs-actions">
-          <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
+          <ion-button fill="outline" (click)="volverAlPanel()">{{ 'resultados.volver_al_panel' | transloco }}</ion-button>
           <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar
+            {{ 'resultados.exportar' | transloco }}
           </ion-button>
         </div>
       } @else if (esDescriptivo()) {
@@ -514,8 +513,8 @@
             <ion-card-content>
               <div class="rd-head">
                 <div>
-                  <h2 class="rs-section-title rc-section-title--tight">Perfil de intensidad · Muestra {{ perfil.numeroMuestra }}</h2>
-                  <p class="rs-muted rs-note">Promedio del panel por atributo ({{ perfil.fichas }} ficha(s)).</p>
+                  <h2 class="rs-section-title rc-section-title--tight">{{ 'resultados.perfil_de_intensidad_muestra' | transloco: { p0: (perfil.numeroMuestra) } }}</h2>
+                  <p class="rs-muted rs-note">{{ 'resultados.promedio_del_panel_por' | transloco: { p0: (perfil.fichas) } }}</p>
                 </div>
               </div>
               <div class="rd-scale" aria-hidden="true">
@@ -524,7 +523,7 @@
               <ul class="rx-bars rd-bars" role="list">
                 @for (a of perfil.atributos; track a.clave) {
                   <li class="rx-bars__row">
-                    <span class="rx-bars__label">{{ a.etiqueta }}</span>
+                    <span class="rx-bars__label">{{ a.etiqueta | tr }}</span>
                     <div class="rx-bar rx-bar--intensity rd-bar"><i [style.width.%]="a.porcentaje"></i></div>
                     <strong class="rx-bars__value">{{ a.valor === null ? '—' : (a.valor | number:'1.1-1') }}</strong>
                   </li>
@@ -537,13 +536,13 @@
         <!-- Comparativa entre muestras -->
         <ion-card class="rc-card">
           <ion-card-content>
-            <h2 class="rs-section-title rc-section-title--tight">Comparativa de intensidades</h2>
-            <p class="rs-muted rs-note">Promedio del panel (0–15). El tono de cada celda es proporcional a la intensidad.</p>
+            <h2 class="rs-section-title rc-section-title--tight">{{ 'resultados.comparativa_de_intensidades' | transloco }}</h2>
+            <p class="rs-muted rs-note">{{ 'resultados.promedio_del_panel_015' | transloco }}</p>
             <div class="rs-table-wrap">
               <table class="rs-table rd-matrix">
                 <thead>
                   <tr>
-                    <th scope="col">Atributo</th>
+                    <th scope="col">{{ 'resultados.atributo' | transloco }}</th>
                     @for (p of perfilesDescriptivos(); track p.numeroMuestra) {
                       <th scope="col" class="rd-matrix__num">M{{ p.numeroMuestra }}</th>
                     }
@@ -552,7 +551,7 @@
                 <tbody>
                   @for (atr of atributosCva; track atr.clave; let i = $index) {
                     <tr>
-                      <th scope="row">{{ atr.etiqueta }}</th>
+                      <th scope="row">{{ atr.etiqueta | tr }}</th>
                       @for (p of perfilesDescriptivos(); track p.numeroMuestra) {
                         <td class="rd-matrix__num">
                           <span class="rd-cell" [class.rd-cell--dark]="p.atributos[i].porcentaje > 55" [style.--rd-alpha]="p.atributos[i].porcentaje / 100">
@@ -573,10 +572,10 @@
         <ng-container *ngTemplateOutlet="graficasPerfil"></ng-container>
 
         <div class="rs-actions">
-          <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
+          <ion-button fill="outline" (click)="volverAlPanel()">{{ 'resultados.volver_al_panel' | transloco }}</ion-button>
           <ion-button class="primary-btn" [disabled]="imprimiendo()" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar
+            {{ 'resultados.exportar' | transloco }}
           </ion-button>
         </div>
       } @else if (esExtrinseco()) {
@@ -588,9 +587,9 @@
                 <div class="re-head__title">
                   <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
                   <div>
-                    <h2>Ficha técnica del café · Muestra {{ ficha.numeroMuestra }}</h2>
+                    <h2>{{ 'resultados.ficha_tecnica_del_cafe' | transloco: { p0: (ficha.numeroMuestra) } }}</h2>
                     <p class="rs-muted">
-                      @if (ficha.registradaPor) { Registrada por {{ ficha.registradaPor }} }
+                      @if (ficha.registradaPor) { {{ 'resultados.registrada_por' | transloco: { p0: (ficha.registradaPor) } }} }
                       @if (ficha.registradaEn) { · {{ ficha.registradaEn | date:'mediumDate' }} }
                     </p>
                   </div>
@@ -602,11 +601,11 @@
                   @for (seccion of ficha.secciones; track seccion.titulo) {
                     <ion-col size="12" size-md="6" size-xl="4">
                       <section class="re-section">
-                        <h3 class="rs-section-title">{{ seccion.titulo }}</h3>
+                        <h3 class="rs-section-title">{{ seccion.titulo | tr }}</h3>
                         <dl class="re-dl">
                           @for (campo of seccion.campos; track campo.etiqueta) {
-                            <dt>{{ campo.etiqueta }}</dt>
-                            <dd [class.re-dl__empty]="campo.valor === '—'">{{ campo.valor }}</dd>
+                            <dt>{{ campo.etiqueta | tr }}</dt>
+                            <dd [class.re-dl__empty]="campo.valor === '—'">{{ campo.valor | tr }}</dd>
                           }
                         </dl>
                       </section>
@@ -616,21 +615,21 @@
               </ion-grid>
 
               <section class="re-section">
-                <h3 class="rs-section-title">Certificaciones</h3>
+                <h3 class="rs-section-title">{{ 'resultados.certificaciones' | transloco }}</h3>
                 @if (ficha.certificaciones.length > 0) {
                   <div class="re-certs">
                     @for (c of ficha.certificaciones; track c) {
-                      <ion-badge class="rc-chip re-cert"><ion-icon name="ribbon-outline" aria-hidden="true"></ion-icon> {{ c }}</ion-badge>
+                      <ion-badge class="rc-chip re-cert"><ion-icon name="ribbon-outline" aria-hidden="true"></ion-icon> {{ c | tr }}</ion-badge>
                     }
                   </div>
                 } @else {
-                  <p class="rs-muted rs-note">Sin certificaciones registradas.</p>
+                  <p class="rs-muted rs-note">{{ 'resultados.sin_certificaciones_registradas' | transloco }}</p>
                 }
               </section>
 
               @if (ficha.notas) {
                 <section class="re-section">
-                  <h3 class="rs-section-title">Notas</h3>
+                  <h3 class="rs-section-title">{{ 'resultados.notas' | transloco }}</h3>
                   <p class="re-notes">{{ ficha.notas }}</p>
                 </section>
               }
@@ -640,16 +639,16 @@
           <ion-card class="rc-card">
             <ion-card-content class="rs-center">
               <ion-icon name="document-text-outline" class="rs-lock" aria-hidden="true"></ion-icon>
-              <p>Esta sesión no tiene fichas técnicas registradas.</p>
+              <p>{{ 'resultados.esta_sesion_no_tiene' | transloco }}</p>
             </ion-card-content>
           </ion-card>
         }
 
         <div class="rs-actions">
-          <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
+          <ion-button fill="outline" (click)="volverAlPanel()">{{ 'resultados.volver_al_panel' | transloco }}</ion-button>
           <ion-button class="primary-btn" [disabled]="imprimiendo() || fichasTecnicas().length === 0" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar
+            {{ 'resultados.exportar' | transloco }}
           </ion-button>
         </div>
       } @else {
@@ -658,33 +657,33 @@
           <div class="rs-meta__status">
             <p class="rs-meta__headline">
               <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
-              Sesión cerrada · {{ porcentajeCompletado() }}% completada
+              {{ 'resultados.sesion_cerrada_completada' | transloco: { p0: (porcentajeCompletado()) } }}
             </p>
             <p class="rs-meta__detail">
               {{ hayRecorte()
-                ? 'Consolidación mediante promedio recortado SCA (se descartan máximo y mínimo con 5 o más catadores).'
-                : 'Consolidación mediante promedio simple (menos de 5 fichas por muestra).' }}
+                ? ('resultados.consolidacion_mediante_promedio_recortado' | transloco)
+                : ('resultados.consolidacion_mediante_promedio_simple' | transloco) }}
             </p>
           </div>
           <div class="rs-meta__stats">
-            <div><strong>{{ r.totalMuestras }}</strong><span>Muestras</span></div>
-            <div><strong>{{ r.catadores.length }}</strong><span>Catadores</span></div>
-            <div><strong>{{ tituloFormato() }}</strong><span>Formato</span></div>
+            <div><strong>{{ r.totalMuestras }}</strong><span>{{ 'resultados.muestras' | transloco }}</span></div>
+            <div><strong>{{ r.catadores.length }}</strong><span>{{ 'resultados.catadores' | transloco }}</span></div>
+            <div><strong>{{ tituloFormato() | tr }}</strong><span>{{ 'resultados.formato' | transloco }}</span></div>
           </div>
         </section>
   
         <section class="cupping-card">
-          <h2 class="rs-section-title">Ranking — promedio del panel</h2>
+          <h2 class="rs-section-title">{{ 'resultados.ranking_promedio_del_panel' | transloco }}</h2>
           <div class="rs-table-wrap">
             <table class="rs-table">
               <thead>
                 <tr>
                   <th scope="col">#</th>
-                  <th scope="col">Muestra</th>
-                  <th scope="col">Fichas</th>
-                  <th scope="col">Mín – Máx</th>
-                  <th scope="col">Puntaje panel</th>
-                  <th scope="col">Clasificación</th>
+                  <th scope="col">{{ 'resultados.muestra_2' | transloco }}</th>
+                  <th scope="col">{{ 'resultados.fichas' | transloco }}</th>
+                  <th scope="col">{{ 'resultados.min_max' | transloco }}</th>
+                  <th scope="col">{{ 'resultados.puntaje_panel' | transloco }}</th>
+                  <th scope="col">{{ 'resultados.clasificacion' | transloco }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -692,40 +691,40 @@
                   <tr>
                     <td class="rs-rank">
                       @if (fila.posicion === 1) {
-                        <ion-icon name="trophy-outline" aria-label="Primer lugar"></ion-icon>
+                        <ion-icon name="trophy-outline" [attr.aria-label]="'resultados.primer_lugar' | transloco"></ion-icon>
                       }
                       #{{ fila.posicion }}
                     </td>
                     <td>
-                      Muestra {{ fila.numeroMuestra }}
-                      @if (fila.cerradaForzada) { <span class="rs-tag">cerrada</span> }
+                      {{ 'resultados.muestra' | transloco: { p0: (fila.numeroMuestra) } }}
+                      @if (fila.cerradaForzada) { <span class="rs-tag">{{ 'resultados.cerrada' | transloco }}</span> }
                     </td>
                     <td>{{ fila.evaluacionesRecibidas }} / {{ fila.evaluacionesEsperadas }}</td>
                     <td class="rs-muted">{{ fila.puntajeMin | number:'1.2-2' }} – {{ fila.puntajeMax | number:'1.2-2' }}</td>
                     <td class="rs-score">
                       {{ fila.puntajePromedioPanel | number:'1.2-2' }}
                       @if (fila.recortado) {
-                        <span class="rs-tag" title="Promedio simple: {{ fila.puntajePromedioSimple | number:'1.2-2' }}">recortado</span>
+                        <span class="rs-tag" title="Promedio simple: {{ fila.puntajePromedioSimple | number:'1.2-2' }}">{{ 'resultados.recortado' | transloco }}</span>
                       }
                     </td>
                     <td>
                       <span class="rs-badge" [style.color]="fila.clasificacion.color" [style.background]="fila.clasificacion.fondo">
-                        {{ fila.clasificacion.etiqueta }}
+                        {{ fila.clasificacion.etiqueta | tr }}
                       </span>
                     </td>
                   </tr>
                 } @empty {
-                  <tr><td colspan="6" class="rs-muted">Ninguna muestra recibió fichas.</td></tr>
+                  <tr><td colspan="6" class="rs-muted">{{ 'resultados.ninguna_muestra_recibio_fichas' | transloco }}</td></tr>
                 }
               </tbody>
               @if (ranking().length > 0) {
                 <tfoot>
                   <tr>
-                    <td colspan="4">Promedio del panel</td>
+                    <td colspan="4">{{ 'resultados.promedio_del_panel' | transloco }}</td>
                     <td class="rs-score">{{ promedioPanel() | number:'1.2-2' }}</td>
                     <td>
                       <span class="rs-badge" [style.color]="clasificacionPanel().color" [style.background]="clasificacionPanel().fondo">
-                        {{ clasificacionPanel().etiqueta }}
+                        {{ clasificacionPanel().etiqueta | tr }}
                       </span>
                     </td>
                   </tr>
@@ -735,14 +734,14 @@
           </div>
           @if (muestrasSinFichas().length > 0) {
             <p class="rs-muted rs-note">
-              Sin fichas: {{ muestrasSinFichas().length }} muestra(s) cerradas sin evaluaciones.
+              {{ 'resultados.sin_fichas_muestra_s' | transloco: { p0: (muestrasSinFichas().length) } }}
             </p>
           }
         </section>
   
         <section>
-          <h2 class="rs-section-title">Análisis de catadores</h2>
-          <p class="rs-muted rs-note">Participación y consistencia individual dentro del panel.</p>
+          <h2 class="rs-section-title">{{ 'resultados.analisis_de_catadores' | transloco }}</h2>
+          <p class="rs-muted rs-note">{{ 'resultados.participacion_y_consistencia_individual_2' | transloco }}</p>
           <div class="rs-grid">
             @for (catador of r.catadores; track catador.cupperId) {
               <app-cupper-result-card [catador]="catador"></app-cupper-result-card>
@@ -751,18 +750,18 @@
         </section>
   
         <section class="rs-formula">
-          <h2 class="rs-section-title">Fórmula CVA aplicada</h2>
+          <h2 class="rs-section-title">{{ 'resultados.formula_cva_aplicada' | transloco }}</h2>
           <p class="rs-formula__expr">S = 0.65625 × Σhᵢ + 52.75 − 2u − 4d</p>
           <p class="rs-muted">
-            El consolidado descarta el valor más alto y el más bajo por muestra cuando hay 5 o más fichas.
+            {{ 'resultados.el_consolidado_descarta_el' | transloco }}
           </p>
         </section>
   
         <div class="rs-actions">
-          <ion-button fill="outline" (click)="volverAlPanel()">Volver al panel</ion-button>
+          <ion-button fill="outline" (click)="volverAlPanel()">{{ 'resultados.volver_al_panel' | transloco }}</ion-button>
           <ion-button class="primary-btn" (click)="abrirMenuExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar
+            {{ 'resultados.exportar' | transloco }}
           </ion-button>
         </div>
       }
@@ -775,36 +774,36 @@
       <ng-template>
         <div class="rc-export">
           <div class="rc-export__head">
-            <h2>¿Cómo quieres exportar tu PDF?</h2>
-            <ion-button fill="clear" size="small" aria-label="Cerrar" (click)="cerrarExportar()">
+            <h2>{{ 'resultados.como_quieres_exportar_tu' | transloco }}</h2>
+            <ion-button fill="clear" size="small" [attr.aria-label]="'resultados.cerrar' | transloco" (click)="cerrarExportar()">
               <ion-icon name="close-outline" slot="icon-only"></ion-icon>
             </ion-button>
           </div>
 
-          <label class="rc-export__label" for="rc-export-muestra">Muestra #</label>
-          <ion-select id="rc-export-muestra" class="rc-export__select" interface="popover" placeholder="Selecciona una muestra"
+          <label class="rc-export__label" for="rc-export-muestra">{{ 'resultados.muestra_3' | transloco }}</label>
+          <ion-select id="rc-export-muestra" class="rc-export__select" interface="popover" [placeholder]="'resultados.selecciona_una_muestra' | transloco"
             [value]="muestraHoja()" (ionChange)="cambiarMuestraExportar($event.detail.value)">
             @for (n of numerosMuestra(); track n) {
-              <ion-select-option [value]="n">Muestra {{ n }}</ion-select-option>
+              <ion-select-option [value]="n">{{ 'resultados.muestra' | transloco: { p0: (n) } }}</ion-select-option>
             }
           </ion-select>
 
           <ion-segment class="rc-export__segment" [value]="modoExportacion()" (ionChange)="cambiarModoExportacion($event.detail.value)">
-            <ion-segment-button value="catador"><ion-label>Por catador</ion-label></ion-segment-button>
-            <ion-segment-button value="panel"><ion-label>Panel</ion-label></ion-segment-button>
+            <ion-segment-button value="catador"><ion-label>{{ 'resultados.por_catador' | transloco }}</ion-label></ion-segment-button>
+            <ion-segment-button value="panel"><ion-label>{{ 'resultados.panel' | transloco }}</ion-label></ion-segment-button>
           </ion-segment>
 
           @if (modoExportacion() === 'catador') {
-            <label class="rc-export__label" for="rc-export-catador">Selecciona el catador</label>
-            <ion-select id="rc-export-catador" class="rc-export__select" interface="popover" placeholder="Selecciona un catador"
+            <label class="rc-export__label" for="rc-export-catador">{{ 'resultados.selecciona_el_catador' | transloco }}</label>
+            <ion-select id="rc-export-catador" class="rc-export__select" interface="popover" [placeholder]="'resultados.selecciona_un_catador' | transloco"
               [value]="catadorExportarId()" (ionChange)="cambiarCatadorExportar($event.detail.value)">
               @for (c of catadoresExportables(); track c.cupperId) {
                 <ion-select-option [value]="c.cupperId">{{ c.nombre }}</ion-select-option>
               }
             </ion-select>
           } @else {
-            <p class="rc-export__label">Catadores incluidos en el consolidado</p>
-            <p class="rc-export__help">Desmarca a los catadores descalibrados: sus fichas no se usarán en el PDF.</p>
+            <p class="rc-export__label">{{ 'resultados.catadores_incluidos_en_el' | transloco }}</p>
+            <p class="rc-export__help">{{ 'resultados.desmarca_a_los_catadores' | transloco }}</p>
             <ul class="rc-export__panel" role="list">
               @for (o of opcionesPanel(); track o.id) {
                 <li class="rc-export__panel-item" [class.rc-export__panel-item--off]="!o.tieneFicha">
@@ -815,10 +814,10 @@
                   </ion-checkbox>
                   <span class="rc-export__calib"
                     [class.rc-export__calib--alto]="o.desviacion > 0.5" [class.rc-export__calib--bajo]="o.desviacion < -0.5">
-                    @if (!o.tieneFicha) { sin ficha }
-                    @else if (o.desviacion > 0.5) { +{{ o.desviacion | number:'1.2-2' }} generoso }
-                    @else if (o.desviacion < -0.5) { {{ o.desviacion | number:'1.2-2' }} estricto }
-                    @else { calibrado }
+                    @if (!o.tieneFicha) { {{ 'resultados.sin_ficha' | transloco }} }
+                    @else if (o.desviacion > 0.5) { {{ 'resultados.generoso' | transloco: { p0: (o.desviacion | number:'1.2-2') } }} }
+                    @else if (o.desviacion < -0.5) { {{ 'resultados.estricto' | transloco: { p0: (o.desviacion | number:'1.2-2') } }} }
+                    @else { {{ 'resultados.calibrado' | transloco }} }
                   </span>
                 </li>
               }
@@ -827,9 +826,9 @@
 
           <ion-button expand="block" class="primary-btn rc-export__go" [disabled]="!puedeConfirmarExportar()" (click)="confirmarExportar()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar a PDF (Formato SCA)
+            {{ 'resultados.exportar_a_pdf_formato' | transloco }}
           </ion-button>
-          <p class="rc-export__hint">En la ventana de impresión elige "Guardar como PDF".</p>
+          <p class="rc-export__hint">{{ 'resultados.en_la_ventana_de' | transloco }}</p>
         </div>
       </ng-template>
     </ion-modal>

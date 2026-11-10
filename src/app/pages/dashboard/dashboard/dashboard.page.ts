@@ -33,6 +33,8 @@ import {
   ModoEscaneo, ResultadoEscaneo, ScannerModalComponent
 } from '../../../shared/components/scanner-modal/scanner-modal.component';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 interface SesionItemUi {
   id: string;
   titulo: string;
@@ -63,7 +65,7 @@ export function normalizarTexto(texto: string | null | undefined): string {
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [
+  imports: [TrPipe, TranslocoPipe, 
     IonContent,
     IonHeader,
     IonToolbar,

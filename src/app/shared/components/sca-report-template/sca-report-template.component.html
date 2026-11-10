@@ -1,9 +1,9 @@
 <!-- ═══════════ Piezas de la hoja SCA (se copian al iframe de impresión) ═══════════ -->
 <ng-template #scaSlider let-titulo="titulo" let-v="v">
   <div class="sca-attr">
-    <div class="sca-attr__name"><b>{{ titulo }}</b><small>Intensidad@if (v !== null) {<span class="sca-attr__val">{{ v | number:'1.0-1' }}</span>}</small></div>
+    <div class="sca-attr__name"><b>{{ titulo | tr }}</b><small>{{ 'hoja.intensidad' | transloco }}@if (v !== null) {<span class="sca-attr__val">{{ v | number:'1.0-1' }}</span>}</small></div>
     <div class="sca-slider">
-      <div class="sca-slider__zones"><span>BAJA</span><span>MEDIA</span><span>ALTA</span></div>
+      <div class="sca-slider__zones"><span>{{ 'hoja.baja' | transloco }}</span><span>{{ 'hoja.media' | transloco }}</span><span>{{ 'hoja.alta' | transloco }}</span></div>
       <div class="sca-slider__bar">
         @if (v !== null) {
           <i class="sca-slider__mark" [style.left.%]="v / 15 * 100"></i>
@@ -20,12 +20,12 @@
     @for (n of escala9; track n) {
       <span class="sca-c" [class.sca-c--on]="circuloMarcado(v) === n">{{ n }}</span>
     }
-    <span class="sca-final" [class.sca-final--on]="v !== null">{{ v === null ? 'FINAL' : (v | number:'1.0-2') }}</span>
+    <span class="sca-final" [class.sca-final--on]="v !== null">{{ v === null ? ('hoja.final' | transloco) : (v | number:'1.0-2') }}</span>
   </div>
 </ng-template>
 
 <ng-template #scaCasilla let-on="on" let-etiqueta="etiqueta" let-principal="principal" let-detalle="detalle">
-  <span class="sca-cb" [class.sca-cb--on]="on"><i></i>@if (principal) {<b>{{ etiqueta }}</b>} @else {{{ etiqueta }}}@if (detalle) { <small>{{ detalle }}</small>}</span>
+  <span class="sca-cb" [class.sca-cb--on]="on"><i></i>@if (principal) {<b>{{ etiqueta | tr }}</b>} @else {<span>{{ etiqueta | tr }}</span>}@if (detalle) { <small>{{ detalle | tr }}</small>}</span>
 </ng-template>
 
 <ng-template #scaDescriptores let-marcadas="marcadas">
@@ -40,7 +40,7 @@
 
 <ng-template #scaGustos let-marcadas="marcadas">
   <div class="sca-gustos">
-    <p class="sca-label">Gustos Predominantes (2)</p>
+    <p class="sca-label">{{ 'hoja.gustos_predominantes_2' | transloco }}</p>
     @for (g of gustosSca; track g.clave) {
       <div class="sca-desc__row"><ng-container *ngTemplateOutlet="scaCasilla; context: { on: marcadas.has(g.clave), etiqueta: g.etiqueta, principal: true }"></ng-container></div>
     }
@@ -54,7 +54,7 @@
 </ng-template>
 
 <ng-template #scaNotas let-texto="texto" let-titulo="titulo">
-  <div class="sca-notes"><p class="sca-label">{{ titulo || 'Notas' }}</p>@if (texto) {<p class="sca-notes__text">{{ texto }}</p>}</div>
+  <div class="sca-notes"><p class="sca-label">{{ titulo || ('hoja.notas' | transloco) }}</p>@if (texto) {<p class="sca-notes__text">{{ texto }}</p>}</div>
 </ng-template>
 
 <ng-template #scaTazas let-n="n">
@@ -67,85 +67,83 @@
     <article class="sca-page sca-ext" [class.sca-ext--break]="!primera">
       <header class="sca-head">
         <div class="sca-head__main">
-          <p class="sca-head__brand">PacamaraQs · Evaluación sensorial CVA</p>
-          <h1>Formato Extrínseco</h1>
+          <p class="sca-head__brand">{{ 'hoja.pacamaraqs_evaluacion_sensorial_cva' | transloco }}</p>
+          <h1>{{ 'hoja.formato_extrinseco' | transloco }}</h1>
           <div class="sca-fields">
-            <div class="sca-field sca-field--wide"><span>Nombre</span><b>{{ f.registradaPor || '' }}</b></div>
-            <div class="sca-field"><span>Fecha</span><b>{{ f.registradaEn ? (f.registradaEn | date:'dd/MM/yyyy') : fecha }}</b></div>
-            <div class="sca-field sca-field--wide"><span>Objetivo</span><b>{{ objetivo }}</b></div>
-            <div class="sca-field"><span>Nº de muestra</span><b>{{ f.numeroMuestra }}</b></div>
+            <div class="sca-field sca-field--wide"><span>{{ 'hoja.nombre' | transloco }}</span><b>{{ f.registradaPor || '' }}</b></div>
+            <div class="sca-field"><span>{{ 'hoja.fecha' | transloco }}</span><b>{{ f.registradaEn ? (f.registradaEn | date:'dd/MM/yyyy') : fecha }}</b></div>
+            <div class="sca-field sca-field--wide"><span>{{ 'hoja.objetivo' | transloco }}</span><b>{{ objetivo }}</b></div>
+            <div class="sca-field"><span>{{ 'hoja.n_de_muestra' | transloco }}</span><b>{{ f.numeroMuestra }}</b></div>
           </div>
         </div>
       </header>
       <div class="sca-ext__grid">
         @for (sec of f.secciones; track sec.titulo) {
           <section class="sca-ext__box">
-            <h2 class="sca-ext__title">{{ sec.titulo.toUpperCase() }}</h2>
+            <h2 class="sca-ext__title">{{ (sec.titulo | tr).toUpperCase() }}</h2>
             <table class="sca-ext__table">
               @for (c of sec.campos; track c.etiqueta) {
-                <tr><th>{{ c.etiqueta }}</th><td>{{ c.valor === '—' ? '' : c.valor }}</td></tr>
+                <tr><th>{{ c.etiqueta | tr }}</th><td>{{ (c.valor === '—' ? '' : c.valor) | tr }}</td></tr>
               }
             </table>
           </section>
         }
         <section class="sca-ext__box">
-          <h2 class="sca-ext__title">CERTIFICACIONES</h2>
+          <h2 class="sca-ext__title">{{ 'hoja.certificaciones' | transloco }}</h2>
           <div class="sca-ext__certs">
             @for (c of certificacionesSca; track c) {
               <ng-container *ngTemplateOutlet="scaCasilla; context: { on: f.certificaciones.includes(c), etiqueta: c, principal: true }"></ng-container>
             }
-            <div class="sca-ext__otra"><span>Otra:</span><b>{{ otrasCertificaciones(f.certificaciones) }}</b></div>
+            <div class="sca-ext__otra"><span>{{ 'hoja.otra' | transloco }}</span><b>{{ otrasCertificaciones(f.certificaciones) }}</b></div>
           </div>
         </section>
         <section class="sca-ext__box sca-ext__box--full">
-          <h2 class="sca-ext__title">NOTAS</h2>
+          <h2 class="sca-ext__title">{{ 'hoja.notas_2' | transloco }}</h2>
           <p class="sca-ext__notes">{{ f.notas }}</p>
         </section>
       </div>
       <footer class="sca-legal">
-        Formato modificado para PacamaraQs, basado en el Sistema de Evaluación del Café de la SCA (Versión 2, junio 2024).
-        No es un documento oficial de la SCA.
+        {{ 'hoja.formato_modificado_para_pacamaraqs' | transloco }}
       </footer>
     </article>
   } @empty {
-    <p class="sca-notes__text">Esta sesión no tiene fichas técnicas registradas.</p>
+    <p class="sca-notes__text">{{ 'hoja.esta_sesion_no_tiene' | transloco }}</p>
   }
 } @else if (hoja; as h) {
       <article class="sca-page" [class.sca-page--combinado]="h.formato === 'combinado'">
         <!-- Cabecera -->
         <header class="sca-head">
           <div class="sca-head__main">
-            <p class="sca-head__brand">PacamaraQs · Evaluación sensorial CVA</p>
-            <h1>{{ h.titulo }}</h1>
+            <p class="sca-head__brand">{{ 'hoja.pacamaraqs_evaluacion_sensorial_cva' | transloco }}</p>
+            <h1>{{ h.titulo | tr }}</h1>
             <div class="sca-fields">
-              <div class="sca-field sca-field--wide"><span>Nombre</span><b>{{ h.nombre }}</b></div>
-              <div class="sca-field"><span>Fecha</span><b>{{ h.fecha }}</b></div>
-              <div class="sca-field sca-field--wide"><span>Objetivo</span><b>{{ h.objetivo }}</b></div>
-              <div class="sca-field"><span>Nº de muestra</span><b>{{ h.numeroMuestra }}</b></div>
+              <div class="sca-field sca-field--wide"><span>{{ 'hoja.nombre' | transloco }}</span><b>{{ h.nombre | tr }}</b></div>
+              <div class="sca-field"><span>{{ 'hoja.fecha' | transloco }}</span><b>{{ h.fecha }}</b></div>
+              <div class="sca-field sca-field--wide"><span>{{ 'hoja.objetivo' | transloco }}</span><b>{{ h.objetivo }}</b></div>
+              <div class="sca-field"><span>{{ 'hoja.n_de_muestra' | transloco }}</span><b>{{ h.numeroMuestra }}</b></div>
             </div>
           </div>
           @if (h.formato !== 'descriptivo') {
             <div class="sca-legend">
-              <p>IMPRESIÓN DE CALIDAD</p>
-              <ol>@for (l of LEYENDA_HEDONICA; track l.n) {<li><i>{{ l.n }}</i>{{ l.etiqueta.toUpperCase() }}</li>}</ol>
+              <p>{{ 'hoja.impresion_de_calidad' | transloco }}</p>
+              <ol>@for (l of LEYENDA_HEDONICA; track l.n) {<li><i>{{ l.n }}</i>{{ (l.etiqueta | tr).toUpperCase() }}</li>}</ol>
             </div>
           }
         </header>
 
         <!-- Consolidado del panel -->
         @if (h.resumenPanel; as rp) {
-          <section class="sca-kpis" aria-label="Consolidado del panel">
+          <section class="sca-kpis" [attr.aria-label]="'hoja.consolidado_del_panel' | transloco">
             @if (rp.puntaje !== null) {
-              <div class="sca-kpi"><strong>{{ rp.puntaje | number:'1.2-2' }}</strong><span>Puntaje panel</span></div>
-              <div class="sca-kpi"><strong>{{ rp.clasificacion }}</strong><span>Clasificación</span></div>
+              <div class="sca-kpi"><strong>{{ rp.puntaje | number:'1.2-2' }}</strong><span>{{ 'hoja.puntaje_panel' | transloco }}</span></div>
+              <div class="sca-kpi"><strong>{{ rp.clasificacion | tr }}</strong><span>{{ 'hoja.clasificacion' | transloco }}</span></div>
             }
-            <div class="sca-kpi"><strong>{{ rp.fichas }}</strong><span>Fichas</span></div>
+            <div class="sca-kpi"><strong>{{ rp.fichas }}</strong><span>{{ 'hoja.fichas' | transloco }}</span></div>
             @if (rp.puntaje !== null) {
-              <div class="sca-kpi"><strong>{{ rp.minMax }}</strong><span>Mín – Máx</span></div>
+              <div class="sca-kpi"><strong>{{ rp.minMax }}</strong><span>{{ 'hoja.min_max' | transloco }}</span></div>
             }
             <p class="sca-kpis__note">
-              {{ rp.recortado ? 'Promedio recortado SCA (se descartan máximo y mínimo).' : 'Promedio simple de las fichas seleccionadas.' }}
-              Intensidades: promedio · Descriptores: unión de todas las fichas · Gustos, textura y defectos: mayoría (&gt; 50 %) · Círculos: entero más cercano al promedio.
+              {{ 'hoja.intensidades_promedio_descriptores_union' | transloco: { p0: (rp.recortado ? ('hoja.promedio_recortado_sca_se' | transloco) : ('hoja.promedio_simple_de_las' | transloco)) } }}
             </p>
           </section>
         }
@@ -154,11 +152,11 @@
           <!-- ══════ FORMATO COMBINADO ══════ -->
           <div class="sca-bars">
             <div class="sca-bars__left">
-              <span class="sca-bar">PARTE 1: EVALUACIÓN DESCRIPTIVA</span>
-              <span class="sca-bar">NIVEL DE TUESTE</span>
+              <span class="sca-bar">{{ 'hoja.parte_1_evaluacion_descriptiva' | transloco }}</span>
+              <span class="sca-bar">{{ 'hoja.nivel_de_tueste' | transloco }}</span>
               <span class="sca-roast"><em>{{ h.nivelTueste || '' }}</em></span>
             </div>
-            <span class="sca-bar sca-bars__right">PARTE 2: EVALUACIÓN AFECTIVA</span>
+            <span class="sca-bar sca-bars__right">{{ 'hoja.parte_2_evaluacion_afectiva' | transloco }}</span>
           </div>
 
           <div class="sca-comb">
@@ -218,22 +216,22 @@
 
             <!-- Otras notas | Impresión global -->
             <div class="sca-l sca-otras">
-              <span class="sca-bar sca-bar--block">OTRAS NOTAS</span>
+              <span class="sca-bar sca-bar--block">{{ 'hoja.otras_notas' | transloco }}</span>
               <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
             </div>
             <div class="sca-r sca-global">
               <div class="sca-global__head">
-                <b class="sca-global__title">Impresión global</b>
+                <b class="sca-global__title">{{ 'hoja.impresion_global' | transloco }}</b>
                 <ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.impresionGlobal }"></ng-container>
               </div>
               <ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.puntaje !== null ? 'Puntaje CVA: ' + (h.ficha.puntaje | number:'1.2-2') + ' · ' + etiquetaCalidad(h.ficha.impresionGlobal) : etiquetaCalidad(h.ficha.impresionGlobal) }"></ng-container>
               <div class="sca-cups">
                 <div class="sca-cups__left">
-                  <div><b>TAZAS NO UNIFORMES</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasNoUniformes }"></ng-container></div>
-                  <div><b>TAZAS DEFECTUOSAS</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasDefectuosas }"></ng-container></div>
+                  <div><b>{{ 'hoja.tazas_no_uniformes' | transloco }}</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasNoUniformes }"></ng-container></div>
+                  <div><b>{{ 'hoja.tazas_defectuosas' | transloco }}</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasDefectuosas }"></ng-container></div>
                 </div>
                 <div class="sca-cups__right">
-                  <b>DEFECTO (DE HABERLO)</b>
+                  <b>{{ 'hoja.defecto_de_haberlo' | transloco }}</b>
                   <div>
                     @for (d of defectosSca; track d.clave) {
                       <ng-container *ngTemplateOutlet="scaCasilla; context: { on: h.ficha.defectos.has(d.clave), etiqueta: d.etiqueta.toUpperCase(), principal: true }"></ng-container>
@@ -246,41 +244,41 @@
         } @else if (h.formato === 'afectivo') {
           <!-- ══════ FORMATO AFECTIVO (hoja SCA: Parte 2 · Evaluación afectiva) ══════ -->
           <div class="sca-bars sca-bars--desc">
-            <span class="sca-bar sca-bar--muestra">Nº DE MUESTRA <em>{{ h.numeroMuestra }}</em></span>
-            <span class="sca-bar">NIVEL DE TUESTE</span>
+            <span class="sca-bar sca-bar--muestra">{{ 'hoja.n_de_muestra_2' | transloco }} <em>{{ h.numeroMuestra }}</em></span>
+            <span class="sca-bar">{{ 'hoja.nivel_de_tueste' | transloco }}</span>
             <span class="sca-roast"><em>{{ h.nivelTueste || '' }}</em></span>
           </div>
           <div class="sca-afe">
-            <div class="sca-afe__hd">ATRIBUTO</div>
-            <div class="sca-afe__hd">IMPRESIÓN DE CALIDAD (1 – 9)</div>
-            <div class="sca-afe__hd">NOTAS</div>
+            <div class="sca-afe__hd">{{ 'hoja.atributo' | transloco }}</div>
+            <div class="sca-afe__hd">{{ 'hoja.impresion_de_calidad_1' | transloco }}</div>
+            <div class="sca-afe__hd">{{ 'hoja.notas_2' | transloco }}</div>
             @for (a of atributosAfectivos; track a.clave) {
-              <div class="sca-afe__name"><b>{{ a.etiqueta }}</b></div>
+              <div class="sca-afe__name"><b>{{ a.etiqueta | tr }}</b></div>
               <div class="sca-afe__circ"><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.calidad[a.clave] }"></ng-container></div>
               <div class="sca-afe__note">{{ notaAfectiva(h, a.clave) }}</div>
             }
-            <div class="sca-afe__name sca-afe__name--global"><b>Impresión global</b></div>
+            <div class="sca-afe__name sca-afe__name--global"><b>{{ 'hoja.impresion_global' | transloco }}</b></div>
             <div class="sca-afe__circ"><ng-container *ngTemplateOutlet="scaCirculos; context: { v: h.ficha.impresionGlobal }"></ng-container></div>
-            <div class="sca-afe__note">{{ h.ficha.puntaje !== null ? 'Puntaje CVA: ' + (h.ficha.puntaje | number:'1.2-2') + ' · ' : '' }}{{ etiquetaCalidad(h.ficha.impresionGlobal) }}</div>
+            <div class="sca-afe__note">{{ h.ficha.puntaje !== null ? ('hoja.puntaje_cva' | transloco) + (h.ficha.puntaje | number:'1.2-2') + ' · ' : '' }}{{ etiquetaCalidad(h.ficha.impresionGlobal) | tr }}</div>
             <div class="sca-afe__cups">
-              <div><b>TAZAS NO UNIFORMES</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasNoUniformes }"></ng-container></div>
-              <div><b>TAZAS DEFECTUOSAS</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasDefectuosas }"></ng-container></div>
-              <div class="sca-afe__def"><b>DEFECTO (DE HABERLO)</b>
+              <div><b>{{ 'hoja.tazas_no_uniformes' | transloco }}</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasNoUniformes }"></ng-container></div>
+              <div><b>{{ 'hoja.tazas_defectuosas' | transloco }}</b><ng-container *ngTemplateOutlet="scaTazas; context: { n: h.ficha.tazasDefectuosas }"></ng-container></div>
+              <div class="sca-afe__def"><b>{{ 'hoja.defecto_de_haberlo' | transloco }}</b>
                 @for (d of defectosSca; track d.clave) {
                   <ng-container *ngTemplateOutlet="scaCasilla; context: { on: h.ficha.defectos.has(d.clave), etiqueta: d.etiqueta.toUpperCase(), principal: true }"></ng-container>
                 }
               </div>
             </div>
             <div class="sca-afe__otras">
-              <span class="sca-bar sca-bar--block">OTRAS NOTAS</span>
+              <span class="sca-bar sca-bar--block">{{ 'hoja.otras_notas' | transloco }}</span>
               <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
             </div>
           </div>
         } @else {
           <!-- ══════ FORMATO DESCRIPTIVO ══════ -->
           <div class="sca-bars sca-bars--desc">
-            <span class="sca-bar sca-bar--muestra">Nº DE MUESTRA <em>{{ h.numeroMuestra }}</em></span>
-            <span class="sca-bar">NIVEL DE TUESTE</span>
+            <span class="sca-bar sca-bar--muestra">{{ 'hoja.n_de_muestra_2' | transloco }} <em>{{ h.numeroMuestra }}</em></span>
+            <span class="sca-bar">{{ 'hoja.nivel_de_tueste' | transloco }}</span>
             <span class="sca-roast"><em>{{ h.nivelTueste || '' }}</em></span>
           </div>
           <div class="sca-desc-grid">
@@ -314,15 +312,14 @@
             <div class="sca-r"><ng-container *ngTemplateOutlet="scaNotas; context: { texto: h.ficha.notas.boca }"></ng-container></div>
 
             <div class="sca-l sca-otras sca-full">
-              <span class="sca-bar sca-bar--block">OTRAS NOTAS</span>
+              <span class="sca-bar sca-bar--block">{{ 'hoja.otras_notas' | transloco }}</span>
               <p class="sca-notes__text">{{ h.ficha.notas.otras }}</p>
             </div>
           </div>
         }
 
         <footer class="sca-legal">
-          Formato modificado para PacamaraQs, basado en el Sistema de Evaluación del Café de la SCA (Versión 2, junio 2024).
-          No es un documento oficial de la SCA.
+          {{ 'hoja.formato_modificado_para_pacamaraqs' | transloco }}
         </footer>
       </article>
 }

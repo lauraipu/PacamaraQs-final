@@ -8,6 +8,8 @@ import { BaseCataForm } from '../../../core/cva/base-cata-form';
 import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
 import { ETIQUETAS_HEDONICAS } from '../../../core/cva/cva';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 addIcons({ arrowBackOutline });
 
 type AtributoHedonico =
@@ -28,7 +30,7 @@ interface FormularioAfectivo extends Record<AtributoHedonico | 'impresionGlobal'
   selector: 'app-affective-form',
   templateUrl: './affective-form.page.html',
   standalone: true,
-  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent]
+  imports: [TrPipe, TranslocoPipe, IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent]
 })
 export class AffectiveFormPage extends BaseCataForm<FormularioAfectivo> {
   override formulario: FormularioAfectivo = this.crearFormularioVacio();

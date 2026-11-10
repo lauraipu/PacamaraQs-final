@@ -20,6 +20,8 @@ import {
   TIPOS_DEFECTO
 } from '../../../core/cva/cva';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TrPipe } from '../../../core/i18n/tr';
 addIcons({
   arrowBackOutline,
   chevronDownOutline,
@@ -73,7 +75,7 @@ export type AtributoCalificable =
   selector: 'app-combined-form',
   templateUrl: './combined-form.page.html',
   standalone: true,
-  imports: [IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, GustosPredominantesComponent]
+  imports: [TrPipe, TranslocoPipe, IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, GustosPredominantesComponent]
 })
 export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
 

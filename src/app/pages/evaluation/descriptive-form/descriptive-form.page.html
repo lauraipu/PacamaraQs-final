@@ -11,16 +11,16 @@
   <header class="cva-header">
     <div class="cva-header__inner">
       <div class="cva-header__left">
-        <button type="button" class="cva-header__back-btn" aria-label="Volver" (click)="volver()">
+        <button type="button" class="cva-header__back-btn" [attr.aria-label]="'descriptivo.volver' | transloco" (click)="volver()">
           <ion-icon name="arrow-back-outline"></ion-icon>
         </button>
         <div class="cva-header__meta">
-          <p class="cva-header__session-name">Evaluación Descriptiva</p>
-          <p class="cva-header__sample-label">Muestra {{ muestraActual() }} <span>de {{ totalMuestras() }}</span></p>
+          <p class="cva-header__session-name">{{ 'descriptivo.evaluacion_descriptiva' | transloco }}</p>
+          <p class="cva-header__sample-label">{{ 'descriptivo.muestra' | transloco: { p0: (muestraActual()) } }} <span>{{ 'descriptivo.de' | transloco: { p0: (totalMuestras()) } }}</span></p>
         </div>
       </div>
       <div class="cva-header__right">
-        <span class="cva-header__format-badge">Descriptivo</span>
+        <span class="cva-header__format-badge">{{ 'descriptivo.descriptivo' | transloco }}</span>
       </div>
     </div>
     <div class="cva-header__progress-bar-wrap">
@@ -34,21 +34,21 @@
     <div class="cva-main__grid">
       <div class="cva-main__column">
         <article class="attr-card" *ngFor="let atributo of atributosAromaticos">
-          <h3 class="attr-card__title">{{ atributo.label }}</h3>
+          <h3 class="attr-card__title">{{ atributo.label | tr }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física (0-15)</span>
-              <span class="intensity-slider__value">{{ formulario[atributo.key].intensidad === null ? 'Sin marcar' : (formulario[atributo.key].intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'descriptivo.intensidad_fisica_0_15' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario[atributo.key].intensidad === null ? ('descriptivo.sin_marcar' | transloco) : (formulario[atributo.key].intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'descriptivo.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario[atributo.key].intensidad === null" [(ngModel)]="formulario[atributo.key].intensidad" (pointerup)="marcarIntensidad(formulario[atributo.key], $event)" (keyup)="marcarIntensidad(formulario[atributo.key], $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'descriptivo.alta' | transloco }}</span>
             </div>
           </div>
 
           <div class="flavor-tree">
-            <p class="flavor-tree__section-label">Descriptores aromáticos</p>
+            <p class="flavor-tree__section-label">{{ 'descriptivo.descriptores_aromaticos' | transloco }}</p>
             <div class="flavor-tree__category" *ngFor="let categoria of ruedaKeys">
               <button type="button" class="flavor-tree__category-btn" (click)="toggleCategoria(categoria)">
                 <span class="flavor-tree__category-left">
@@ -57,7 +57,7 @@
                     class="flavor-tree__chevron">
                   </ion-icon>
                   <span class="flavor-tree__swatch" [style.background]="ruedaSabores[categoria].color"></span>
-                  {{ categoria }}
+                  {{ categoria | tr }}
                 </span>
               </button>
               <div class="flavor-tree__sub-list" *ngIf="categoriasAbiertas[categoria]">
@@ -69,7 +69,7 @@
                   [style.background]="isDescriptorSelected(atributo.key, descriptor) ? ruedaSabores[categoria].color : ''"
                   [style.color]="isDescriptorSelected(atributo.key, descriptor) ? 'white' : ''"
                   (click)="toggleDescriptor(atributo.key, descriptor)">
-                  {{ descriptor }}
+                  {{ descriptor | tr }}
                 </button>
               </div>
             </div>
@@ -77,14 +77,14 @@
               type="text"
               class="extra-descriptor"
               [attr.aria-label]="'Descriptor personalizado para ' + atributo.label"
-              placeholder="Agregar descriptor personalizado..."
+              [placeholder]="'descriptivo.agregar_descriptor_personalizado' | transloco"
               [(ngModel)]="formulario[atributo.key].extra">
           </div>
         </article>
 
         <!-- GUSTOS PREDOMINANTES (2) — hoja SCA, bloque de Sabor / Sabor residual -->
         <article class="attr-card">
-          <h3 class="attr-card__title">Gustos Predominantes (2)</h3>
+          <h3 class="attr-card__title">{{ 'descriptivo.gustos_predominantes_2' | transloco }}</h3>
           <app-gustos-predominantes
             [seleccion]="formulario.gustosPredominantes"
             [deshabilitado]="muestraActualCerrada()"
@@ -93,58 +93,58 @@
         </article>
 
         <article class="attr-card">
-          <h3 class="attr-card__title">Acidez</h3>
+          <h3 class="attr-card__title">{{ 'descriptivo.acidez' | transloco }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física (0-15)</span>
-              <span class="intensity-slider__value">{{ formulario.acidez.intensidad === null ? 'Sin marcar' : (formulario.acidez.intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'descriptivo.intensidad_fisica_0_15' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario.acidez.intensidad === null ? ('descriptivo.sin_marcar' | transloco) : (formulario.acidez.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'descriptivo.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.acidez.intensidad === null" [(ngModel)]="formulario.acidez.intensidad" (pointerup)="marcarIntensidad(formulario.acidez, $event)" (keyup)="marcarIntensidad(formulario.acidez, $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'descriptivo.alta' | transloco }}</span>
             </div>
           </div>
           <div class="notes-panel" style="margin-top:16px;">
-            <div class="notes-panel__header">Notas de acidez (ej. cítrica, málica)</div>
+            <div class="notes-panel__header">{{ 'descriptivo.notas_de_acidez_ej' | transloco }}</div>
             <textarea class="notes-panel__textarea" rows="2" [(ngModel)]="formulario.acidez.nota"></textarea>
           </div>
         </article>
 
         <article class="attr-card">
-          <h3 class="attr-card__title">Dulzor</h3>
+          <h3 class="attr-card__title">{{ 'descriptivo.dulzor' | transloco }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física (0-15)</span>
-              <span class="intensity-slider__value">{{ formulario.dulzor.intensidad === null ? 'Sin marcar' : (formulario.dulzor.intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'descriptivo.intensidad_fisica_0_15' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario.dulzor.intensidad === null ? ('descriptivo.sin_marcar' | transloco) : (formulario.dulzor.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'descriptivo.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.dulzor.intensidad === null" [(ngModel)]="formulario.dulzor.intensidad" (pointerup)="marcarIntensidad(formulario.dulzor, $event)" (keyup)="marcarIntensidad(formulario.dulzor, $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'descriptivo.alta' | transloco }}</span>
             </div>
           </div>
         </article>
 
         <article class="attr-card">
-          <h3 class="attr-card__title">Sensación en Boca</h3>
+          <h3 class="attr-card__title">{{ 'descriptivo.sensacion_en_boca' | transloco }}</h3>
           <div class="intensity-slider">
             <div class="intensity-slider__header">
-              <span class="intensity-slider__label">Intensidad física (0-15)</span>
-              <span class="intensity-slider__value">{{ formulario.sensacionEnBoca.intensidad === null ? 'Sin marcar' : (formulario.sensacionEnBoca.intensidad | number:'1.1-1') }}</span>
+              <span class="intensity-slider__label">{{ 'descriptivo.intensidad_fisica_0_15' | transloco }}</span>
+              <span class="intensity-slider__value">{{ formulario.sensacionEnBoca.intensidad === null ? ('descriptivo.sin_marcar' | transloco) : (formulario.sensacionEnBoca.intensidad | number:'1.1-1') }}</span>
             </div>
             <div class="intensity-slider__track">
-              <span class="intensity-slider__endpoint">Baja</span>
+              <span class="intensity-slider__endpoint">{{ 'descriptivo.baja' | transloco }}</span>
               <input class="intensity-slider__input" type="range" min="0" max="15" step="0.5" [class.intensity-slider__input--vacio]="formulario.sensacionEnBoca.intensidad === null" [(ngModel)]="formulario.sensacionEnBoca.intensidad" (pointerup)="marcarIntensidad(formulario.sensacionEnBoca, $event)" (keyup)="marcarIntensidad(formulario.sensacionEnBoca, $event)">
-              <span class="intensity-slider__endpoint">Alta</span>
+              <span class="intensity-slider__endpoint">{{ 'descriptivo.alta' | transloco }}</span>
             </div>
           </div>
           <div class="mouthfeel">
-            <p class="flavor-tree__section-label">Texturas táctiles</p>
+            <p class="flavor-tree__section-label">{{ 'descriptivo.texturas_tactiles' | transloco }}</p>
             <div class="mouthfeel__list">
               <label class="mouthfeel__item" *ngFor="let textura of texturas">
                 <input type="checkbox" [checked]="formulario.sensacionEnBoca.textura.includes(textura)" (change)="toggleTextura(textura)">
-                {{ textura }}
+                {{ textura | tr }}
               </label>
             </div>
           </div>
@@ -153,8 +153,8 @@
 
       <aside class="cva-main__sidebar">
         <div class="notes-panel">
-          <div class="notes-panel__header">Notas adicionales</div>
-          <textarea class="notes-panel__textarea" rows="5" [(ngModel)]="formulario.notas" placeholder="Observaciones descriptivas..."></textarea>
+          <div class="notes-panel__header">{{ 'descriptivo.notas_adicionales' | transloco }}</div>
+          <textarea class="notes-panel__textarea" rows="5" [(ngModel)]="formulario.notas" [placeholder]="'descriptivo.observaciones_descriptivas' | transloco"></textarea>
         </div>
         <div class="sample-navigation">
           <button
@@ -162,10 +162,10 @@
             type="button"
             class="submit-btn sample-navigation__previous"
             (click)="irAMuestraAnterior()">
-            ← Anterior
+            {{ 'descriptivo.anterior' | transloco }}
           </button>
           <button type="button" class="submit-btn" (click)="irAMuestraSiguiente()" [disabled]="guardando()">
-            {{ guardando() ? 'Guardando…' : (muestraActual() === totalMuestras() ? 'Terminar cata' : 'Siguiente muestra →') }}
+            {{ guardando() ? ('descriptivo.guardando' | transloco) : (muestraActual() === totalMuestras() ? ('descriptivo.terminar_cata' | transloco) : ('descriptivo.siguiente_muestra' | transloco)) }}
           </button>
         </div>
       </aside>
