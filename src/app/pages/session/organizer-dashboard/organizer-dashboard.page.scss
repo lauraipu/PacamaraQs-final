@@ -1,42 +1,49 @@
 .od-toolbar { --background: var(--app-bg-card); }
-.od-title { color: var(--app-text-main); font-size: 15px; font-weight: 700; }
-.od-subtitle { color: var(--app-text-muted); font-size: 12px; font-weight: 400; }
+.od-title { color: var(--app-text-main); font-size: 0.9375rem; font-weight: 700; }
+.od-subtitle { color: var(--app-text-muted); font-size: 0.75rem; font-weight: 400; }
 .od-content { --background: var(--app-bg-screen); }
 .od-container { width: min(100%, 720px); margin: 0 auto; }
-.od-section-title { margin: 0 0 4px; color: var(--app-text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
-.od-hint { margin: 8px 0 0; color: var(--app-text-muted); font-size: 12px; }
+.od-section-title { margin: 0 0 4px; color: var(--app-text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.od-hint { margin: 8px 0 0; color: var(--app-text-muted); font-size: 0.75rem; }
 .od-empty { padding: 24px; color: var(--app-text-muted); text-align: center; }
-.od-error { margin-bottom: 16px; padding: 12px; border-radius: 8px; background: var(--app-error-bg); color: var(--app-error-text); font-size: 13px; }
-.od-banner { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 10px 12px; border-radius: 8px; background: #fef9c3; color: #854d0e; font-size: 12px; }
+.od-error { margin-bottom: 16px; padding: 12px; border-radius: 8px; background: var(--app-error-bg); color: var(--app-error-text); font-size: 0.8125rem; }
+.od-banner { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 16px; padding: 10px 12px; border-radius: 8px; background: #fef9c3; color: #854d0e; font-size: 0.75rem; }
 
-.od-guide { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.od-guide { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .od-stepper { display: flex; align-items: center; gap: 8px; }
-.od-stepper__value { min-width: 88px; color: var(--app-text-main); font-weight: 700; text-align: center; }
+.od-stepper__value { min-width: 64px; color: var(--app-text-main); font-weight: 700; text-align: center; }
 
 .od-table-wrap { margin-top: 8px; overflow-x: auto; }
-.od-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.od-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
 .od-table th, .od-table td { padding: 8px 6px; border-bottom: 1px solid var(--app-border); text-align: center; }
-.od-table thead th { color: var(--app-text-muted); font-size: 11px; font-weight: 600; }
+.od-table thead th { color: var(--app-text-muted); font-size: 0.75rem; font-weight: 600; }
 .od-table tbody th, .od-table tfoot th { color: var(--app-text-main); font-weight: 500; text-align: left; white-space: nowrap; }
-.od-table tfoot th { color: var(--app-text-muted); font-size: 11px; }
-.od-table ion-icon { font-size: 18px; vertical-align: middle; }
+.od-table tfoot th { color: var(--app-text-muted); font-size: 0.75rem; }
+.od-table ion-icon { font-size: clamp(1rem, 5.0vw, 1.125rem); vertical-align: middle; }
 .od-row--unstable { background: #fefce8; }
 
 .od-presence { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--app-text-faint); }
 .od-presence--online { background: var(--app-success); }
 .od-presence--unstable { background: #eab308; }
-.od-tag { margin-left: 4px; color: var(--app-text-muted); font-size: 10px; }
-.od-grace { display: block; color: #a16207; font-size: 11px; font-weight: 600; }
+.od-tag { margin-left: 4px; color: var(--app-text-muted); font-size: 0.75rem; }
+.od-grace { display: block; color: #a16207; font-size: 0.75rem; font-weight: 600; }
 
 .od-close-btn {
-  padding: 4px 8px;
+  min-height: 36px;
+  padding: 6px 10px;
   border: 1px solid var(--app-border);
   border-radius: 6px;
   background: var(--app-bg-card);
   color: var(--app-text-main);
   font: inherit;
-  font-size: 11px;
+  font-size: 0.75rem;
   cursor: pointer;
   white-space: nowrap;
 }
 .od-close-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* ── Celulares pequeños (≤ 380 px) ── */
+@media (max-width: 380px) {
+  .od-table th, .od-table td { padding: 6px 4px; }
+  .od-guide > * { flex: 1 1 100%; }
+}

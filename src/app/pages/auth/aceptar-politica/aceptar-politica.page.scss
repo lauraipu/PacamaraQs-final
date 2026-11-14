@@ -1,9 +1,9 @@
 .politica-content { --background: var(--app-bg-screen); }
 .politica-container { width: min(100%, 560px); margin: 0 auto; padding: 16px 4px 32px; }
 .politica-top { display: flex; justify-content: flex-end; margin-bottom: 8px; }
-.politica-title { margin: 0 0 16px; color: var(--app-text-main); font-size: 22px; font-weight: 700; line-height: 1.25; }
+.politica-title { margin: 0 0 16px; color: var(--app-text-main); font-size: clamp(1.0625rem, 6.1vw, 1.375rem); font-weight: 700; line-height: 1.25; }
 .politica-card { margin-bottom: 16px; padding: 16px; border: 1px solid var(--app-border); border-radius: 12px; background: var(--app-bg-card, #fff); }
 .politica-check { display: block; margin-bottom: 16px; }
 .politica-check ion-checkbox { --size: 22px; width: 100%; --checkbox-background-checked: var(--app-primary-dark); --border-color-checked: var(--app-primary-dark); }
-.politica-check__text { white-space: normal; color: var(--app-text-main); font-size: 15px; line-height: 1.4; }
+.politica-check__text { white-space: normal; color: var(--app-text-main); font-size: 0.9375rem; line-height: 1.4; }
 .primary-btn { margin-bottom: 8px; }

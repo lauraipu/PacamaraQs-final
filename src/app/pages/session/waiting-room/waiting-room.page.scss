@@ -8,7 +8,7 @@ ion-back-button {
 
 .blind-badge {
   --background: #2f3e46;
-  font-size: 11px;
+  font-size: 0.75rem;
   padding: 6px 10px;
   border-radius: 6px;
   display: flex;
@@ -45,19 +45,19 @@ ion-back-button {
 }
 
 .metric-label {
-  font-size: 11px;
+  font-size: 0.75rem;
   color: #62748e;
   margin-bottom: 4px;
 }
 
 .metric-value {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: bold;
   color: #0f172b;
 }
 
 .section-title {
-  font-size: 11px;
+  font-size: 0.75rem;
   font-weight: bold;
   color: #62748e;
   text-transform: uppercase;
@@ -78,14 +78,14 @@ ion-back-button {
 }
 
 .code-display {
-  font-size: 20px;
+  font-size: clamp(1rem, 5.6vw, 1.25rem);
   font-weight: bold;
   letter-spacing: 2px;
   color: #0f172b;
 }
 
 .share-hint {
-  font-size: 11px;
+  font-size: 0.75rem;
   color: #94a3b8;
   margin: 8px 0 0;
 }
@@ -102,7 +102,7 @@ ion-back-button {
 }
 
 .list-subtitle {
-  font-size: 11px;
+  font-size: 0.75rem;
   color: #62748e;
   text-align: right;
   max-width: 100px;
@@ -131,12 +131,12 @@ ion-back-button {
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 1rem;
   margin-right: 12px;
 }
 
 .taster-item h2 {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: bold;
   color: #0f172b;
   margin: 0 0 2px;
@@ -146,13 +146,13 @@ ion-back-button {
 }
 
 .org-tag {
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: normal;
   color: #62748e;
 }
 
 .taster-item p {
-  font-size: 11px;
+  font-size: 0.75rem;
   color: #62748e;
   margin: 0;
 }
@@ -161,7 +161,7 @@ ion-back-button {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #62748e;
 }
 
@@ -181,7 +181,7 @@ ion-back-button {
   border-radius: 8px;
   padding: 20px;
   text-align: center;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #62748e;
 }
 
@@ -197,12 +197,12 @@ ion-back-button {
 
 .privacy-card ion-icon {
   color: #62748e;
-  font-size: 18px;
+  font-size: clamp(1rem, 5.0vw, 1.125rem);
   flex-shrink: 0;
 }
 
 .privacy-card p {
-  font-size: 11px;
+  font-size: 0.75rem;
   color: #62748e;
   margin: 0;
   line-height: 1.4;
@@ -232,12 +232,12 @@ ion-back-button {
   border-radius: 8px;
   background: #ffe4e6;
   color: #991b1b;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 /* --- Auditoría 2026-11-03: estados nuevos (listo, reintento, subtítulo) --- */
-.page-title { color: var(--app-text-main); font-size: 15px; font-weight: 700; }
-.page-subtitle { margin-top: 2px; color: var(--app-text-muted); font-size: 12px; font-weight: 400; }
+.page-title { color: var(--app-text-main); font-size: 0.9375rem; font-weight: 700; }
+.page-subtitle { margin-top: 2px; color: var(--app-text-muted); font-size: 0.75rem; font-weight: 400; }
 
 .blind-badge ion-icon { margin-right: 4px; }
 
@@ -263,7 +263,7 @@ ion-back-button {
   gap: 8px;
   margin: 16px 0 0;
   color: var(--app-text-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .pulse-dot {
@@ -293,7 +293,7 @@ ion-back-button {
   border-radius: 8px;
   background: #fef9c3;
   color: #854d0e;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .avatar { position: relative; }

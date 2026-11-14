@@ -20,7 +20,7 @@ import { IDIOMAS, IdiomaService } from '../../../core/i18n/idioma.service';
   `,
   styles: [`
     :host { display: inline-block; }
-    .selector-idioma { --padding-start: 12px; --padding-end: 8px; min-height: 44px; min-width: 128px; font-size: 14px; }
+    .selector-idioma { --padding-start: 12px; --padding-end: 8px; min-height: 44px; min-width: 128px; font-size: 0.875rem; }
   `]
 })
 export class SelectorIdiomaComponent {

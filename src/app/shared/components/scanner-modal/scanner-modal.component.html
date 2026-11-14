@@ -64,6 +64,7 @@
           <dt>{{ 'escaner.grado' | transloco }}</dt><dd>{{ valorDe(f, 'trading.grade') }}</dd>
         </dl>
       } @else {
+        <div class="sc-table-wrap">
         <table class="sc-table">
           <thead>
             <tr>
@@ -96,6 +97,7 @@
             }
           </tbody>
         </table>
+        </div>
 
         @if (f.formato !== 'descriptivo') {
           <div class="sc-kpis">

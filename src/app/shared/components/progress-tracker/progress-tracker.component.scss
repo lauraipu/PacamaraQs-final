@@ -9,8 +9,8 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 12px;
-  .label { font-size: 13px; font-weight: 600; color: #62748E; }
-  .value { font-size: 13px; font-weight: 700; color: #0F172B; }
+  .label { font-size: 0.8125rem; font-weight: 600; color: #62748E; }
+  .value { font-size: 0.8125rem; font-weight: 700; color: #0F172B; }
 }
 .progress-bar-bg {
   height: 8px;
@@ -26,7 +26,7 @@
 }
 .progress-hint {
   margin-top: 12px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #62748E;
   text-align: center;
   &.success { color: #15803D; font-weight: 600; }

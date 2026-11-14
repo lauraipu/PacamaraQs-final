@@ -5,7 +5,7 @@
   border-radius: 999px;
   background: var(--app-bg-subtle, #f1f5f9);
   color: var(--app-text-muted, #62748e);
-  font-size: 11px;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 .gustos__count--full { background: var(--app-primary-dark, #2f3e46); color: #ffffff; }
@@ -14,13 +14,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 12px;
   border: 1px solid var(--app-border, #e2e8f0);
   border-radius: 999px;
   background: var(--app-bg-card, #ffffff);
   color: var(--app-text-main, #0f172b);
-  font-size: 13px;
+  font-size: 0.8125rem;
   cursor: pointer;
   transition: border-color 0.15s ease, background-color 0.15s ease, opacity 0.15s ease;
 
@@ -28,4 +28,4 @@
 }
 .gustos__item--on { border-color: var(--app-primary-dark, #2f3e46); background: var(--app-bg-subtle, #f1f5f9); font-weight: 600; }
 .gustos__item--off { opacity: 0.45; cursor: not-allowed; }
-.gustos__hint { margin: 8px 0 0; color: var(--app-text-muted, #62748e); font-size: 11px; }
+.gustos__hint { margin: 8px 0 0; color: var(--app-text-muted, #62748e); font-size: 0.75rem; }

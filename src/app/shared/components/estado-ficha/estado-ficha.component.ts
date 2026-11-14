@@ -44,7 +44,7 @@ import { TrPipe } from '../../../core/i18n/tr';
       margin: 8px 12px;
       padding: 10px 12px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 0.75rem;
       line-height: 1.4;
     }
     .estado-ficha--pendiente { background: #fef9c3; color: #854d0e; }

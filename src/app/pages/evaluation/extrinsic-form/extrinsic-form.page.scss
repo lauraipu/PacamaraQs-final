@@ -22,7 +22,7 @@
 .money-input__suffix {
   padding: 0 10px;
   color: var(--app-text-muted, #62748e);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -41,7 +41,7 @@
 .money-input__error {
   margin: 6px 0 0;
   color: var(--app-error-text, #991b1b);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 /* Moneda con buscador dentro del campo de precio */

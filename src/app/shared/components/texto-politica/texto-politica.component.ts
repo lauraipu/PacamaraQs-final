@@ -20,10 +20,10 @@ import { VERSION_POLITICA } from '../../../core/services/auth';
     </div>
   `,
   styles: [`
-    .texto-politica { color: var(--app-text-main); font-size: 14px; line-height: 1.5; }
+    .texto-politica { color: var(--app-text-main); font-size: 0.875rem; line-height: 1.5; }
     .texto-politica ul { margin: 12px 0; padding-left: 20px; }
     .texto-politica li { margin-bottom: 8px; }
-    .texto-politica__version { color: var(--app-text-muted); font-size: 12px; }
+    .texto-politica__version { color: var(--app-text-muted); font-size: 0.75rem; }
   `]
 })
 export class TextoPoliticaComponent {
