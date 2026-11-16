@@ -40,7 +40,7 @@ import { IDIOMAS, IdiomaService } from '../../../core/i18n/idioma.service';
       border-radius: 8px;
       object-fit: cover;
     }
-    .selector-idioma { --padding-start: 0; --padding-end: 4px; min-height: 36px; min-width: 112px; font-size: 0.875rem; }
+    .selector-idioma { --padding-start: 0; --padding-end: 4px; min-height: 44px; min-width: 112px; font-size: 0.875rem; }
   `]
 })
 export class SelectorIdiomaComponent {

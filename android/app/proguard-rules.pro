@@ -19,3 +19,16 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# ── PacamaraQS ──────────────────────────────────────────────────────────────
+# Capacitor ya incluye sus reglas (consumerProguardFiles) para los plugins
+# anotados con @CapacitorPlugin. Estas reglas extra protegen el puente
+# JavaScript ↔ Android y los plugins usados por la app.
+-keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-keep class com.getcapacitor.** { *; }
+-keep class com.capacitorjs.plugins.** { *; }
+-keep class com.capgo.printer.** { *; }
+-keep class com.pacamaraqs.app.** { *; }

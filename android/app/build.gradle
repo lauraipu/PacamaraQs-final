@@ -16,10 +16,29 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Firma del APK release. Con los secretos ANDROID_KEYSTORE_* (GitHub Actions)
+    // o un keystore.properties local se usa la llave propia; si no existen,
+    // se firma con la llave de depuración solo para poder instalarlo y probarlo.
+    def propsFile = rootProject.file('keystore.properties')
+    def props = new Properties()
+    if (propsFile.exists()) { propsFile.withInputStream { props.load(it) } }
+    def keystorePath = System.getenv('ANDROID_KEYSTORE_PATH') ?: props['storeFile']
+    signingConfigs {
+        if (keystorePath) {
+            propia {
+                storeFile file(keystorePath)
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD') ?: props['storePassword']
+                keyAlias System.getenv('ANDROID_KEY_ALIAS') ?: props['keyAlias']
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD') ?: props['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig keystorePath ? signingConfigs.propia : signingConfigs.debug
         }
     }
 }
