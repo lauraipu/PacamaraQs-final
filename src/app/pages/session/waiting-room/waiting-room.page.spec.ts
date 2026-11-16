@@ -172,6 +172,7 @@ describe('WaitingRoomPage', () => {
     obtenerSesionPorId.mockResolvedValue(sesionBase({ formato: 'afectivo', estado: EstadoSesion.INICIADA }));
     eventos.next({ tipo: 'INICIAR_CATA' });
     await fixture.whenStable();
+    await new Promise(resolve => setTimeout(resolve, 0));
     expect(navigateByUrl).toHaveBeenCalledWith('/affective-form/session-id', { replaceUrl: true });
   });
 

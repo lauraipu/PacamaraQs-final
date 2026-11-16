@@ -76,7 +76,7 @@ describe('sanearFicha', () => {
     expect(afectivo.formulario['fragancia']).toBe(8);
     expect(afectivo.atributos.every(a => a.intensidad === null)).toBe(true);
     const ext = sanearFicha({ processing: { processType: 'Honey' }, farming: { country: 'Colombia' } }, 'extrinseca', false);
-    expect((ext.formulario['processing'] as Record<string, unknown>)['processType']).toBe('');
+    expect((ext.formulario['processing'] as Record<string, unknown>)['processType']).toBe('honey');
     expect(ext.camposFaltantes).toEqual(['Variedad']);
     expect(ext.atributos).toEqual([]);
   });
