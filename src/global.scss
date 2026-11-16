@@ -49,8 +49,25 @@ ion-item {
 }
 
 body {
+  margin: 0;
+  background: var(--app-bg-screen);
   color: var(--app-text-main);
   font-family: var(--ion-font-family);
+}
+
+ion-toolbar {
+  --background: var(--app-bg-card);
+  --border-color: var(--app-border);
+  border-bottom: 1px solid var(--app-border);
+  box-shadow: 0 2px 12px rgb(25 47 38 / 4%);
+}
+
+ion-card,
+.cupping-card {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-card);
+  background: var(--app-bg-card);
+  box-shadow: var(--app-shadow-card);
 }
 
 .custom-input {
@@ -61,7 +78,7 @@ body {
   --border-width: 1px;
   --border-color: var(--app-border-input);
   --border-style: solid;
-  --border-radius: 8px;
+  --border-radius: var(--app-radius-control);
   --highlight-color-focused: var(--app-primary-dark);
   --highlight-color-valid: var(--app-primary-dark);
   --highlight-color-invalid: var(--app-error);
@@ -71,6 +88,7 @@ body {
 
   &.ion-focused {
     --border-width: 2px;
+    box-shadow: 0 0 0 3px rgb(47 62 70 / 10%);
   }
 }
 
@@ -88,8 +106,9 @@ body {
   margin-bottom: 16px;
   padding: 16px;
   border: 1px solid var(--app-border);
-  border-radius: 12px;
+  border-radius: var(--app-radius-card);
   background: var(--app-bg-card);
+  box-shadow: var(--app-shadow-card);
 }
 
 .formato-item {
@@ -98,7 +117,7 @@ body {
   margin-bottom: 12px;
   padding: 16px;
   border: 1px solid var(--app-border);
-  border-radius: 8px;
+  border-radius: var(--app-radius-control);
   background: var(--app-bg-card);
   color: var(--app-text-main);
   cursor: pointer;
@@ -108,7 +127,8 @@ body {
 
   &.selected {
     border-color: var(--app-primary-dark);
-    background: #f8fafc;
+    background: var(--app-primary-soft);
+    box-shadow: 0 0 0 3px rgb(47 62 70 / 8%);
   }
 }
 
@@ -117,20 +137,25 @@ body {
   --background-hover: var(--app-primary-hover);
   --color: #ffffff;
   --border-radius: 8px;
-  --box-shadow: none;
+  --box-shadow: 0 8px 18px rgb(25 47 38 / 16%);
 
   min-height: 48px;
   margin: 0;
   font-weight: 600;
   font-size: 0.875rem;
   text-transform: none;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+
+  &:hover { --box-shadow: 0 10px 22px rgb(25 47 38 / 22%); }
+  &:active { transform: translateY(1px); }
 }
 
 .btn-login {
   --background: var(--app-primary-dark);
   --background-hover: var(--app-primary-hover);
   --color: #ffffff;
-  --border-radius: 8px;
+  --border-radius: var(--app-radius-control);
+  --box-shadow: 0 8px 18px rgb(25 47 38 / 16%);
   font-size: 0.875rem;
   font-weight: 600;
   text-transform: none;
@@ -246,7 +271,7 @@ ion-item { --min-height: 48px; }
 .oauth-divider::before, .oauth-divider::after { content: ''; flex: 1; border-top: 1px solid var(--app-border); }
 .btn-google {
   --border-color: var(--app-border); --color: var(--app-text-main); --background: #ffffff;
-  --border-radius: 8px; --box-shadow: none; min-height: 48px; margin: 0; font-weight: 600; text-transform: none;
+  --border-radius: var(--app-radius-control); --box-shadow: var(--app-shadow-card); min-height: 48px; margin: 0; font-weight: 600; text-transform: none;
 }
 .btn-google__logo { width: 20px; height: 20px; flex: 0 0 auto; margin-right: 10px; }
 .btn-google__text { white-space: normal; }
