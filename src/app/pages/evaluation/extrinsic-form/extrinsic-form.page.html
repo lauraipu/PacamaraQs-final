@@ -6,26 +6,45 @@
     [rechazo]="rechazoActual()"
     [esperandoFinalizar]="esperandoSincronizacion()"
     (reintentar)="reintentarSincronizacion()"
-    (salir)="salirConPendientes()">
+    (salir)="salirConPendientes()"
+  >
   </app-estado-ficha>
   <header class="cva-header">
     <div class="cva-header__inner">
       <div class="cva-header__left">
-        <button type="button" class="cva-header__back-btn" [attr.aria-label]="'extrinseco.volver' | transloco" (click)="volver()">
+        <button
+          type="button"
+          class="cva-header__back-btn"
+          [attr.aria-label]="'extrinseco.volver' | transloco"
+          (click)="volver()"
+        >
           <ion-icon name="arrow-back-outline"></ion-icon>
         </button>
         <div class="cva-header__meta">
-          <p class="cva-header__session-name">{{ 'extrinseco.evaluacion_extrinseca' | transloco }}</p>
-          <p class="cva-header__sample-label">{{ 'extrinseco.muestra' | transloco: { p0: (muestraActual()) } }} <span>{{ 'extrinseco.de' | transloco: { p0: (totalMuestras()) } }}</span></p>
+          <p class="cva-header__session-name">
+            {{ 'extrinseco.evaluacion_extrinseca' | transloco }}
+          </p>
+          <p class="cva-header__sample-label">
+            {{ 'extrinseco.muestra' | transloco: { p0: (muestraActual()) } }}
+            <span
+              >{{ 'extrinseco.de' | transloco: { p0: (totalMuestras()) }
+              }}</span
+            >
+          </p>
         </div>
       </div>
       <div class="cva-header__right">
-        <span class="cva-header__format-badge">{{ 'extrinseco.extrinseca' | transloco }}</span>
+        <span class="cva-header__format-badge"
+          >{{ 'extrinseco.extrinseca' | transloco }}</span
+        >
       </div>
     </div>
     <div class="cva-header__progress-bar-wrap">
       <div class="cva-header__progress-bar">
-        <div class="cva-header__progress-bar-fill" [style.width]="(muestraActual() / totalMuestras()) * 100 + '%'"></div>
+        <div
+          class="cva-header__progress-bar-fill"
+          [style.width]="(muestraActual() / totalMuestras()) * 100 + '%'"
+        ></div>
       </div>
     </div>
   </header>
@@ -35,182 +54,423 @@
       <div class="cva-main__column">
         <!-- 1. CULTIVO -->
         <article class="attr-card">
-          <h3 class="attr-card__title">{{ 'extrinseco.t_1_informacion_de_cultivo' | transloco }}</h3>
+          <h3 class="attr-card__title">
+            {{ 'extrinseco.t_1_informacion_de_cultivo' | transloco }}
+          </h3>
           <div class="form-fields">
             <div class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.pais' | transloco }}</span>
-              <app-selector-buscable [titulo]="'extrinseco.pais' | transloco" [placeholder]="'extrinseco.ej_colombia' | transloco" [permitirOtro]="true"
-                [opciones]="opcionesPaises" [valor]="formulario.farming.country" (valorChange)="cambiarPais($event)">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.pais' | transloco }}</span
+              >
+              <app-selector-buscable
+                [titulo]="'extrinseco.pais' | transloco"
+                [placeholder]="'extrinseco.ej_colombia' | transloco"
+                [permitirOtro]="true"
+                [opciones]="opcionesPaises"
+                [valor]="formulario.farming.country"
+                (valorChange)="cambiarPais($event)"
+              >
               </app-selector-buscable>
             </div>
             <div class="form-field">
-              <span class="intensity-slider__label">{{ etiquetaRegion() | tr }}</span>
+              <span class="intensity-slider__label"
+                >{{ etiquetaRegion() | tr }}</span
+              >
               @if (opcionesRegiones().length > 0) {
-                <app-selector-buscable [titulo]="etiquetaRegion()" [placeholder]="('extrinseco.ej' | transloco) + ' ' + opcionesRegiones()[0].etiqueta" [permitirOtro]="true"
-                  [opciones]="opcionesRegiones()" [valor]="formulario.farming.region" (valorChange)="formulario.farming.region = $event">
-                </app-selector-buscable>
+              <app-selector-buscable
+                [titulo]="etiquetaRegion()"
+                [placeholder]="('extrinseco.ej' | transloco) + ' ' + opcionesRegiones()[0].etiqueta"
+                [permitirOtro]="true"
+                [opciones]="opcionesRegiones()"
+                [valor]="formulario.farming.region"
+                (valorChange)="formulario.farming.region = $event"
+              >
+              </app-selector-buscable>
               } @else {
-                <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.region"
-                  [placeholder]="formulario.farming.country ? ('extrinseco.ej_region_de' | transloco) + formulario.farming.country : ('extrinseco.primero_elige_el_pais' | transloco)">
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.farming.region"
+                [placeholder]="formulario.farming.country ? ('extrinseco.ej_region_de' | transloco) + formulario.farming.country : ('extrinseco.primero_elige_el_pais' | transloco)"
+              />
               }
             </div>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.nombre_de_la_finca' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.farmName"
-                (blur)="normalizarNombres()" [placeholder]="'extrinseco.ej_finca_el_mirador' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.nombre_de_la_finca' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.farming.farmName"
+                (blur)="normalizarNombres()"
+                [placeholder]="'extrinseco.ej_finca_el_mirador' | transloco"
+              />
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.productor_es' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.producers"
-                (blur)="normalizarNombres()" [placeholder]="'extrinseco.ej_ana_gomez_luis' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.productor_es' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.farming.producers"
+                (blur)="normalizarNombres()"
+                [placeholder]="'extrinseco.ej_ana_gomez_luis' | transloco"
+              />
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.especie' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.species" [placeholder]="'extrinseco.ej_coffea_arabica' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.especie' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.farming.species"
+                [placeholder]="'extrinseco.ej_coffea_arabica' | transloco"
+              />
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.variedad_es' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.variety" [placeholder]="'extrinseco.ej_pacamara' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.variedad_es' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.farming.variety"
+                [placeholder]="'extrinseco.ej_pacamara' | transloco"
+              />
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.fecha_de_cosecha' | transloco }}</span>
-              <input class="notes-panel__textarea" type="date" [(ngModel)]="formulario.farming.harvestDate" [placeholder]="'extrinseco.ej_2026_05_15' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.fecha_de_cosecha' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="date"
+                [(ngModel)]="formulario.farming.harvestDate"
+                [placeholder]="'extrinseco.ej_2026_05_15' | transloco"
+              />
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.otra_informacion_de_cultivo' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.farming.other" [placeholder]="'extrinseco.ej_altitud_1_750' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.otra_informacion_de_cultivo' | transloco
+                }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.farming.other"
+                [placeholder]="'extrinseco.ej_altitud_1_750' | transloco"
+              />
             </label>
           </div>
         </article>
 
         <!-- 2. PROCESAMIENTO -->
         <article class="attr-card">
-          <h3 class="attr-card__title">{{ 'extrinseco.t_2_informacion_de_procesamiento' | transloco }}</h3>
+          <h3 class="attr-card__title">
+            {{ 'extrinseco.t_2_informacion_de_procesamiento' | transloco }}
+          </h3>
           <div class="form-fields">
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.nombre_del_procesador' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.processorName"
-                (blur)="normalizarNombres()" [placeholder]="'extrinseco.ej_beneficio_la_esperanza' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.nombre_del_procesador' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.processing.processorName"
+                (blur)="normalizarNombres()"
+                [placeholder]="'extrinseco.ej_beneficio_la_esperanza' | transloco"
+              />
             </label>
             <div class="form-field">
-              <label class="intensity-slider__label" for="campo-wetMill">{{ 'extrinseco.beneficio_humedo' | transloco }}</label>
+              <label class="intensity-slider__label" for="campo-wetMill"
+                >{{ 'extrinseco.beneficio_humedo' | transloco }}</label
+              >
               <div class="money-input">
-                <input id="campo-wetMill" class="money-input__control" type="text" [(ngModel)]="formulario.processing.wetMill"
-                  (blur)="normalizarNombres()" [placeholder]="'extrinseco.ej_beneficio_central_pitalito' | transloco">
-                <span class="money-input__suffix" aria-hidden="true">{{ 'extrinseco.nombre_lugar' | transloco }}</span>
+                <input
+                  id="campo-wetMill"
+                  class="money-input__control"
+                  type="text"
+                  [(ngModel)]="formulario.processing.wetMill"
+                  (blur)="normalizarNombres()"
+                  [placeholder]="'extrinseco.ej_beneficio_central_pitalito' | transloco"
+                />
+                <span class="money-input__suffix" aria-hidden="true"
+                  >{{ 'extrinseco.nombre_lugar' | transloco }}</span
+                >
               </div>
             </div>
             <div class="form-field">
-              <label class="intensity-slider__label" for="campo-dryMill">{{ 'extrinseco.beneficio_seco_trilladora' | transloco }}</label>
+              <label class="intensity-slider__label" for="campo-dryMill"
+                >{{ 'extrinseco.beneficio_seco_trilladora' | transloco }}</label
+              >
               <div class="money-input">
-                <input id="campo-dryMill" class="money-input__control" type="text" [(ngModel)]="formulario.processing.dryMill"
-                  (blur)="normalizarNombres()" [placeholder]="'extrinseco.ej_trilladora_del_huila' | transloco">
-                <span class="money-input__suffix" aria-hidden="true">{{ 'extrinseco.nombre_lugar' | transloco }}</span>
+                <input
+                  id="campo-dryMill"
+                  class="money-input__control"
+                  type="text"
+                  [(ngModel)]="formulario.processing.dryMill"
+                  (blur)="normalizarNombres()"
+                  [placeholder]="'extrinseco.ej_trilladora_del_huila' | transloco"
+                />
+                <span class="money-input__suffix" aria-hidden="true"
+                  >{{ 'extrinseco.nombre_lugar' | transloco }}</span
+                >
               </div>
             </div>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.tipo_de_proceso' | transloco }}</span>
-              <select class="notes-panel__textarea" [(ngModel)]="formulario.processing.processType">
-                <option value="">{{ 'extrinseco.seleccionar_ej_lavado' | transloco }}</option>
-                @for (t of tiposProceso; track t.valor) { <option [value]="t.valor">{{ t.etiqueta | tr }}</option> }
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.tipo_de_proceso' | transloco }}</span
+              >
+              <select
+                class="notes-panel__textarea"
+                [(ngModel)]="formulario.processing.processType"
+              >
+                <option value="">
+                  {{ 'extrinseco.seleccionar_ej_lavado' | transloco }}
+                </option>
+                @for (t of tiposProceso; track t.valor) {
+                <option [value]="t.valor">{{ t.etiqueta | tr }}</option>
+                }
               </select>
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.descafeinado' | transloco }}</span>
-              <select class="notes-panel__textarea" [(ngModel)]="formulario.processing.decaf">
-                <option value="">{{ 'extrinseco.no_aplica' | transloco }}</option>
-                <option value="Agua (Swiss Water)">{{ 'extrinseco.agua_swiss_water' | transloco }}</option>
-                <option value="CO₂ supercrítico">{{ 'extrinseco.co_supercritico' | transloco }}</option>
-                <option value="Acetato de etilo (Caña)">{{ 'extrinseco.acetato_de_etilo_cana' | transloco }}</option>
-                <option value="Cloruro de metileno">{{ 'extrinseco.cloruro_de_metileno' | transloco }}</option>
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.descafeinado' | transloco }}</span
+              >
+              <select
+                class="notes-panel__textarea"
+                [(ngModel)]="formulario.processing.decaf"
+              >
+                <option value="">
+                  {{ 'extrinseco.no_aplica' | transloco }}
+                </option>
+                <option value="Agua (Swiss Water)">
+                  {{ 'extrinseco.agua_swiss_water' | transloco }}
+                </option>
+                <option value="CO₂ supercrítico">
+                  {{ 'extrinseco.co_supercritico' | transloco }}
+                </option>
+                <option value="Acetato de etilo (Caña)">
+                  {{ 'extrinseco.acetato_de_etilo_cana' | transloco }}
+                </option>
+                <option value="Cloruro de metileno">
+                  {{ 'extrinseco.cloruro_de_metileno' | transloco }}
+                </option>
               </select>
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.descripcion_del_proceso' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.description"
-                [placeholder]="'extrinseco.ej_72_h_de' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.descripcion_del_proceso' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.processing.description"
+                [placeholder]="'extrinseco.ej_72_h_de' | transloco"
+              />
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.otra_informacion_de_proceso' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.processing.other" [placeholder]="'extrinseco.ej_humedad_final_10' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.otra_informacion_de_proceso' | transloco
+                }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.processing.other"
+                [placeholder]="'extrinseco.ej_humedad_final_10' | transloco"
+              />
             </label>
           </div>
         </article>
 
         <!-- 3. COMERCIO -->
         <article class="attr-card">
-          <h3 class="attr-card__title">{{ 'extrinseco.t_3_informacion_de_comercio' | transloco }}</h3>
+          <h3 class="attr-card__title">
+            {{ 'extrinseco.t_3_informacion_de_comercio' | transloco }}
+          </h3>
           <div class="form-fields">
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.importador' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.importer"
-                (blur)="normalizarNombres()" [placeholder]="'extrinseco.ej_green_coffee_imports' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.importador' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.trading.importer"
+                (blur)="normalizarNombres()"
+                [placeholder]="'extrinseco.ej_green_coffee_imports' | transloco"
+              />
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.exportador' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.exporter"
-                (blur)="normalizarNombres()" [placeholder]="'extrinseco.ej_cafe_origen_s' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.exportador' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.trading.exporter"
+                (blur)="normalizarNombres()"
+                [placeholder]="'extrinseco.ej_cafe_origen_s' | transloco"
+              />
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.grado_size_grade_other' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.grade" [placeholder]="'extrinseco.ej_supremo_malla_17' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.grado_size_grade_other' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.trading.grade"
+                [placeholder]="'extrinseco.ej_supremo_malla_17' | transloco"
+              />
             </label>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.numero_ico' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.icoNumber" [placeholder]="'extrinseco.ej_3_0123_0456' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.numero_ico' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.trading.icoNumber"
+                [placeholder]="'extrinseco.ej_3_0123_0456' | transloco"
+              />
             </label>
             <div class="form-field">
-              <label class="intensity-slider__label" for="campo-farmPrice">{{ 'extrinseco.precio_en_finca' | transloco }}</label>
-              <div class="money-input" [class.money-input--error]="errorCampo('farmPrice')">
+              <label class="intensity-slider__label" for="campo-farmPrice"
+                >{{ 'extrinseco.precio_en_finca' | transloco }}</label
+              >
+              <div
+                class="money-input"
+                [class.money-input--error]="errorCampo('farmPrice')"
+              >
                 <span class="money-input__prefix" aria-hidden="true">$</span>
-                <input id="campo-farmPrice" class="money-input__control" type="text" inputmode="decimal" autocomplete="off"
+                <input
+                  id="campo-farmPrice"
+                  class="money-input__control"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
                   [placeholder]="'extrinseco.ej_25_000' | transloco"
-                  [attr.aria-invalid]="!!errorCampo('farmPrice')" [attr.aria-describedby]="'error-farmPrice'"
+                  [attr.aria-invalid]="!!errorCampo('farmPrice')"
+                  [attr.aria-describedby]="'error-farmPrice'"
                   [value]="textoCampo('farmPrice')"
-                  (focus)="alEnfocarNumero('farmPrice')" (keydown)="alPresionarTeclaNumero('farmPrice', $event)"
-                  (input)="alEscribirNumero('farmPrice', $event)" (blur)="alSalirNumero('farmPrice')">
-                <app-selector-buscable class="money-input__currency" [titulo]="'extrinseco.moneda' | transloco" [placeholder]="'extrinseco.cop' | transloco"
-                  [opciones]="opcionesMonedas" [valor]="formulario.trading.currency || ('extrinseco.cop' | transloco)"
-                  (valorChange)="formulario.trading.currency = $event">
+                  (focus)="alEnfocarNumero('farmPrice')"
+                  (keydown)="alPresionarTeclaNumero('farmPrice', $event)"
+                  (input)="alEscribirNumero('farmPrice', $event)"
+                  (blur)="alSalirNumero('farmPrice')"
+                />
+                <app-selector-buscable
+                  class="money-input__currency"
+                  [titulo]="'extrinseco.moneda' | transloco"
+                  [placeholder]="'extrinseco.cop' | transloco"
+                  [opciones]="opcionesMonedas"
+                  [valor]="formulario.trading.currency || ('extrinseco.cop' | transloco)"
+                  (valorChange)="formulario.trading.currency = $event"
+                >
                 </app-selector-buscable>
               </div>
               @if (errorCampo('farmPrice'); as mensaje) {
-                <p id="error-farmPrice" class="money-input__error" role="alert">{{ mensaje | tr }}</p>
+              <p id="error-farmPrice" class="money-input__error" role="alert">
+                {{ mensaje | tr }}
+              </p>
               }
             </div>
             <div class="form-field">
-              <label class="intensity-slider__label" for="campo-lotSizeKg">{{ 'extrinseco.tamano_del_lote' | transloco }}</label>
-              <div class="money-input" [class.money-input--error]="errorCampo('lotSizeKg')">
-                <input id="campo-lotSizeKg" class="money-input__control" type="text" inputmode="decimal" autocomplete="off"
+              <label class="intensity-slider__label" for="campo-lotSizeKg"
+                >{{ 'extrinseco.tamano_del_lote' | transloco }}</label
+              >
+              <div
+                class="money-input"
+                [class.money-input--error]="errorCampo('lotSizeKg')"
+              >
+                <input
+                  id="campo-lotSizeKg"
+                  class="money-input__control"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
                   [placeholder]="'extrinseco.ej_690' | transloco"
-                  [attr.aria-invalid]="!!errorCampo('lotSizeKg')" [attr.aria-describedby]="'error-lotSizeKg'"
+                  [attr.aria-invalid]="!!errorCampo('lotSizeKg')"
+                  [attr.aria-describedby]="'error-lotSizeKg'"
                   [value]="textoCampo('lotSizeKg')"
-                  (focus)="alEnfocarNumero('lotSizeKg')" (keydown)="alPresionarTeclaNumero('lotSizeKg', $event)"
-                  (input)="alEscribirNumero('lotSizeKg', $event)" (blur)="alSalirNumero('lotSizeKg')">
-                <span class="money-input__suffix" aria-hidden="true">{{ 'extrinseco.kg' | transloco }}</span>
+                  (focus)="alEnfocarNumero('lotSizeKg')"
+                  (keydown)="alPresionarTeclaNumero('lotSizeKg', $event)"
+                  (input)="alEscribirNumero('lotSizeKg', $event)"
+                  (blur)="alSalirNumero('lotSizeKg')"
+                />
+                <span class="money-input__suffix" aria-hidden="true"
+                  >{{ 'extrinseco.kg' | transloco }}</span
+                >
               </div>
               @if (errorCampo('lotSizeKg'); as mensaje) {
-                <p id="error-lotSizeKg" class="money-input__error" role="alert">{{ mensaje | tr }}</p>
+              <p id="error-lotSizeKg" class="money-input__error" role="alert">
+                {{ mensaje | tr }}
+              </p>
               }
             </div>
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.otra_informacion_comercial' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.trading.other" [placeholder]="'extrinseco.ej_contrato_directo_10' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.otra_informacion_comercial' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.trading.other"
+                [placeholder]="'extrinseco.ej_contrato_directo_10' | transloco"
+              />
             </label>
           </div>
         </article>
 
         <!-- 4. CERTIFICACIONES -->
         <article class="attr-card">
-          <h3 class="attr-card__title">{{ 'extrinseco.t_4_certificaciones' | transloco }}</h3>
+          <h3 class="attr-card__title">
+            {{ 'extrinseco.t_4_certificaciones' | transloco }}
+          </h3>
           <div class="mouthfeel__list">
-            <label class="mouthfeel__item"><input type="checkbox" [(ngModel)]="formulario.certifications.c4"> 4C</label>
-            <label class="mouthfeel__item"><input type="checkbox" [(ngModel)]="formulario.certifications.fairTrade"> {{ 'extrinseco.fair_trade' | transloco }}</label>
-            <label class="mouthfeel__item"><input type="checkbox" [(ngModel)]="formulario.certifications.organic"> {{ 'extrinseco.organico' | transloco }}</label>
-            <label class="mouthfeel__item"><input type="checkbox" [(ngModel)]="formulario.certifications.rainforest"> {{ 'extrinseco.rainforest_alliance' | transloco }}</label>
+            <label class="mouthfeel__item"
+              ><input
+                type="checkbox"
+                [(ngModel)]="formulario.certifications.c4"
+              />
+              4C</label
+            >
+            <label class="mouthfeel__item"
+              ><input
+                type="checkbox"
+                [(ngModel)]="formulario.certifications.fairTrade"
+              />
+              {{ 'extrinseco.fair_trade' | transloco }}</label
+            >
+            <label class="mouthfeel__item"
+              ><input
+                type="checkbox"
+                [(ngModel)]="formulario.certifications.organic"
+              />
+              {{ 'extrinseco.organico' | transloco }}</label
+            >
+            <label class="mouthfeel__item"
+              ><input
+                type="checkbox"
+                [(ngModel)]="formulario.certifications.rainforest"
+              />
+              {{ 'extrinseco.rainforest_alliance' | transloco }}</label
+            >
             <label class="form-field">
-              <span class="intensity-slider__label">{{ 'extrinseco.otra_certificacion' | transloco }}</span>
-              <input class="notes-panel__textarea" type="text" [(ngModel)]="formulario.certifications.other" [placeholder]="'extrinseco.ej_bird_friendly' | transloco">
+              <span class="intensity-slider__label"
+                >{{ 'extrinseco.otra_certificacion' | transloco }}</span
+              >
+              <input
+                class="notes-panel__textarea"
+                type="text"
+                [(ngModel)]="formulario.certifications.other"
+                [placeholder]="'extrinseco.ej_bird_friendly' | transloco"
+              />
             </label>
           </div>
         </article>
@@ -218,20 +478,35 @@
 
       <aside class="cva-main__sidebar">
         <div class="notes-panel">
-          <div class="notes-panel__header">{{ 'extrinseco.notas_extrinsecas' | transloco }}</div>
-          <textarea class="notes-panel__textarea" rows="5" [(ngModel)]="formulario.notes"
-            [placeholder]="'extrinseco.ej_lote_ganador_de' | transloco"></textarea>
+          <div class="notes-panel__header">
+            {{ 'extrinseco.notas_extrinsecas' | transloco }}
+          </div>
+          <textarea
+            class="notes-panel__textarea"
+            rows="5"
+            [(ngModel)]="formulario.notes"
+            [placeholder]="'extrinseco.ej_lote_ganador_de' | transloco"
+          ></textarea>
         </div>
         <div class="sample-navigation">
+          @if (muestraActual() > 1) {
           <button
-            *ngIf="muestraActual() > 1"
             type="button"
             class="submit-btn sample-navigation__previous"
-            (click)="irAMuestraAnterior()">
+            (click)="irAMuestraAnterior()"
+          >
             {{ 'extrinseco.anterior' | transloco }}
           </button>
-          <button type="button" class="submit-btn" (click)="irAMuestraSiguiente()" [disabled]="guardando()">
-            {{ guardando() ? ('extrinseco.guardando' | transloco) : (muestraActual() === totalMuestras() ? ('extrinseco.terminar_cata' | transloco) : ('extrinseco.siguiente_muestra' | transloco)) }}
+          }
+          <button
+            type="button"
+            class="submit-btn"
+            (click)="irAMuestraSiguiente()"
+            [disabled]="guardando()"
+          >
+            {{ guardando() ? ('extrinseco.guardando' | transloco) :
+            (muestraActual() === totalMuestras() ? ('extrinseco.terminar_cata' |
+            transloco) : ('extrinseco.siguiente_muestra' | transloco)) }}
           </button>
         </div>
       </aside>
