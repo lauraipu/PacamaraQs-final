@@ -18,7 +18,7 @@ import { EventoSala, GRACE_PERIOD_MS, RealtimeService, SalaRealtime } from '../.
 import { SesionService } from '../../../core/services/sesion';
 import { mensajeDeError } from '../../../core/utils/errores';
 
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { TrPipe } from '../../../core/i18n/tr';
 const MINIMO_CATADORES = 3;
 const TIEMPO_MAXIMO_CARGA_MS = 15_000;
@@ -81,6 +81,7 @@ export class WaitingRoomPage implements OnDestroy {
   private readonly realtimeService = inject(RealtimeService);
   private readonly toastController = inject(ToastController);
   private readonly alertController = inject(AlertController);
+  private readonly transloco = inject(TranslocoService);
 
   readonly sesion = signal<Sesion | null>(null);
   readonly participantes = signal<Participante[]>([]);
@@ -142,6 +143,7 @@ export class WaitingRoomPage implements OnDestroy {
   private conectado = false;
   private redirigiendo = false;
   private version = 0;
+  private resincronizacion = 0;
 
   constructor() {
     addIcons({
@@ -192,7 +194,7 @@ export class WaitingRoomPage implements OnDestroy {
       await conTiempoLimite(this.authService.asegurarInicializado(), TIEMPO_MAXIMO_CARGA_MS);
       const usuario = this.authService.usuario();
       if (!vigente()) return;
-      if (!usuario) throw new Error('Debes iniciar sesión para ver esta sesión.');
+      if (!usuario) throw new Error(this.transloco.translate('debes_iniciar_sesion_para_ver_es_dfbyqh'));
 
       const [sesion, participantes] = await conTiempoLimite(
         Promise.all([
@@ -202,7 +204,7 @@ export class WaitingRoomPage implements OnDestroy {
         TIEMPO_MAXIMO_CARGA_MS
       );
       if (!vigente()) return;
-      if (!sesion) throw new Error('No se encontró la sesión o no perteneces a ella.');
+      if (!sesion) throw new Error(this.transloco.translate('no_se_encontro_la_sesion_o_no_pe_1e33yn'));
       this.sesion.set(sesion);
       this.participantes.set(participantes);
 
@@ -214,7 +216,7 @@ export class WaitingRoomPage implements OnDestroy {
 
       const esOrganizador = sesion.organizadorId === usuario.id;
       if (!esOrganizador && !participantes.some(p => p.usuarioId === usuario.id)) {
-        throw new Error('Ya no formas parte de esta sesión.');
+        throw new Error(this.transloco.translate('ya_no_formas_parte_de_esta_sesio_pyo0hz'));
       }
 
       const sala = this.realtimeService.abrirSala({
@@ -285,12 +287,13 @@ export class WaitingRoomPage implements OnDestroy {
 
   /** Recarga sesión + participantes desde la BD (fuente de verdad). */
   private async resincronizar(version: number): Promise<void> {
+    const solicitud = ++this.resincronizacion;
     try {
       const [sesion, participantes] = await Promise.all([
         this.sesionService.obtenerSesionPorId(this.sesionId),
         this.sesionService.obtenerParticipantes(this.sesionId)
       ]);
-      if (version !== this.version) return;
+      if (version !== this.version || solicitud !== this.resincronizacion) return;
       if (!sesion) {
         this.error.set('La sesión ya no está disponible.');
         return;
@@ -407,7 +410,7 @@ export class WaitingRoomPage implements OnDestroy {
       const toast = await this.toastController.create({ message: '¡Código copiado!', duration: 2000, color: 'dark' });
       await toast.present();
     } catch {
-      this.error.set('No se pudo copiar el código.');
+      this.error.set(this.transloco.translate('no_se_pudo_copiar_el_codigo_fj869g'));
     }
   }
 
@@ -442,7 +445,7 @@ export class WaitingRoomPage implements OnDestroy {
       return true;
     } catch {
       this.redirigiendo = false;
-      this.error.set('No se pudo abrir la pantalla de la sesión.');
+      this.error.set(this.transloco.translate('no_se_pudo_abrir_la_pantalla_de_gqih7d'));
       return false;
     }
   }

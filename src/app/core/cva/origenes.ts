@@ -103,7 +103,7 @@ export function formatearPrecio(valor: number, moneda = 'COP'): string {
     const n = new Intl.NumberFormat('es-CO', {
       style: 'currency', currency: moneda, currencyDisplay: 'narrowSymbol', minimumFractionDigits: 0, maximumFractionDigits: 2
     }).format(valor);
-    return `${n} ${moneda}`;
+    return `${n.replace(/\u00a0/g, ' ')} ${moneda}`;
   } catch {
     return `${valor.toLocaleString('es-CO', { maximumFractionDigits: 2 })} ${moneda}`;
   }
