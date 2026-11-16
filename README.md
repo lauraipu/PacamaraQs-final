@@ -83,10 +83,10 @@ Las migraciones versionadas en `supabase/migrations/` son incrementales; incluye
 
 ### Estado de seguridad y publicación
 
-- **Gemini:** el cliente invoca `analizar-ficha`, una Supabase Edge Function que exige un usuario autenticado no anónimo y lee `GEMINI_API_KEY` del entorno del servidor. Reintenta ante errores 503/429 y puede usar un modelo de respaldo (`GEMINI_MODEL_RESPALDO`). La clave nunca va en los archivos `environment` ni en el bundle. Aún falta un límite de escaneos por usuario.
+- **Gemini:** el cliente invoca `analizar-ficha`, una Supabase Edge Function que exige un usuario autenticado no anónimo y lee `GEMINI_API_KEY` del entorno del servidor. Reintenta ante errores 503/429 y puede usar un modelo de respaldo (`GEMINI_MODEL_RESPALDO`). La clave nunca va en los archivos `environment` ni en el bundle. La función aplica un límite de 10 escaneos por usuario y por hora; se puede ajustar con el secreto `SCANNER_RATE_LIMIT`.
 - **Escritura de evaluaciones:** la app ya guarda solo mediante `registrar_evaluacion`. Queda pendiente activar el bloque "PASO 2" de su migración, que retira las políticas de escritura directa, cuando todos usen la versión nueva del APK.
 - **Pendientes del asesor de seguridad de Supabase:** desactivar el inicio de sesión anónimo en Auth, activar la protección contra contraseñas filtradas y revocar `EXECUTE` de `rls_auto_enable()` a `anon`/`authenticated`.
-- **Android:** `applicationId` es `com.pacamaraqs.app`, pero el `namespace` de Gradle y el paquete de `MainActivity` siguen como `io.ionic.starter`. Para publicar en tiendas conviene alinearlos, poner `allowBackup="false"` y activar `minifyEnabled` en release.
+- **Android:** `applicationId`, `namespace` y el paquete de `MainActivity` usan `com.pacamaraqs.app`. Las copias de seguridad automáticas están desactivadas y el código release usa minificación/obfuscación.
 
 ### Arquitectura de reportes
 
@@ -175,7 +175,7 @@ export const environment = {
 >   supabase functions deploy analizar-ficha
 >   ```
 >
-> - La función exige autenticación, pero el código actual no implementa límites de frecuencia o cuota por usuario. Añádelos y prueba los límites de gasto antes de vender planes de pago.
+> - La función exige autenticación y aplica un límite temporal por usuario en cada instancia de Edge Function. Para planes de pago, complementa este límite con una cuota persistente en la base de datos o un proveedor externo de rate limiting.
 > - No subas claves privadas al repositorio. Usa valores de prueba o marcadores en los archivos de ejemplo y rota cualquier credencial que se haya expuesto.
 
 Las migraciones de `supabase/migrations/` deben aplicarse en orden. Las más recientes y obligatorias para la versión actual son:
