@@ -10,6 +10,10 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const MODELO = Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.6-flash';
 const MAX_BASE64 = 8 * 1024 * 1024; // ~6 MB de imagen
+const RATE_WINDOW_MS = 60 * 60 * 1000;
+const RATE_LIMIT_CONFIG = Number.parseInt(Deno.env.get('SCANNER_RATE_LIMIT') ?? '10', 10);
+const RATE_LIMIT = Number.isFinite(RATE_LIMIT_CONFIG) && RATE_LIMIT_CONFIG > 0 ? RATE_LIMIT_CONFIG : 10;
+const solicitudes = new Map<string, { inicio: number; cantidad: number }>();
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -109,6 +113,23 @@ function construirPrompt(formato: string): string {
 const json = (cuerpo: unknown, status = 200) =>
   new Response(JSON.stringify(cuerpo), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 
+function permitirSolicitud(usuarioId: string): boolean {
+  const ahora = Date.now();
+  if (solicitudes.size > 1000) {
+    for (const [id, solicitud] of solicitudes) {
+      if (ahora - solicitud.inicio >= RATE_WINDOW_MS) solicitudes.delete(id);
+    }
+  }
+  const actual = solicitudes.get(usuarioId);
+  if (!actual || ahora - actual.inicio >= RATE_WINDOW_MS) {
+    solicitudes.set(usuarioId, { inicio: ahora, cantidad: 1 });
+    return true;
+  }
+  if (actual.cantidad >= RATE_LIMIT) return false;
+  actual.cantidad += 1;
+  return true;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
@@ -132,6 +153,12 @@ Deno.serve(async (req: Request) => {
   if (!ESQUEMAS[formato]) return json({ error: 'Formato de ficha no soportado.' }, 400);
   if (!imagen || imagen.length > MAX_BASE64 || !/^[A-Za-z0-9+/=]+$/.test(imagen.slice(0, 200))) {
     return json({ error: 'Imagen inválida o demasiado grande.' }, 400);
+  }
+  if (!permitirSolicitud(user.id)) {
+    return new Response(JSON.stringify({ error: 'Has alcanzado el límite temporal de escaneos. Intenta de nuevo más tarde.' }), {
+      status: 429,
+      headers: { ...CORS, 'Content-Type': 'application/json', 'Retry-After': String(Math.ceil(RATE_WINDOW_MS / 1000)) }
+    });
   }
 
   const llave = Deno.env.get('GEMINI_API_KEY');
