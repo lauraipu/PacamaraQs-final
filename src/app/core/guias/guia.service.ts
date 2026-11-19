@@ -25,8 +25,8 @@ export class GuiaService {
     try {
       const vistas = await this.cargarVistas();
       if (vistas.has(id) || this.abierta) return;
+      vistas.add(id); // antes de abrir: aunque falle, no se reintenta en bucle
       await this.abrir(id);
-      vistas.add(id);
       this.guardarLocal(vistas);
       void this.supabase.client.rpc('marcar_guia_vista', { p_guia: id }).then(() => undefined, () => undefined);
     } catch (error) {

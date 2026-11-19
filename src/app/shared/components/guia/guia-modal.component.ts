@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Input, signal } from '@angular/core';
 import { IonButton, IonContent, IonIcon, ModalController } from '@ionic/angular';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
@@ -14,11 +14,11 @@ addIcons(ICONOS_GUIAS);
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <ion-content class="ion-padding">
-      <section class="gm" role="dialog" [attr.aria-label]="'guias.' + id() + '.titulo' | transloco">
+      <section class="gm" role="dialog" [attr.aria-label]="'guias.' + idGuia() + '.titulo' | transloco">
         <p class="gm__contador">{{ 'guias.comun.paso' | transloco: { n: paso() + 1, total: total() } }}</p>
         <ion-icon class="gm__icono" [name]="icono()" aria-hidden="true"></ion-icon>
-        <h2 class="gm__titulo">{{ 'guias.' + id() + '.' + paso() + '.titulo' | transloco }}</h2>
-        <p class="gm__texto">{{ 'guias.' + id() + '.' + paso() + '.texto' | transloco }}</p>
+        <h2 class="gm__titulo">{{ 'guias.' + idGuia() + '.' + paso() + '.titulo' | transloco }}</h2>
+        <p class="gm__texto">{{ 'guias.' + idGuia() + '.' + paso() + '.texto' | transloco }}</p>
         <div class="gm__puntos" aria-hidden="true">
           @for (i of indices(); track i) { <span [class.gm__punto--on]="i === paso()"></span> }
         </div>
@@ -52,14 +52,23 @@ addIcons(ICONOS_GUIAS);
   `]
 })
 export class GuiaModalComponent {
-  readonly id = input.required<IdGuia>();
+  /**
+   * ModalController entrega componentProps asignando propiedades
+   * (Object.assign), no con setInput: un input() de signal quedaría
+   * reemplazado por un texto y la plantilla fallaría en cada ciclo de
+   * detección de cambios, bloqueando el resto de la app. Por eso se usa un
+   * setter clásico que alimenta un signal interno.
+   */
+  @Input() set id(valor: IdGuia) { this._id.set(valor); }
+  private readonly _id = signal<IdGuia>('dashboard');
+  readonly idGuia = this._id.asReadonly();
   readonly paso = signal(0);
   private readonly modales = inject(ModalController);
 
-  readonly total = computed(() => GUIAS[this.id()].length);
+  readonly total = computed(() => GUIAS[this.idGuia()].length);
   readonly indices = computed(() => Array.from({ length: this.total() }, (_, i) => i));
   readonly ultimo = computed(() => this.paso() === this.total() - 1);
-  readonly icono = computed(() => GUIAS[this.id()][this.paso()]);
+  readonly icono = computed(() => GUIAS[this.idGuia()][this.paso()]);
 
   cerrar(): void {
     void this.modales.dismiss();
