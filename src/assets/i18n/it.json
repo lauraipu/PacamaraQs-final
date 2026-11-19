@@ -690,7 +690,112 @@
     "panel_administrador": "Pannello amministratore",
     "administracion": "Amministrazione",
     "tu_cuenta_tiene_el": "Il tuo account ha il ruolo di amministratore.",
-    "cerrar_sesion": "Esci"
+    "cerrar_sesion": "Esci",
+    "tabs": {
+      "resumen": "Riepilogo",
+      "usuarios": "Utenti",
+      "sesiones": "Sessioni",
+      "auditoria": "Audit"
+    },
+    "actualizar": "Aggiorna",
+    "reintentar": "Riprova",
+    "cargar_mas": "Carica altri",
+    "cargando": "Caricamento…",
+    "error_carga": "Impossibile caricare i dati. Controlla la connessione e riprova.",
+    "sin_resultados": "Nessun risultato con questi filtri.",
+    "mostrando": "{{n}} di {{total}}",
+    "todos": "Tutti",
+    "buscar_usuarios": "Cerca per nome o email",
+    "buscar_sesiones": "Cerca per nome, codice o organizzatore",
+    "resumen": {
+      "titulo": "Stato generale della piattaforma",
+      "usuarios": "Utenti",
+      "nuevos_semana": "+{{n}} questa settimana",
+      "activos": "Attivi (7 giorni)",
+      "activos_sub": "hanno effettuato l'accesso",
+      "sesiones": "Sessioni",
+      "en_progreso_sub": "{{n}} in corso",
+      "evaluaciones": "Valutazioni",
+      "evaluaciones_sub": "{{n}} questa settimana",
+      "escaneos": "Scansioni IA (7 giorni)",
+      "escaneos_sub": "{{n}} nelle ultime 24 h",
+      "base_datos": "Database",
+      "base_datos_sub": "{{usado}} MB di {{limite}} MB",
+      "actividad": "Attività degli ultimi 14 giorni",
+      "actividad_aria": "{{dia}}: {{e}} valutazioni e {{s}} sessioni",
+      "leyenda_evaluaciones": "Valutazioni",
+      "leyenda_sesiones": "Sessioni create",
+      "por_estado": "Sessioni per stato",
+      "por_formato": "Sessioni per formato"
+    },
+    "estados": {
+      "esperando": "In attesa",
+      "en_progreso": "In corso",
+      "completada": "Completata",
+      "cancelada": "Annullata"
+    },
+    "formatos": {
+      "combinado": "Combinato",
+      "afectivo": "Affettivo",
+      "descriptivo": "Descrittivo",
+      "extrinseca": "Estrinseco"
+    },
+    "roles": {
+      "catador": "Assaggiatore",
+      "administrador": "Amministratore",
+      "catadores": "Assaggiatori",
+      "administradores": "Amministratori"
+    },
+    "usuarios": {
+      "tu": "Tu",
+      "dos_pasos": "2 passaggi attiva",
+      "sin_dos_pasos": "Senza 2 passaggi",
+      "organizadas": "Sessioni organizzate",
+      "evaluaciones": "Valutazioni",
+      "ultimo_acceso": "Ultimo accesso",
+      "nunca": "Mai",
+      "alta": "Registrazione",
+      "hacer_admin": "Rendi amministratore",
+      "quitar_admin": "Rimuovi amministratore",
+      "confirmar_admin_titulo": "Assegnare il ruolo di amministratore?",
+      "confirmar_admin_texto": "{{nombre}} potrà vedere tutti gli utenti, le sessioni e l'audit. Per entrare nel pannello dovrà attivare la verifica in due passaggi.",
+      "confirmar_quitar_titulo": "Rimuovere il ruolo di amministratore?",
+      "confirmar_quitar_texto": "{{nombre}} diventerà assaggiatore e perderà l'accesso al pannello.",
+      "confirmar": "Conferma",
+      "rol_actualizado": "Fatto: {{nombre}} ora è {{rol}}."
+    },
+    "sesiones": {
+      "personal": "Personale",
+      "codigo": "Codice",
+      "organizador": "Organizzatore",
+      "catadores": "Assaggiatori pronti",
+      "evaluaciones": "Valutazioni",
+      "muestras": "Campioni",
+      "creada": "Creata",
+      "filtro_estado": "Stato"
+    },
+    "auditoria": {
+      "filtro_tabla": "Tipo",
+      "filtro_operacion": "Azione",
+      "tablas": {
+        "sesiones": "Sessione",
+        "participantes": "Partecipante",
+        "evaluaciones": "Valutazione",
+        "cierres_muestra": "Chiusura campione",
+        "usuarios": "Utente"
+      },
+      "operaciones": {
+        "INSERT": "Creato",
+        "UPDATE": "Aggiornato",
+        "DELETE": "Eliminato",
+        "CAMBIO_ROL": "Cambio ruolo"
+      },
+      "sistema": "Sistema",
+      "nota_privacidad": "Per privacy non vengono mostrati punteggi né risposte degli assaggiatori.",
+      "muestra": "Campione {{n}}",
+      "listo": "pronto",
+      "no_listo": "non pronto"
+    }
   },
   "estado": {
     "esta_muestra_fue_cerrada": "Questo campione è stato chiuso dall'organizzatore: non si accettano più modifiche.",

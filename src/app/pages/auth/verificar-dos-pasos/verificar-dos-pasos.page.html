@@ -7,20 +7,13 @@
     <p class="subtitle">{{ 'dos_pasos.verificar_texto' | transloco }}</p>
 
     <form class="auth-card" (ngSubmit)="verificar()">
-      <ion-input
-        class="custom-input codigo-2fa"
-        fill="outline"
-        [label]="'dos_pasos.codigo' | transloco"
-        labelPlacement="stacked"
-        inputmode="numeric"
-        autocomplete="one-time-code"
-        maxlength="6"
-        placeholder="000000"
-        [ngModel]="codigo()"
-        (ngModelChange)="alEscribir($event)"
-        name="codigo"
-        required
-      ></ion-input>
+      <app-codigo-otp
+        [valor]="codigo()"
+        (valorChange)="alEscribir($event)"
+        [etiqueta]="'dos_pasos.codigo' | transloco"
+        [deshabilitado]="verificando()"
+        (enviar)="verificar()"
+      ></app-codigo-otp>
       <ion-button expand="block" type="submit" class="primary-btn" [disabled]="verificando()">
         @if (verificando()) {
           <ion-spinner name="crescent"></ion-spinner>
@@ -31,6 +24,9 @@
       <p class="hint">{{ 'dos_pasos.ayuda_perdida' | transloco }}</p>
     </form>
 
-    <button type="button" class="back-link" (click)="salir()">{{ 'dos_pasos.usar_otra_cuenta' | transloco }}</button>
+    <ion-button fill="clear" expand="block" class="otra-cuenta" (click)="salir()">
+      <ion-icon slot="start" name="swap-horizontal-outline" aria-hidden="true"></ion-icon>
+      {{ 'dos_pasos.usar_otra_cuenta' | transloco }}
+    </ion-button>
   </main>
 </ion-content>

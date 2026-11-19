@@ -17,6 +17,7 @@ import { SupabaseService } from '../../core/services/supabase';
 import { CampoContrasenaComponent } from '../../shared/components/campo-contrasena/campo-contrasena.component';
 
 import { BotonGuiaComponent } from '../../shared/components/boton-guia/boton-guia.component';
+import { CodigoOtpComponent } from '../../shared/components/codigo-otp/codigo-otp.component';
 addIcons({ chevronDownOutline, chevronUpOutline, pencilOutline });
 
 interface Preferencias { altoContraste?: boolean; tamanoTexto?: number; reducirAnimaciones?: boolean }
@@ -26,7 +27,7 @@ interface Preferencias { altoContraste?: boolean; tamanoTexto?: number; reducirA
   templateUrl: './configuracion.page.html',
   styleUrls: ['./configuracion.page.scss'],
   standalone: true,
-  imports: [BotonGuiaComponent, 
+  imports: [BotonGuiaComponent, CodigoOtpComponent, 
     FormsModule, TranslocoPipe, CampoContrasenaComponent, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
     IonContent, IonModal, IonSpinner, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonToggle, IonRange
   ]

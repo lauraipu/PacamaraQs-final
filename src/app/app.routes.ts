@@ -55,7 +55,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin-dashboard',
-    loadComponent: () => import('./pages/admin-dashboard/admin-dashboard.page').then(m => m.AdminDashboardPage),
+    loadComponent: () => import('./features/admin/pages/admin-panel.page').then(m => m.AdminPanelPage),
     canActivate: [authGuard, roleGuard],
     data: { roles: ROLES_ADMIN }
   },

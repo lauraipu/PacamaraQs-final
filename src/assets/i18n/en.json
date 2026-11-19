@@ -690,7 +690,112 @@
     "panel_administrador": "Admin dashboard",
     "administracion": "Administration",
     "tu_cuenta_tiene_el": "Your account has the administrator role.",
-    "cerrar_sesion": "Sign out"
+    "cerrar_sesion": "Sign out",
+    "tabs": {
+      "resumen": "Overview",
+      "usuarios": "Users",
+      "sesiones": "Sessions",
+      "auditoria": "Audit"
+    },
+    "actualizar": "Refresh",
+    "reintentar": "Retry",
+    "cargar_mas": "Load more",
+    "cargando": "Loading…",
+    "error_carga": "Could not load the data. Check your connection and try again.",
+    "sin_resultados": "No results match these filters.",
+    "mostrando": "Showing {{n}} of {{total}}",
+    "todos": "All",
+    "buscar_usuarios": "Search by name or email",
+    "buscar_sesiones": "Search by name, code or organizer",
+    "resumen": {
+      "titulo": "Platform overview",
+      "usuarios": "Users",
+      "nuevos_semana": "+{{n}} this week",
+      "activos": "Active (7 days)",
+      "activos_sub": "signed in",
+      "sesiones": "Sessions",
+      "en_progreso_sub": "{{n}} in progress",
+      "evaluaciones": "Evaluations",
+      "evaluaciones_sub": "{{n}} this week",
+      "escaneos": "AI scans (7 days)",
+      "escaneos_sub": "{{n}} in the last 24 h",
+      "base_datos": "Database",
+      "base_datos_sub": "{{usado}} MB of {{limite}} MB",
+      "actividad": "Activity in the last 14 days",
+      "actividad_aria": "{{dia}}: {{e}} evaluations and {{s}} sessions",
+      "leyenda_evaluaciones": "Evaluations",
+      "leyenda_sesiones": "Sessions created",
+      "por_estado": "Sessions by status",
+      "por_formato": "Sessions by format"
+    },
+    "estados": {
+      "esperando": "Waiting",
+      "en_progreso": "In progress",
+      "completada": "Completed",
+      "cancelada": "Cancelled"
+    },
+    "formatos": {
+      "combinado": "Combined",
+      "afectivo": "Affective",
+      "descriptivo": "Descriptive",
+      "extrinseca": "Extrinsic"
+    },
+    "roles": {
+      "catador": "Cupper",
+      "administrador": "Administrator",
+      "catadores": "Cuppers",
+      "administradores": "Administrators"
+    },
+    "usuarios": {
+      "tu": "You",
+      "dos_pasos": "2-step on",
+      "sin_dos_pasos": "No 2-step",
+      "organizadas": "Sessions organized",
+      "evaluaciones": "Evaluations",
+      "ultimo_acceso": "Last sign-in",
+      "nunca": "Never",
+      "alta": "Joined",
+      "hacer_admin": "Make administrator",
+      "quitar_admin": "Remove administrator",
+      "confirmar_admin_titulo": "Grant administrator role?",
+      "confirmar_admin_texto": "{{nombre}} will be able to see all users, sessions and the audit log. They must turn on 2-step verification to open the panel.",
+      "confirmar_quitar_titulo": "Remove administrator role?",
+      "confirmar_quitar_texto": "{{nombre}} will become a cupper and lose access to the panel.",
+      "confirmar": "Confirm",
+      "rol_actualizado": "Done: {{nombre}} is now {{rol}}."
+    },
+    "sesiones": {
+      "personal": "Personal",
+      "codigo": "Code",
+      "organizador": "Organizer",
+      "catadores": "Cuppers ready",
+      "evaluaciones": "Evaluations",
+      "muestras": "Samples",
+      "creada": "Created",
+      "filtro_estado": "Status"
+    },
+    "auditoria": {
+      "filtro_tabla": "Type",
+      "filtro_operacion": "Action",
+      "tablas": {
+        "sesiones": "Session",
+        "participantes": "Participant",
+        "evaluaciones": "Evaluation",
+        "cierres_muestra": "Sample closed",
+        "usuarios": "User"
+      },
+      "operaciones": {
+        "INSERT": "Created",
+        "UPDATE": "Updated",
+        "DELETE": "Deleted",
+        "CAMBIO_ROL": "Role change"
+      },
+      "sistema": "System",
+      "nota_privacidad": "For privacy, cuppers' scores and answers are not shown.",
+      "muestra": "Sample {{n}}",
+      "listo": "ready",
+      "no_listo": "not ready"
+    }
   },
   "estado": {
     "esta_muestra_fue_cerrada": "The organizer closed this sample: changes are no longer accepted.",

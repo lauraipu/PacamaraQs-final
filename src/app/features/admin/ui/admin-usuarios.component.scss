@@ -1,0 +1,30 @@
+.us-cabeza {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px 12px;
+  align-items: center;
+
+  .ad-chips { grid-column: 1 / -1; }
+}
+
+@media (min-width: 768px) {
+  .us-cabeza { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .us-cabeza .ad-chips { grid-column: auto; justify-content: flex-end; }
+}
+
+.us-avatar {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--app-bg-subtle);
+  color: var(--app-primary-dark);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.us-ident { min-width: 0; }
+
+.us-acciones { display: flex; justify-content: flex-end; }
+.us-acciones ion-button { min-width: 180px; }

@@ -1,0 +1,19 @@
+.ap-content { --background: var(--app-bg-screen); }
+
+.ap-contenedor {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ap-titulo { color: var(--app-text-main); font-size: clamp(1rem, 5vw, 1.125rem); font-weight: 700; }
+.ap-subtitulo { margin-top: 2px; color: var(--app-text-muted); font-size: 0.75rem; font-weight: 400; }
+
+.ap-tabs {
+  --min-height: 48px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+
+  ion-segment { max-width: 640px; margin: 0 auto; }
+  ion-segment-button { --indicator-color: var(--app-primary-dark); --color-checked: var(--app-primary-dark); min-width: 96px; text-transform: none; }
+}

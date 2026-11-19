@@ -1,15 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonButton, IonContent, IonIcon, IonInput, IonSpinner, ToastController } from '@ionic/angular';
+import { IonButton, IonContent, IonIcon, IonSpinner, ToastController } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
-import { shieldCheckmarkOutline } from 'ionicons/icons';
+import { shieldCheckmarkOutline, swapHorizontalOutline } from 'ionicons/icons';
 import { CierreSesionService } from '../../../core/auth/cierre-sesion.service';
 import { AuthService } from '../../../core/services/auth';
 import { esSinConexion } from '../../../core/utils/errores';
+import { CodigoOtpComponent } from '../../../shared/components/codigo-otp/codigo-otp.component';
 
-addIcons({ shieldCheckmarkOutline });
+addIcons({ shieldCheckmarkOutline, swapHorizontalOutline });
 
 /** Segundo paso del inicio de sesión: código de 6 dígitos de la app de autenticación. */
 @Component({
@@ -17,7 +17,7 @@ addIcons({ shieldCheckmarkOutline });
   templateUrl: './verificar-dos-pasos.page.html',
   styleUrls: ['../recuperar/recuperar.page.scss'],
   standalone: true,
-  imports: [IonContent, IonInput, IonButton, IonSpinner, IonIcon, FormsModule, TranslocoPipe]
+  imports: [IonContent, IonButton, IonSpinner, IonIcon, TranslocoPipe, CodigoOtpComponent]
 })
 export class VerificarDosPasosPage {
   readonly codigo = signal('');
@@ -30,8 +30,8 @@ export class VerificarDosPasosPage {
   private readonly toastController = inject(ToastController);
   private readonly transloco = inject(TranslocoService);
 
-  alEscribir(valor: string | null | undefined): void {
-    this.codigo.set((valor ?? '').replace(/\D/g, '').slice(0, 6));
+  alEscribir(valor: string): void {
+    this.codigo.set(valor);
   }
 
   async verificar(): Promise<void> {

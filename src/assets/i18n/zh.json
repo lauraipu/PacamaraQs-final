@@ -690,7 +690,112 @@
     "panel_administrador": "管理员面板",
     "administracion": "管理",
     "tu_cuenta_tiene_el": "你的账号拥有管理员角色。",
-    "cerrar_sesion": "退出登录"
+    "cerrar_sesion": "退出登录",
+    "tabs": {
+      "resumen": "概览",
+      "usuarios": "用户",
+      "sesiones": "杯测会话",
+      "auditoria": "审计"
+    },
+    "actualizar": "刷新",
+    "reintentar": "重试",
+    "cargar_mas": "加载更多",
+    "cargando": "加载中…",
+    "error_carga": "无法加载数据。请检查网络后重试。",
+    "sin_resultados": "没有符合筛选条件的结果。",
+    "mostrando": "显示 {{n}} / {{total}}",
+    "todos": "全部",
+    "buscar_usuarios": "按姓名或邮箱搜索",
+    "buscar_sesiones": "按名称、代码或组织者搜索",
+    "resumen": {
+      "titulo": "平台总体状态",
+      "usuarios": "用户",
+      "nuevos_semana": "本周 +{{n}}",
+      "activos": "活跃（7天）",
+      "activos_sub": "已登录",
+      "sesiones": "会话",
+      "en_progreso_sub": "{{n}} 个进行中",
+      "evaluaciones": "评估",
+      "evaluaciones_sub": "本周 {{n}} 个",
+      "escaneos": "AI 扫描（7天）",
+      "escaneos_sub": "最近 24 小时 {{n}} 次",
+      "base_datos": "数据库",
+      "base_datos_sub": "{{usado}} MB / {{limite}} MB",
+      "actividad": "最近 14 天的活动",
+      "actividad_aria": "{{dia}}：{{e}} 个评估，{{s}} 个会话",
+      "leyenda_evaluaciones": "评估",
+      "leyenda_sesiones": "创建的会话",
+      "por_estado": "按状态的会话",
+      "por_formato": "按格式的会话"
+    },
+    "estados": {
+      "esperando": "等待中",
+      "en_progreso": "进行中",
+      "completada": "已完成",
+      "cancelada": "已取消"
+    },
+    "formatos": {
+      "combinado": "综合",
+      "afectivo": "情感",
+      "descriptivo": "描述",
+      "extrinseca": "外在"
+    },
+    "roles": {
+      "catador": "杯测师",
+      "administrador": "管理员",
+      "catadores": "杯测师",
+      "administradores": "管理员"
+    },
+    "usuarios": {
+      "tu": "你",
+      "dos_pasos": "已启用两步验证",
+      "sin_dos_pasos": "未启用两步验证",
+      "organizadas": "组织的会话",
+      "evaluaciones": "评估",
+      "ultimo_acceso": "最近登录",
+      "nunca": "从未",
+      "alta": "注册",
+      "hacer_admin": "设为管理员",
+      "quitar_admin": "取消管理员",
+      "confirmar_admin_titulo": "授予管理员角色？",
+      "confirmar_admin_texto": "{{nombre}} 将能查看所有用户、会话和审计记录。进入面板前必须启用两步验证。",
+      "confirmar_quitar_titulo": "取消管理员角色？",
+      "confirmar_quitar_texto": "{{nombre}} 将成为杯测师并失去面板访问权限。",
+      "confirmar": "确认",
+      "rol_actualizado": "完成：{{nombre}} 现在是{{rol}}。"
+    },
+    "sesiones": {
+      "personal": "个人",
+      "codigo": "代码",
+      "organizador": "组织者",
+      "catadores": "已就绪杯测师",
+      "evaluaciones": "评估",
+      "muestras": "样品",
+      "creada": "创建于",
+      "filtro_estado": "状态"
+    },
+    "auditoria": {
+      "filtro_tabla": "类型",
+      "filtro_operacion": "操作",
+      "tablas": {
+        "sesiones": "会话",
+        "participantes": "参与者",
+        "evaluaciones": "评估",
+        "cierres_muestra": "样品关闭",
+        "usuarios": "用户"
+      },
+      "operaciones": {
+        "INSERT": "创建",
+        "UPDATE": "更新",
+        "DELETE": "删除",
+        "CAMBIO_ROL": "角色变更"
+      },
+      "sistema": "系统",
+      "nota_privacidad": "为保护隐私，不显示杯测师的分数和答案。",
+      "muestra": "样品 {{n}}",
+      "listo": "已就绪",
+      "no_listo": "未就绪"
+    }
   },
   "estado": {
     "esta_muestra_fue_cerrada": "该样品已被组织者关闭，不再接受修改。",

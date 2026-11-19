@@ -690,7 +690,112 @@
     "panel_administrador": "Panel administrador",
     "administracion": "Administración",
     "tu_cuenta_tiene_el": "Tu cuenta tiene el rol de administrador.",
-    "cerrar_sesion": "Cerrar sesión"
+    "cerrar_sesion": "Cerrar sesión",
+    "tabs": {
+      "resumen": "Resumen",
+      "usuarios": "Usuarios",
+      "sesiones": "Sesiones",
+      "auditoria": "Auditoría"
+    },
+    "actualizar": "Actualizar",
+    "reintentar": "Reintentar",
+    "cargar_mas": "Cargar más",
+    "cargando": "Cargando…",
+    "error_carga": "No se pudieron cargar los datos. Revisa tu conexión e intenta de nuevo.",
+    "sin_resultados": "No hay resultados con estos filtros.",
+    "mostrando": "Mostrando {{n}} de {{total}}",
+    "todos": "Todos",
+    "buscar_usuarios": "Buscar por nombre o correo",
+    "buscar_sesiones": "Buscar por nombre, código u organizador",
+    "resumen": {
+      "titulo": "Estado general de la plataforma",
+      "usuarios": "Usuarios",
+      "nuevos_semana": "+{{n}} esta semana",
+      "activos": "Activos (7 días)",
+      "activos_sub": "iniciaron sesión",
+      "sesiones": "Sesiones",
+      "en_progreso_sub": "{{n}} en progreso",
+      "evaluaciones": "Evaluaciones",
+      "evaluaciones_sub": "{{n}} esta semana",
+      "escaneos": "Escaneos IA (7 días)",
+      "escaneos_sub": "{{n}} en las últimas 24 h",
+      "base_datos": "Base de datos",
+      "base_datos_sub": "{{usado}} MB de {{limite}} MB",
+      "actividad": "Actividad de los últimos 14 días",
+      "actividad_aria": "{{dia}}: {{e}} evaluaciones y {{s}} sesiones",
+      "leyenda_evaluaciones": "Evaluaciones",
+      "leyenda_sesiones": "Sesiones creadas",
+      "por_estado": "Sesiones por estado",
+      "por_formato": "Sesiones por formato"
+    },
+    "estados": {
+      "esperando": "En espera",
+      "en_progreso": "En progreso",
+      "completada": "Completada",
+      "cancelada": "Cancelada"
+    },
+    "formatos": {
+      "combinado": "Combinado",
+      "afectivo": "Afectivo",
+      "descriptivo": "Descriptivo",
+      "extrinseca": "Extrínseco"
+    },
+    "roles": {
+      "catador": "Catador",
+      "administrador": "Administrador",
+      "catadores": "Catadores",
+      "administradores": "Administradores"
+    },
+    "usuarios": {
+      "tu": "Tú",
+      "dos_pasos": "2 pasos activa",
+      "sin_dos_pasos": "Sin 2 pasos",
+      "organizadas": "Sesiones organizadas",
+      "evaluaciones": "Evaluaciones",
+      "ultimo_acceso": "Último acceso",
+      "nunca": "Nunca",
+      "alta": "Registro",
+      "hacer_admin": "Hacer administrador",
+      "quitar_admin": "Quitar administrador",
+      "confirmar_admin_titulo": "¿Dar rol de administrador?",
+      "confirmar_admin_texto": "{{nombre}} podrá ver todos los usuarios, las sesiones y la auditoría. Para entrar al panel deberá activar la verificación en dos pasos.",
+      "confirmar_quitar_titulo": "¿Quitar rol de administrador?",
+      "confirmar_quitar_texto": "{{nombre}} pasará a ser catador y perderá el acceso al panel.",
+      "confirmar": "Confirmar",
+      "rol_actualizado": "Listo: {{nombre}} ahora es {{rol}}."
+    },
+    "sesiones": {
+      "personal": "Personal",
+      "codigo": "Código",
+      "organizador": "Organizador",
+      "catadores": "Catadores listos",
+      "evaluaciones": "Evaluaciones",
+      "muestras": "Muestras",
+      "creada": "Creada",
+      "filtro_estado": "Estado"
+    },
+    "auditoria": {
+      "filtro_tabla": "Tipo",
+      "filtro_operacion": "Acción",
+      "tablas": {
+        "sesiones": "Sesión",
+        "participantes": "Participante",
+        "evaluaciones": "Evaluación",
+        "cierres_muestra": "Cierre de muestra",
+        "usuarios": "Usuario"
+      },
+      "operaciones": {
+        "INSERT": "Creó",
+        "UPDATE": "Actualizó",
+        "DELETE": "Eliminó",
+        "CAMBIO_ROL": "Cambio de rol"
+      },
+      "sistema": "Sistema",
+      "nota_privacidad": "Por privacidad no se muestran puntajes ni respuestas de los catadores.",
+      "muestra": "Muestra {{n}}",
+      "listo": "listo",
+      "no_listo": "no listo"
+    }
   },
   "estado": {
     "esta_muestra_fue_cerrada": "Esta muestra fue cerrada por el organizador: ya no se aceptan cambios.",

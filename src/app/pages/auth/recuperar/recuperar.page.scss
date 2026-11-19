@@ -116,11 +116,10 @@
   margin: 0;
 }
 
-button.back-link { border: 0; background: none; font: inherit; font-size: 0.875rem; cursor: pointer; }
-
-.codigo-2fa {
-  font-family: var(--app-font-mono);
-  font-size: 1.25rem;
-  letter-spacing: 0.3em;
-  text-align: center;
+.otra-cuenta {
+  margin-top: 8px;
+  --color: var(--app-primary-dark);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: none;
 }
