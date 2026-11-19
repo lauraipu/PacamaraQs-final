@@ -75,7 +75,7 @@
       </ion-searchbar>
       @if (hayBusqueda && !cargando) {
         <p class="search-summary" role="status">
-          {{ 'dashboard.para' | transloco: { p0: (sesionesFiltradas.length), p1: (sesionesFiltradas.length === 1 ? 'resultado' : 'resultados'), p2: (terminoBusqueda.trim()) } }}
+          {{ 'dashboard.para' | transloco: { p0: (sesionesFiltradas.length), p1: ((sesionesFiltradas.length === 1 ? 'dashboard.resultado' : 'dashboard.resultados') | transloco), p2: (terminoBusqueda.trim()) } }}
         </p>
       }
     </div>

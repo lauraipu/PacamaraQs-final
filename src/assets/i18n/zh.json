@@ -178,7 +178,9 @@
     "unirme_a_una_sesion": "加入会话",
     "ingresa_el_codigo_proporcionado": "请输入组织者提供的代码",
     "ej_abc_123": "例：ABC-123",
-    "unirme": "加入"
+    "unirme": "加入",
+    "resultado": "个结果",
+    "resultados": "个结果"
   },
   "sala": {
     "sala_de_espera": "等候室",
@@ -1300,7 +1302,10 @@
     "seccion_1cwhihn": "部分",
     "puntaje_catador_1fbr5gy": "杯测师分数",
     "no_r5wqai": "否",
-    "combinado_descriptivo_afectivo_tgsuum": "综合（描述性 + 情感）"
+    "combinado_descriptivo_afectivo_tgsuum": "综合（描述性 + 情感）",
+    "reporte_sca_2o9493": "SCA 报告",
+    "reporte_pacamaraqs_1wbxvwa": "PacamaraQs 报告",
+    "tu_sesion_expiro_inicia_sesion_d_a2rr34": "你的登录已过期。请重新登录；你的回答已保存在此设备上。"
   },
   "config": {
     "titulo": "设置",

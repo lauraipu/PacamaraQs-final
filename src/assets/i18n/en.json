@@ -178,7 +178,9 @@
     "unirme_a_una_sesion": "Join a session",
     "ingresa_el_codigo_proporcionado": "Enter the code provided by the organizer",
     "ej_abc_123": "E.g. ABC-123",
-    "unirme": "Join"
+    "unirme": "Join",
+    "resultado": "result",
+    "resultados": "results"
   },
   "sala": {
     "sala_de_espera": "Waiting room",
@@ -1300,7 +1302,10 @@
     "seccion_1cwhihn": "Section",
     "puntaje_catador_1fbr5gy": "Cupper score",
     "no_r5wqai": "No",
-    "combinado_descriptivo_afectivo_tgsuum": "Combined (Descriptive + Affective)"
+    "combinado_descriptivo_afectivo_tgsuum": "Combined (Descriptive + Affective)",
+    "reporte_sca_2o9493": "SCA report",
+    "reporte_pacamaraqs_1wbxvwa": "PacamaraQs report",
+    "tu_sesion_expiro_inicia_sesion_d_a2rr34": "Your session expired. Sign in again; your answers were saved on this device."
   },
   "config": {
     "titulo": "Settings",

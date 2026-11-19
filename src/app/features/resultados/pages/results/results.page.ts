@@ -646,15 +646,16 @@ export class ResultsPage implements OnInit {
   /** Nombre del documento: el navegador lo propone como nombre del PDF. */
   readonly tituloReporte = computed(() => {
     const r = this.resultados();
-    if (!r) return 'Reporte PacamaraQs';
-    const partes = [this.esExtrinseco() ? 'Ficha técnica' : 'Reporte SCA', r.nombreSesion, this.tituloFormato()];
+    if (!r) return tr('Reporte PacamaraQs');
+    // Nombre del PDF/CSV en el idioma activo (los textos fuente siguen en español).
+    const partes = [tr(this.esExtrinseco() ? 'Ficha técnica' : 'Reporte SCA'), r.nombreSesion, tr(this.tituloFormato())];
     if (this.formatoHoja()) {
       const muestra = this.muestraHoja();
-      if (muestra) partes.push(`Muestra ${muestra}`);
+      if (muestra) partes.push(`${tr('Muestra')} ${muestra}`);
       if (this.modoExportacion() === 'catador') {
         if (this.catadorExportar()) partes.push(this.catadorExportar()!.nombre);
       } else {
-        partes.push('Panel');
+        partes.push(tr('Panel'));
       }
     }
     return partes.filter(Boolean).join(' - ');

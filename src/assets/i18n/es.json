@@ -178,7 +178,9 @@
     "unirme_a_una_sesion": "Unirme a una sesión",
     "ingresa_el_codigo_proporcionado": "Ingresa el código proporcionado por el organizador",
     "ej_abc_123": "Ej: ABC-123",
-    "unirme": "Unirme"
+    "unirme": "Unirme",
+    "resultado": "resultado",
+    "resultados": "resultados"
   },
   "sala": {
     "sala_de_espera": "Sala de espera",
@@ -1300,7 +1302,10 @@
     "seccion_1cwhihn": "Sección",
     "puntaje_catador_1fbr5gy": "Puntaje catador",
     "no_r5wqai": "No",
-    "combinado_descriptivo_afectivo_tgsuum": "Combinado (Descriptivo + Afectivo)"
+    "combinado_descriptivo_afectivo_tgsuum": "Combinado (Descriptivo + Afectivo)",
+    "reporte_sca_2o9493": "Reporte SCA",
+    "reporte_pacamaraqs_1wbxvwa": "Reporte PacamaraQs",
+    "tu_sesion_expiro_inicia_sesion_d_a2rr34": "Tu sesión expiró. Inicia sesión de nuevo; tus respuestas quedaron guardadas en este dispositivo."
   },
   "config": {
     "titulo": "Configuración",
