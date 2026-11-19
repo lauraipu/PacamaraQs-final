@@ -5,11 +5,11 @@
 // =============================================================================
 :root {
   // Superficies
-  --app-bg-screen: #f8f9fa;
+  --app-bg-screen: #f5f7f6;
   --app-bg-card: #ffffff;
-  --app-bg-subtle: #f1f5f9;      // chips neutros, tags de formato, caja de fórmula
-  --app-border: #e2e8f0;
-  --app-border-input: #ced4da;
+  --app-bg-subtle: #eef3f1;      // chips neutros, tags de formato, caja de fórmula
+  --app-border: #dce5e1;
+  --app-border-input: #c8d4cf;
 
   // Texto
   --app-text-main: #0f172b;
@@ -18,7 +18,8 @@
 
   // Marca (pizarra oscura de botones, badge "Evaluación ciega", seleccionados)
   --app-primary-dark: #2f3e46;
-  --app-primary-hover: #1a2328;
+  --app-primary-hover: #1d2b31;
+  --app-primary-soft: #e7efec;
 
   // Puntaje CVA (tarjeta naranja del prototipo)
   --app-score: #c2410c;
@@ -32,8 +33,10 @@
   --app-error-text: #991b1b;
 
   // Forma
-  --app-radius-card: 12px;
-  --app-radius-control: 8px;
+  --app-radius-card: 16px;
+  --app-radius-control: 10px;
+  --app-shadow-card: 0 10px 28px rgb(25 47 38 / 7%);
+  --app-shadow-float: 0 14px 34px rgb(25 47 38 / 12%);
 
   // Tipografía
   --ion-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

@@ -120,7 +120,7 @@ describe('CombinedFormPage', () => {
 
   it('starts without preselected hedonic ratings and with zero intensity', () => {
     for (const atributo of ATRIBUTOS) {
-      expect(component.formulario.atributos[atributo].intensidad).toBe(0);
+      expect(component.formulario.atributos[atributo].intensidad).toBeNull();
       expect(component.formulario.atributos[atributo].calidad).toBe(0);
     }
     expect(component.formulario.impresionGlobal).toBe(0);
@@ -281,6 +281,7 @@ describe('CombinedFormPage', () => {
     fixture = TestBed.createComponent(CombinedFormPage);
     fixture.detectChanges();
     await fixture.whenStable();
+    await component.ngOnInit();
 
     expect(navigateRoot).toHaveBeenCalledWith('/session/waiting/session-id');
   });

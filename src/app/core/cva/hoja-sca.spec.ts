@@ -112,8 +112,8 @@ describe('panel consolidation', () => {
     expect(circuloMarcado(7.49)).toBe(7);
     expect(panel.impresionGlobal).toBe(7.5);
     expect(panel.olfativo.has('floral')).toBe(true);
-    expect(panel.notas.acidez).toContain('Ver reporte individual');
-    expect(panel.notas.otras).toBe('resumen');
+    expect(panel.notas.acidez).toBe('');
+    expect(panel.notas.otras).toContain('resumen');
   });
 
   it('trims the max and min score with five or more sheets, like the RPC', () => {

@@ -6,23 +6,44 @@
     [rechazo]="rechazoActual()"
     [esperandoFinalizar]="esperandoSincronizacion()"
     (reintentar)="reintentarSincronizacion()"
-    (salir)="salirConPendientes()">
+    (salir)="salirConPendientes()"
+  >
   </app-estado-ficha>
   <header class="cva-header">
     <div class="cva-header__inner">
       <div class="cva-header__left">
-        <button type="button" class="cva-header__back-btn" [attr.aria-label]="'afectivo.volver' | transloco" (click)="volver()">
+        <button
+          type="button"
+          class="cva-header__back-btn"
+          [attr.aria-label]="'afectivo.volver' | transloco"
+          (click)="volver()"
+        >
           <ion-icon name="arrow-back-outline"></ion-icon>
         </button>
         <div class="cva-header__meta">
-          <p class="cva-header__session-name">{{ 'afectivo.evaluacion_afectiva' | transloco }}</p>
-          <p class="cva-header__sample-label">{{ 'afectivo.muestra' | transloco: { p0: (muestraActual()) } }} <span>{{ 'afectivo.de' | transloco: { p0: (totalMuestras()) } }}</span></p>
+          <p class="cva-header__session-name">
+            {{ 'afectivo.evaluacion_afectiva' | transloco }}
+          </p>
+          <p class="cva-header__sample-label">
+            {{ 'afectivo.muestra' | transloco: { p0: (muestraActual()) } }}
+            <span
+              >{{ 'afectivo.de' | transloco: { p0: (totalMuestras()) } }}</span
+            >
+          </p>
         </div>
       </div>
       <div class="cva-header__right">
-        <div class="cva-header__live-score" [style.background]="clasificacion.bg">
-          <span class="cva-header__live-score-label">{{ 'afectivo.cva' | transloco }}</span>
-          <span class="cva-header__live-score-value" [style.color]="clasificacion.color">
+        <div
+          class="cva-header__live-score"
+          [style.background]="clasificacion.bg"
+        >
+          <span class="cva-header__live-score-label"
+            >{{ 'afectivo.cva' | transloco }}</span
+          >
+          <span
+            class="cva-header__live-score-value"
+            [style.color]="clasificacion.color"
+          >
             {{ puntaje | number:'1.2-2' }}
           </span>
         </div>
@@ -30,7 +51,10 @@
     </div>
     <div class="cva-header__progress-bar-wrap">
       <div class="cva-header__progress-bar">
-        <div class="cva-header__progress-bar-fill" [style.width]="(muestraActual() / totalMuestras()) * 100 + '%'"></div>
+        <div
+          class="cva-header__progress-bar-fill"
+          [style.width]="(muestraActual() / totalMuestras()) * 100 + '%'"
+        ></div>
       </div>
     </div>
   </header>
@@ -38,48 +62,62 @@
   <main class="cva-main">
     <div class="cva-main__grid">
       <div class="cva-main__column">
-        <article class="attr-card" *ngFor="let atributo of atributos">
+        @for (atributo of atributos; track atributo) {
+        <article class="attr-card">
           <h3 class="attr-card__title">{{ atributo.label | tr }}</h3>
           <div class="hedonic-buttons">
             <div class="hedonic-buttons__header">
-              <span class="hedonic-buttons__label">{{ 'afectivo.calidad_hedonica' | transloco }}</span>
+              <span class="hedonic-buttons__label"
+                >{{ 'afectivo.calidad_hedonica' | transloco }}</span
+              >
               <span class="hedonic-buttons__descriptor">
-                {{ formulario[atributo.key] }} — {{ etiquetas[formulario[atributo.key]] | tr }}
+                {{ formulario[atributo.key] }} — {{
+                etiquetas[formulario[atributo.key]] | tr }}
               </span>
             </div>
             <div class="hedonic-buttons__grid">
+              @for (valor of escalaHedonica; track valor) {
               <button
                 type="button"
-                *ngFor="let valor of escalaHedonica"
                 class="hedonic-buttons__btn"
                 [class.hedonic-buttons__btn--active]="formulario[atributo.key] === valor"
                 [attr.aria-pressed]="formulario[atributo.key] === valor"
-                (click)="formulario[atributo.key] = valor">
+                (click)="formulario[atributo.key] = valor"
+              >
                 {{ valor }}
               </button>
+              }
             </div>
           </div>
         </article>
+        }
 
         <article class="attr-card">
-          <h3 class="attr-card__title">{{ 'afectivo.impresion_global' | transloco }}</h3>
+          <h3 class="attr-card__title">
+            {{ 'afectivo.impresion_global' | transloco }}
+          </h3>
           <div class="hedonic-buttons">
             <div class="hedonic-buttons__header">
-              <span class="hedonic-buttons__label">{{ 'afectivo.calidad_hedonica' | transloco }}</span>
+              <span class="hedonic-buttons__label"
+                >{{ 'afectivo.calidad_hedonica' | transloco }}</span
+              >
               <span class="hedonic-buttons__descriptor">
-                {{ formulario.impresionGlobal }} — {{ etiquetas[formulario.impresionGlobal] | tr }}
+                {{ formulario.impresionGlobal }} — {{
+                etiquetas[formulario.impresionGlobal] | tr }}
               </span>
             </div>
             <div class="hedonic-buttons__grid">
+              @for (valor of escalaHedonica; track valor) {
               <button
                 type="button"
-                *ngFor="let valor of escalaHedonica"
                 class="hedonic-buttons__btn"
                 [class.hedonic-buttons__btn--active]="formulario.impresionGlobal === valor"
                 [attr.aria-pressed]="formulario.impresionGlobal === valor"
-                (click)="formulario.impresionGlobal = valor">
+                (click)="formulario.impresionGlobal = valor"
+              >
                 {{ valor }}
               </button>
+              }
             </div>
           </div>
         </article>
@@ -87,55 +125,118 @@
 
       <aside class="cva-main__sidebar">
         <div class="score-panel" [style.background]="clasificacion.bg">
-          <span class="score-panel__label">{{ 'afectivo.puntaje_cva' | transloco }}</span>
+          <span class="score-panel__label"
+            >{{ 'afectivo.puntaje_cva' | transloco }}</span
+          >
           <span class="score-panel__value" [style.color]="clasificacion.color">
             {{ puntaje | number:'1.2-2' }}
           </span>
-          <span class="score-panel__classification" [style.color]="clasificacion.color">
+          <span
+            class="score-panel__classification"
+            [style.color]="clasificacion.color"
+          >
             {{ clasificacion.label | tr }}
           </span>
         </div>
 
         <div class="defect-panel">
-          <span class="label-micro" style="display:block; margin-bottom:16px;">{{ 'afectivo.defectos' | transloco }}</span>
+          <span class="label-micro" style="display: block; margin-bottom: 16px"
+            >{{ 'afectivo.defectos' | transloco }}</span
+          >
           <div class="defect-counter">
             <div class="defect-counter__info">
-              <span class="defect-counter__label">{{ 'afectivo.tazas_no_uniformes' | transloco }}</span>
-              <span class="defect-counter__sublabel">{{ 'afectivo.t_2_pts_por_taza' | transloco }}</span>
+              <span class="defect-counter__label"
+                >{{ 'afectivo.tazas_no_uniformes' | transloco }}</span
+              >
+              <span class="defect-counter__sublabel"
+                >{{ 'afectivo.t_2_pts_por_taza' | transloco }}</span
+              >
             </div>
             <div class="defect-counter__controls">
-              <button type="button" class="defect-counter__btn" [attr.aria-label]="'afectivo.restar_taza_no_uniforme' | transloco" (click)="ajustarDefecto('uniformes', 'restar')">−</button>
-              <span class="defect-counter__value">{{ formulario.defectos.tazasNoUniformes }}</span>
-              <button type="button" class="defect-counter__btn" [attr.aria-label]="'afectivo.sumar_taza_no_uniforme' | transloco" (click)="ajustarDefecto('uniformes', 'sumar')">+</button>
+              <button
+                type="button"
+                class="defect-counter__btn"
+                [attr.aria-label]="'afectivo.restar_taza_no_uniforme' | transloco"
+                (click)="ajustarDefecto('uniformes', 'restar')"
+              >
+                −
+              </button>
+              <span class="defect-counter__value"
+                >{{ formulario.defectos.tazasNoUniformes }}</span
+              >
+              <button
+                type="button"
+                class="defect-counter__btn"
+                [attr.aria-label]="'afectivo.sumar_taza_no_uniforme' | transloco"
+                (click)="ajustarDefecto('uniformes', 'sumar')"
+              >
+                +
+              </button>
             </div>
           </div>
-          <div class="defect-counter" style="margin-top:16px;">
+          <div class="defect-counter" style="margin-top: 16px">
             <div class="defect-counter__info">
-              <span class="defect-counter__label">{{ 'afectivo.tazas_defectuosas' | transloco }}</span>
-              <span class="defect-counter__sublabel">{{ 'afectivo.t_4_pts_por_taza' | transloco }}</span>
+              <span class="defect-counter__label"
+                >{{ 'afectivo.tazas_defectuosas' | transloco }}</span
+              >
+              <span class="defect-counter__sublabel"
+                >{{ 'afectivo.t_4_pts_por_taza' | transloco }}</span
+              >
             </div>
             <div class="defect-counter__controls">
-              <button type="button" class="defect-counter__btn" [attr.aria-label]="'afectivo.restar_taza_defectuosa' | transloco" (click)="ajustarDefecto('defectuosas', 'restar')">−</button>
-              <span class="defect-counter__value">{{ formulario.defectos.tazasDefectuosas }}</span>
-              <button type="button" class="defect-counter__btn" [attr.aria-label]="'afectivo.sumar_taza_defectuosa' | transloco" (click)="ajustarDefecto('defectuosas', 'sumar')">+</button>
+              <button
+                type="button"
+                class="defect-counter__btn"
+                [attr.aria-label]="'afectivo.restar_taza_defectuosa' | transloco"
+                (click)="ajustarDefecto('defectuosas', 'restar')"
+              >
+                −
+              </button>
+              <span class="defect-counter__value"
+                >{{ formulario.defectos.tazasDefectuosas }}</span
+              >
+              <button
+                type="button"
+                class="defect-counter__btn"
+                [attr.aria-label]="'afectivo.sumar_taza_defectuosa' | transloco"
+                (click)="ajustarDefecto('defectuosas', 'sumar')"
+              >
+                +
+              </button>
             </div>
           </div>
         </div>
 
         <div class="notes-panel">
-          <div class="notes-panel__header">{{ 'afectivo.notas_adicionales' | transloco }}</div>
-          <textarea class="notes-panel__textarea" rows="4" [(ngModel)]="formulario.notas" [placeholder]="'afectivo.observaciones' | transloco"></textarea>
+          <div class="notes-panel__header">
+            {{ 'afectivo.notas_adicionales' | transloco }}
+          </div>
+          <textarea
+            class="notes-panel__textarea"
+            rows="4"
+            [(ngModel)]="formulario.notas"
+            [placeholder]="'afectivo.observaciones' | transloco"
+          ></textarea>
         </div>
         <div class="sample-navigation">
+          @if (muestraActual() > 1) {
           <button
-            *ngIf="muestraActual() > 1"
             type="button"
             class="submit-btn sample-navigation__previous"
-            (click)="irAMuestraAnterior()">
+            (click)="irAMuestraAnterior()"
+          >
             {{ 'afectivo.anterior' | transloco }}
           </button>
-          <button type="button" class="submit-btn" (click)="irAMuestraSiguiente()" [disabled]="guardando()">
-            {{ guardando() ? ('afectivo.guardando' | transloco) : (muestraActual() === totalMuestras() ? ('afectivo.terminar_cata' | transloco) : ('afectivo.siguiente_muestra' | transloco)) }}
+          }
+          <button
+            type="button"
+            class="submit-btn"
+            (click)="irAMuestraSiguiente()"
+            [disabled]="guardando()"
+          >
+            {{ guardando() ? ('afectivo.guardando' | transloco) :
+            (muestraActual() === totalMuestras() ? ('afectivo.terminar_cata' |
+            transloco) : ('afectivo.siguiente_muestra' | transloco)) }}
           </button>
         </div>
       </aside>

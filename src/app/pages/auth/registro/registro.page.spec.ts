@@ -19,7 +19,14 @@ describe('RegistroPage', () => {
       imports: [RegistroPage],
       providers: [
         provideRouter([]),
-        { provide: AuthService, useValue: { registro } },
+        {
+          provide: AuthService,
+          useValue: {
+            registro,
+            errorOAuth: () => null,
+            limpiarErrorOAuth: vi.fn()
+          }
+        },
         { provide: ToastController, useValue: { create: createToast } }
       ]
     });

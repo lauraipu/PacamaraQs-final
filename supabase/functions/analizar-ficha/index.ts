@@ -10,6 +10,11 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const MODELO = Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.6-flash';
 const MAX_BASE64 = 8 * 1024 * 1024; // ~6 MB de imagen
+// Límite de escaneos por usuario, persistente en la base de datos
+// (public.consumir_cuota_escaner). Ajustable con el secreto SCANNER_RATE_LIMIT.
+const RATE_WINDOW_MIN = 60;
+const RATE_LIMIT_CONFIG = Number.parseInt(Deno.env.get('SCANNER_RATE_LIMIT') ?? '10', 10);
+const RATE_LIMIT = Number.isFinite(RATE_LIMIT_CONFIG) && RATE_LIMIT_CONFIG > 0 ? RATE_LIMIT_CONFIG : 10;
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -133,11 +138,28 @@ Deno.serve(async (req: Request) => {
   if (!imagen || imagen.length > MAX_BASE64 || !/^[A-Za-z0-9+/=]+$/.test(imagen.slice(0, 200))) {
     return json({ error: 'Imagen inválida o demasiado grande.' }, 400);
   }
-
   const llave = Deno.env.get('GEMINI_API_KEY');
   if (!llave) return json({ error: 'El escáner no está configurado (falta GEMINI_API_KEY).' }, 503);
 
-  // 3. Gemini con salida JSON forzada. 503 (saturado) y 429 son temporales:
+  // 3. Cuota por usuario: se cuenta en la base de datos, así no se reinicia
+  //    cuando Supabase crea otra instancia de la función.
+  const { data: cuota, error: errorCuota } = await supabase.rpc('consumir_cuota_escaner', {
+    p_limite: RATE_LIMIT, p_ventana_min: RATE_WINDOW_MIN
+  });
+  if (errorCuota) {
+    console.error('consumir_cuota_escaner', errorCuota.message);
+    return json({ error: 'No se pudo verificar el límite de escaneos. Intenta de nuevo.' }, 503);
+  }
+  if (!cuota?.permitido) {
+    return new Response(JSON.stringify({
+      error: `Alcanzaste el límite de ${RATE_LIMIT} escaneos por hora. Intenta de nuevo más tarde.`
+    }), {
+      status: 429,
+      headers: { ...CORS, 'Content-Type': 'application/json', 'Retry-After': String(cuota?.reintentar_en_s ?? RATE_WINDOW_MIN * 60) }
+    });
+  }
+
+  // 4. Gemini con salida JSON forzada. 503 (saturado) y 429 son temporales:
   //    se reintenta con espera creciente y, si existe GEMINI_MODEL_RESPALDO, se
   //    usa ese modelo en el último intento.
   const cuerpoGemini = JSON.stringify({

@@ -1,0 +1,58 @@
+<ion-content class="ion-padding auth-content">
+  <main class="auth-container">
+    <div class="auth-lang"><app-selector-idioma></app-selector-idioma></div>
+    <div class="logo-box">
+      <img src="assets/icon/logopacamara.png" [alt]="'login.logo_alt' | transloco">
+    </div>
+    <a class="back-link" routerLink="/login" replaceUrl>{{ 'recuperar.volver' | transloco }}</a>
+
+    @if (!enviado()) {
+      <h1 class="title">{{ 'recuperar.titulo' | transloco }}</h1>
+      <p class="subtitle">{{ 'recuperar.subtitulo' | transloco }}</p>
+
+      <form class="auth-card" (ngSubmit)="enviar()">
+        <ion-input
+          [(ngModel)]="email"
+          name="email"
+          [label]="'recuperar.correo' | transloco"
+          labelPlacement="stacked"
+          type="email"
+          autocomplete="email"
+          inputmode="email"
+          placeholder="nombre@lab.com"
+          fill="outline"
+          class="custom-input"
+          required
+        ></ion-input>
+
+        <ion-button expand="block" type="submit" class="primary-btn" [disabled]="enviando()">
+          @if (enviando()) {
+            <ion-spinner name="crescent"></ion-spinner>
+          } @else {
+            <span>{{ 'recuperar.enviar' | transloco }}</span>
+          }
+        </ion-button>
+
+        <p class="hint">{{ 'recuperar.nota_google' | transloco }}</p>
+      </form>
+    } @else {
+      <section class="auth-card auth-card--estado" role="status" aria-live="polite">
+        <ion-icon name="mail-outline" class="estado-icono" aria-hidden="true"></ion-icon>
+        <h1 class="title">{{ 'recuperar.revisa_titulo' | transloco }}</h1>
+        <p class="subtitle">{{ 'recuperar.revisa_texto' | transloco: { correo: email.trim() } }}</p>
+        <p class="hint">{{ 'recuperar.revisa_spam' | transloco }}</p>
+
+        <ion-button expand="block" fill="outline" type="button" [disabled]="enviando() || esperaReenvio() > 0" (click)="enviar()">
+          @if (esperaReenvio() > 0) {
+            {{ 'recuperar.reenviar_en' | transloco: { s: esperaReenvio() } }}
+          } @else {
+            {{ 'recuperar.reenviar' | transloco }}
+          }
+        </ion-button>
+        <ion-button expand="block" fill="clear" type="button" (click)="usarOtroCorreo()">
+          {{ 'recuperar.otro_correo' | transloco }}
+        </ion-button>
+      </section>
+    }
+  </main>
+</ion-content>

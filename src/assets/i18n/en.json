@@ -18,7 +18,7 @@
     "seleccionado": "Selected"
   },
   "login": {
-    "titulo": "PacamaraSQ",
+    "titulo": "PacamaraQS",
     "subtitulo": "CVA Evaluation System · SCA",
     "usuario": "Email",
     "correo_aria": "Email address",
@@ -38,7 +38,8 @@
       "sesion": "Your session could not be validated. Please sign in again.",
       "google_cancelado": "Google sign-in was cancelled.",
       "google": "Could not sign in with Google. Please try again."
-    }
+    },
+    "olvidaste": "Forgot your password?"
   },
   "registro": {
     "volver": "Back to sign in",
@@ -64,6 +65,60 @@
       "no_coinciden": "Passwords do not match.",
       "politica": "You must accept the data processing policy to continue.",
       "generico": "Registration could not be completed."
+    }
+  },
+  "recuperar": {
+    "volver": "Back to sign in",
+    "titulo": "Reset password",
+    "subtitulo": "Enter your account email and we will send you a link to create a new password.",
+    "correo": "Email",
+    "enviar": "Send link",
+    "nota_google": "If you sign in with Google you do not need a password: use “Continue with Google”.",
+    "revisa_titulo": "Check your email",
+    "revisa_texto": "If {{correo}} is registered, we sent you a link to create a new password. It expires in 1 hour.",
+    "revisa_spam": "If you do not see it in a few minutes, check your spam or junk folder.",
+    "reenviar": "Resend link",
+    "reenviar_en": "Resend in {{s}} s",
+    "otro_correo": "Use another email",
+    "verificando": "Checking the link…",
+    "invalido_titulo": "Invalid link",
+    "invalido_texto": "The link has expired or was already used. Request a new one to continue.",
+    "pedir_otro": "Request a new link",
+    "nueva_titulo": "Create your new password",
+    "nueva_subtitulo": "Account: {{correo}}",
+    "guardar": "Save password",
+    "actualizada": "Password updated.",
+    "listo_titulo": "Password updated",
+    "listo_texto": "You can now sign in with your new password, here or in the app.",
+    "continuar": "Continue",
+    "errores": {
+      "correo_invalido": "Enter a valid email.",
+      "limite": "You already requested several links. Wait a few minutes and try again.",
+      "red": "No connection. Check your network and try again."
+    }
+  },
+  "contrasena": {
+    "nueva": "New password",
+    "confirmar": "Confirm password",
+    "fortaleza": "Password strength",
+    "nivel_0": "Type a password",
+    "nivel_1": "Weak",
+    "nivel_2": "Fair",
+    "nivel_3": "Strong",
+    "nivel_4": "Very strong",
+    "req_longitud": "At least {{n}} characters",
+    "req_mayuscula": "An uppercase letter (A-Z)",
+    "req_minuscula": "A lowercase letter (a-z)",
+    "req_numero": "A number (0-9)",
+    "req_simbolo": "A symbol, for example ! @ # $ % & * -",
+    "req_sin_datos": "Does not contain your name or email",
+    "cumple": "met",
+    "falta": "pending",
+    "errores": {
+      "insegura": "The password does not meet all the requirements.",
+      "no_coinciden": "Passwords do not match.",
+      "igual": "The new password must be different from the previous one.",
+      "generico": "The password could not be updated. Try again."
     }
   },
   "politica": {

@@ -83,10 +83,10 @@ Las migraciones versionadas en `supabase/migrations/` son incrementales; incluye
 
 ### Estado de seguridad y publicación
 
-- **Gemini:** el cliente invoca `analizar-ficha`, una Supabase Edge Function que exige un usuario autenticado no anónimo y lee `GEMINI_API_KEY` del entorno del servidor. Reintenta ante errores 503/429 y puede usar un modelo de respaldo (`GEMINI_MODEL_RESPALDO`). La clave nunca va en los archivos `environment` ni en el bundle. Aún falta un límite de escaneos por usuario.
+- **Gemini:** el cliente invoca `analizar-ficha`, una Supabase Edge Function que exige un usuario autenticado no anónimo y lee `GEMINI_API_KEY` del entorno del servidor. Reintenta ante errores 503/429 y puede usar un modelo de respaldo (`GEMINI_MODEL_RESPALDO`). La clave nunca va en los archivos `environment` ni en el bundle. La función aplica un límite de 10 escaneos por usuario y por hora, guardado en la base de datos (`consumir_cuota_escaner`, migración `20261116170000_limite_escaner.sql`); se puede ajustar con el secreto `SCANNER_RATE_LIMIT`.
 - **Escritura de evaluaciones:** la app ya guarda solo mediante `registrar_evaluacion`. Queda pendiente activar el bloque "PASO 2" de su migración, que retira las políticas de escritura directa, cuando todos usen la versión nueva del APK.
 - **Pendientes del asesor de seguridad de Supabase:** desactivar el inicio de sesión anónimo en Auth, activar la protección contra contraseñas filtradas y revocar `EXECUTE` de `rls_auto_enable()` a `anon`/`authenticated`.
-- **Android:** `applicationId` es `com.pacamaraqs.app`, pero el `namespace` de Gradle y el paquete de `MainActivity` siguen como `io.ionic.starter`. Para publicar en tiendas conviene alinearlos, poner `allowBackup="false"` y activar `minifyEnabled` en release.
+- **Android:** `applicationId`, `namespace` y el paquete de `MainActivity` usan `com.pacamaraqs.app`. Las copias de seguridad automáticas están desactivadas y el código release usa minificación/obfuscación.
 
 ### Arquitectura de reportes
 
@@ -175,7 +175,7 @@ export const environment = {
 >   supabase functions deploy analizar-ficha
 >   ```
 >
-> - La función exige autenticación, pero el código actual no implementa límites de frecuencia o cuota por usuario. Añádelos y prueba los límites de gasto antes de vender planes de pago.
+> - La función exige autenticación y aplica un límite por usuario guardado en la base de datos, de modo que no se reinicia entre instancias de la Edge Function.
 > - No subas claves privadas al repositorio. Usa valores de prueba o marcadores en los archivos de ejemplo y rota cualquier credencial que se haya expuesto.
 
 Las migraciones de `supabase/migrations/` deben aplicarse en orden. Las más recientes y obligatorias para la versión actual son:
@@ -231,6 +231,16 @@ npx cap open android
 ### APK automático con GitHub Actions
 
 Cada push ejecuta `.github/workflows/build-android.yml` (Ubuntu 24.04, Node 22, Java 21, Gradle 8.14.3), que compila la web, sincroniza Capacitor y genera un APK de depuración. Se descarga desde la pestaña **Actions** del repositorio, en el artefacto de la ejecución. Si se reinstala sobre una versión anterior y el ícono no cambia, desinstale primero la versión vieja.
+
+El mismo workflow genera también un **APK release** (artefacto `pacamaraqs-release-apk`), ofuscado con R8, para comprobar en el celular que la ofuscación no rompe ningún plugin. Sin llave propia se firma con la llave de depuración (solo para pruebas). Para firmarlo con la llave del proyecto:
+
+```bash
+keytool -genkeypair -v -keystore pacamaraqs.jks -alias pacamaraqs -keyalg RSA -keysize 2048 -validity 10000
+base64 -w0 pacamaraqs.jks > llave.txt
+# En Windows (PowerShell): [Convert]::ToBase64String([IO.File]::ReadAllBytes("pacamaraqs.jks")) | Set-Content llave.txt
+```
+
+y en GitHub → Settings → Secrets and variables → Actions crear `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` y `ANDROID_KEY_PASSWORD`. Guarde el archivo `.jks` y sus contraseñas en un lugar seguro: sin ellos no se pueden publicar actualizaciones de la app.
 
 ### Datos de prueba
 

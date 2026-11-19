@@ -18,7 +18,7 @@
     "seleccionado": "Seleccionado"
   },
   "login": {
-    "titulo": "PacamaraSQ",
+    "titulo": "PacamaraQS",
     "subtitulo": "Sistema de Evaluación CVA · SCA",
     "usuario": "Usuario",
     "correo_aria": "Correo electrónico",
@@ -38,7 +38,8 @@
       "sesion": "No se pudo validar la sesión. Inicia sesión nuevamente.",
       "google_cancelado": "Se canceló el inicio de sesión con Google.",
       "google": "No se pudo iniciar sesión con Google. Intenta de nuevo."
-    }
+    },
+    "olvidaste": "¿Olvidaste tu contraseña?"
   },
   "registro": {
     "volver": "Volver al inicio de sesión",
@@ -64,6 +65,60 @@
       "no_coinciden": "Las contraseñas no coinciden.",
       "politica": "Debes aceptar la política de tratamiento de datos para continuar.",
       "generico": "No se pudo completar el registro."
+    }
+  },
+  "recuperar": {
+    "volver": "Volver al inicio de sesión",
+    "titulo": "Recuperar contraseña",
+    "subtitulo": "Escribe el correo de tu cuenta y te enviaremos un enlace para crear una contraseña nueva.",
+    "correo": "Correo electrónico",
+    "enviar": "Enviar enlace",
+    "nota_google": "Si entras con Google no necesitas contraseña: usa «Continuar con Google».",
+    "revisa_titulo": "Revisa tu correo",
+    "revisa_texto": "Si {{correo}} está registrado, te enviamos un enlace para crear una contraseña nueva. Vence en 1 hora.",
+    "revisa_spam": "Si no lo ves en unos minutos, revisa la carpeta de spam o correo no deseado.",
+    "reenviar": "Reenviar enlace",
+    "reenviar_en": "Reenviar en {{s}} s",
+    "otro_correo": "Usar otro correo",
+    "verificando": "Verificando el enlace…",
+    "invalido_titulo": "Enlace no válido",
+    "invalido_texto": "El enlace venció o ya se usó. Pide uno nuevo para continuar.",
+    "pedir_otro": "Pedir un enlace nuevo",
+    "nueva_titulo": "Crea tu contraseña nueva",
+    "nueva_subtitulo": "Cuenta: {{correo}}",
+    "guardar": "Guardar contraseña",
+    "actualizada": "Contraseña actualizada.",
+    "listo_titulo": "Contraseña actualizada",
+    "listo_texto": "Ya puedes entrar con tu contraseña nueva, aquí o en la app.",
+    "continuar": "Continuar",
+    "errores": {
+      "correo_invalido": "Escribe un correo válido.",
+      "limite": "Ya pediste varios enlaces. Espera unos minutos e intenta de nuevo.",
+      "red": "Sin conexión. Revisa tu red e intenta de nuevo."
+    }
+  },
+  "contrasena": {
+    "nueva": "Contraseña nueva",
+    "confirmar": "Confirmar contraseña",
+    "fortaleza": "Fortaleza de la contraseña",
+    "nivel_0": "Escribe una contraseña",
+    "nivel_1": "Débil",
+    "nivel_2": "Regular",
+    "nivel_3": "Segura",
+    "nivel_4": "Muy segura",
+    "req_longitud": "Al menos {{n}} caracteres",
+    "req_mayuscula": "Una letra mayúscula (A-Z)",
+    "req_minuscula": "Una letra minúscula (a-z)",
+    "req_numero": "Un número (0-9)",
+    "req_simbolo": "Un símbolo, por ejemplo ! @ # $ % & * -",
+    "req_sin_datos": "Que no contenga tu nombre ni tu correo",
+    "cumple": "cumplido",
+    "falta": "pendiente",
+    "errores": {
+      "insegura": "La contraseña no cumple todos los requisitos.",
+      "no_coinciden": "Las contraseñas no coinciden.",
+      "igual": "La contraseña nueva debe ser distinta de la anterior.",
+      "generico": "No se pudo actualizar la contraseña. Intenta de nuevo."
     }
   },
   "politica": {

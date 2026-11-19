@@ -18,7 +18,7 @@
     "seleccionado": "已选择"
   },
   "login": {
-    "titulo": "PacamaraSQ",
+    "titulo": "PacamaraQS",
     "subtitulo": "CVA 评估系统 · SCA",
     "usuario": "邮箱",
     "correo_aria": "电子邮箱",
@@ -38,7 +38,8 @@
       "sesion": "无法验证会话，请重新登录。",
       "google_cancelado": "已取消 Google 登录。",
       "google": "无法使用 Google 登录，请重试。"
-    }
+    },
+    "olvidaste": "忘记密码？"
   },
   "registro": {
     "volver": "返回登录",
@@ -64,6 +65,60 @@
       "no_coinciden": "两次输入的密码不一致。",
       "politica": "您必须接受数据处理政策才能继续。",
       "generico": "无法完成注册。"
+    }
+  },
+  "recuperar": {
+    "volver": "返回登录",
+    "titulo": "找回密码",
+    "subtitulo": "输入您的账户邮箱，我们将发送一个用于设置新密码的链接。",
+    "correo": "电子邮箱",
+    "enviar": "发送链接",
+    "nota_google": "如果您使用 Google 登录，则无需密码：请使用“使用 Google 继续”。",
+    "revisa_titulo": "请查看您的邮箱",
+    "revisa_texto": "如果 {{correo}} 已注册，我们已发送设置新密码的链接。链接 1 小时后失效。",
+    "revisa_spam": "如果几分钟内没有收到，请检查垃圾邮件文件夹。",
+    "reenviar": "重新发送链接",
+    "reenviar_en": "{{s}} 秒后可重新发送",
+    "otro_correo": "使用其他邮箱",
+    "verificando": "正在验证链接…",
+    "invalido_titulo": "链接无效",
+    "invalido_texto": "链接已过期或已被使用。请重新申请一个链接。",
+    "pedir_otro": "申请新链接",
+    "nueva_titulo": "设置新密码",
+    "nueva_subtitulo": "账户：{{correo}}",
+    "guardar": "保存密码",
+    "actualizada": "密码已更新。",
+    "listo_titulo": "密码已更新",
+    "listo_texto": "现在可以使用新密码在此处或应用中登录。",
+    "continuar": "继续",
+    "errores": {
+      "correo_invalido": "请输入有效的邮箱。",
+      "limite": "您已多次申请链接，请稍等几分钟后再试。",
+      "red": "无网络连接。请检查网络后重试。"
+    }
+  },
+  "contrasena": {
+    "nueva": "新密码",
+    "confirmar": "确认密码",
+    "fortaleza": "密码强度",
+    "nivel_0": "请输入密码",
+    "nivel_1": "弱",
+    "nivel_2": "一般",
+    "nivel_3": "安全",
+    "nivel_4": "非常安全",
+    "req_longitud": "至少 {{n}} 个字符",
+    "req_mayuscula": "一个大写字母（A-Z）",
+    "req_minuscula": "一个小写字母（a-z）",
+    "req_numero": "一个数字（0-9）",
+    "req_simbolo": "一个符号，例如 ! @ # $ % & * -",
+    "req_sin_datos": "不包含您的姓名或邮箱",
+    "cumple": "已满足",
+    "falta": "未满足",
+    "errores": {
+      "insegura": "密码未满足全部要求。",
+      "no_coinciden": "两次输入的密码不一致。",
+      "igual": "新密码必须与旧密码不同。",
+      "generico": "无法更新密码，请重试。"
     }
   },
   "politica": {

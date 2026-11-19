@@ -41,7 +41,7 @@ export function textoDeCampo(valor: unknown): string {
 
 /** 25000 → "$ 25.000 COP". */
 export function formatearCop(valor: number): string {
-  return formatearPrecio(valor, 'COP');
+  return formatearPrecio(valor, 'COP').replace(/\u00a0/g, ' ');
 }
 
 /**

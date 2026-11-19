@@ -33,7 +33,17 @@ describe('LoginPage', () => {
       imports: [LoginPage],
       providers: [
         provideRouter([]),
-        { provide: AuthService, useValue: { login, obtenerRutaInicio, rutaInicioPorRol } },
+        {
+          provide: AuthService,
+          useValue: {
+            login,
+            obtenerRutaInicio,
+            rutaInicioPorRol,
+            errorOAuth: () => null,
+            enRecuperacion: () => false,
+            limpiarErrorOAuth: vi.fn()
+          }
+        },
         { provide: ToastController, useValue: { create: toastCreate } },
         {
           provide: ActivatedRoute,
@@ -85,6 +95,7 @@ describe('LoginPage', () => {
     expect(navigateByUrl).toHaveBeenLastCalledWith('/session/waiting/abc', { replaceUrl: true });
 
     login.mockResolvedValue('administrador');
+    component.password = 'password';
     await component.login();
     expect(navigateByUrl).toHaveBeenLastCalledWith('/admin-dashboard', { replaceUrl: true });
   });

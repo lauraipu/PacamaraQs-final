@@ -1,0 +1,90 @@
+<ion-content class="ion-padding auth-content">
+  <main class="auth-container">
+    <div class="auth-lang"><app-selector-idioma></app-selector-idioma></div>
+    <div class="logo-box">
+      <img src="assets/icon/logopacamara.png" [alt]="'login.logo_alt' | transloco">
+    </div>
+
+    @switch (estado()) {
+      @case ('verificando') {
+        <section class="auth-card auth-card--estado" role="status">
+          <ion-spinner name="crescent" class="estado-icono"></ion-spinner>
+          <p class="subtitle">{{ 'recuperar.verificando' | transloco }}</p>
+        </section>
+      }
+
+      @case ('invalido') {
+        <section class="auth-card auth-card--estado" role="alert">
+          <ion-icon name="alert-circle-outline" class="estado-icono" aria-hidden="true"></ion-icon>
+          <h1 class="title">{{ 'recuperar.invalido_titulo' | transloco }}</h1>
+          <p class="subtitle">{{ 'recuperar.invalido_texto' | transloco }}</p>
+          <ion-button expand="block" class="primary-btn" routerLink="/recuperar" [replaceUrl]="true">
+            {{ 'recuperar.pedir_otro' | transloco }}
+          </ion-button>
+          <ion-button expand="block" fill="clear" routerLink="/login" [replaceUrl]="true">
+            {{ 'recuperar.volver' | transloco }}
+          </ion-button>
+        </section>
+      }
+
+      @case ('listo') {
+        <section class="auth-card auth-card--estado" role="status" aria-live="polite">
+          <ion-icon name="checkmark-circle-outline" class="estado-icono" aria-hidden="true"></ion-icon>
+          <h1 class="title">{{ 'recuperar.listo_titulo' | transloco }}</h1>
+          <p class="subtitle">{{ 'recuperar.listo_texto' | transloco }}</p>
+          <ion-button expand="block" class="primary-btn" (click)="continuar()">
+            {{ 'recuperar.continuar' | transloco }}
+          </ion-button>
+        </section>
+      }
+
+      @default {
+        <h1 class="title">{{ 'recuperar.nueva_titulo' | transloco }}</h1>
+        <p class="subtitle">{{ 'recuperar.nueva_subtitulo' | transloco: { correo: correo() ?? '' } }}</p>
+
+        <form class="auth-card" (ngSubmit)="guardar()">
+          <ion-input
+            [ngModel]="contrasena"
+            (ngModelChange)="alEscribir($event)"
+            name="contrasena"
+            [label]="'contrasena.nueva' | transloco"
+            labelPlacement="stacked"
+            [type]="mostrar ? 'text' : 'password'"
+            autocomplete="new-password"
+            fill="outline"
+            class="custom-input"
+            required
+          ></ion-input>
+
+          <app-requisitos-contrasena [contrasena]="valorActual()" [nombre]="nombre()" [email]="correo()"></app-requisitos-contrasena>
+
+          <ion-input
+            [(ngModel)]="confirmacion"
+            name="confirmacion"
+            [label]="'contrasena.confirmar' | transloco"
+            labelPlacement="stacked"
+            [type]="mostrar ? 'text' : 'password'"
+            autocomplete="new-password"
+            fill="outline"
+            class="custom-input"
+            required
+          ></ion-input>
+
+          <ion-button type="button" fill="clear" class="password-toggle"
+            [attr.aria-label]="(mostrar ? 'registro.ocultar_aria' : 'registro.mostrar_aria') | transloco"
+            (click)="mostrar = !mostrar">
+            {{ (mostrar ? 'registro.ocultar' : 'registro.mostrar') | transloco }}
+          </ion-button>
+
+          <ion-button expand="block" type="submit" class="primary-btn" [disabled]="guardando()">
+            @if (guardando()) {
+              <ion-spinner name="crescent"></ion-spinner>
+            } @else {
+              <span>{{ 'recuperar.guardar' | transloco }}</span>
+            }
+          </ion-button>
+        </form>
+      }
+    }
+  </main>
+</ion-content>

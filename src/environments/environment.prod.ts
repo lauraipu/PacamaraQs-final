@@ -7,5 +7,7 @@ export const environment = {
    * (la llave de Gemini es el secreto GEMINI_API_KEY de Supabase, nunca va en la app).
    * true = respuestas simuladas, sin llamar a la IA (pruebas sin gastar cuota).
    */
-  escanerSimulado: false
+  escanerSimulado: false,
+  /** Versión web publicada (Vercel). Destino del enlace de recuperación de contraseña. */
+  urlWeb: 'https://pacamara-qs-final.vercel.app'
 };

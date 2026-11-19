@@ -25,7 +25,7 @@ import { checkmarkCircle, informationCircleOutline } from 'ionicons/icons';
 import { EstadoSesion, FormatoCva, Sesion } from '../../../core/models/sesion.model';
 import { AuthService } from '../../../core/services/auth';
 import { SesionService } from '../../../core/services/sesion';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { TrPipe } from '../../../core/i18n/tr';
 addIcons({ checkmarkCircle, informationCircleOutline });
 
@@ -100,6 +100,7 @@ export class CreateSessionPage {
   private readonly router = inject(Router);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly toastController = inject(ToastController);
+  private readonly transloco = inject(TranslocoService);
 
   getTituloFormato(): string {
     return this.formatosList.find(formato => formato.id === this.formatoSeleccionado)?.titulo ?? '';
@@ -107,7 +108,7 @@ export class CreateSessionPage {
 
   async generarCodigo(): Promise<void> {
     if (!this.nombreSesion.trim()) {
-      this.error = 'El nombre de la sesión no puede estar vacío.';
+      this.error = this.transloco.translate('el_nombre_de_la_sesion_no_puede_1pjfpgj');
       return;
     }
 
@@ -164,7 +165,7 @@ export class CreateSessionPage {
         this.changeDetector.markForCheck();
       }, 2000);
       const toast = await this.toastController.create({
-        message: '¡Código copiado!',
+        message: this.transloco.translate('txt.codigo_copiado_f5fksp'),
         duration: 2000,
         color: 'dark'
       });
@@ -172,7 +173,7 @@ export class CreateSessionPage {
     } catch (error) {
       this.error = this.mensajeError(error);
       const toast = await this.toastController.create({
-        message: `No se pudo copiar el código. ${this.mensajeError(error)}`,
+        message: this.transloco.translate('txt.no_se_pudo_copiar_el_codigo_p0_v6ndnc', { p0: this.mensajeError(error) }),
         duration: 3500,
         color: 'danger'
       });
@@ -191,6 +192,6 @@ export class CreateSessionPage {
   }
 
   private mensajeError(error: unknown): string {
-    return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
+    return error instanceof Error ? error.message : this.transloco.translate('txt.ocurrio_un_error_inesperado_ps7ccd');
   }
 }

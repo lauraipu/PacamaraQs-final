@@ -21,6 +21,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/auth/registro/registro.page').then(m => m.RegistroPage)
   },
   {
+    path: 'recuperar',
+    loadComponent: () => import('./pages/auth/recuperar/recuperar.page').then(m => m.RecuperarPage)
+  },
+  {
+    // Destino del enlace del correo de recuperación: sin guard, la sesión
+    // de recuperación la crea Supabase al cargar la página.
+    path: 'nueva-contrasena',
+    loadComponent: () => import('./pages/auth/nueva-contrasena/nueva-contrasena.page').then(m => m.NuevaContrasenaPage)
+  },
+  {
     // Aceptación obligatoria de la política de datos (p. ej. primer ingreso con Google).
     path: 'aceptar-politica',
     loadComponent: () => import('./pages/auth/aceptar-politica/aceptar-politica.page').then(m => m.AceptarPoliticaPage),
