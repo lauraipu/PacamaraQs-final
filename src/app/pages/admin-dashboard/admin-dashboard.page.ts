@@ -1,9 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import {
   IonButton, IonContent, IonHeader, IonTitle, IonToolbar, ToastController
 } from '@ionic/angular';
-import { AuthService } from '../../core/services/auth';
+import { CierreSesionService } from '../../core/auth/cierre-sesion.service';
 
 import { TranslocoPipe } from '@jsverse/transloco';
 @Component({
@@ -26,8 +25,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
   `
 })
 export class AdminDashboardPage {
-  private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly cierreSesion = inject(CierreSesionService);
   private readonly toastController = inject(ToastController);
   cerrandoSesion = false;
 
@@ -35,8 +33,7 @@ export class AdminDashboardPage {
     if (this.cerrandoSesion) return;
     this.cerrandoSesion = true;
     try {
-      await this.authService.signOut();
-      await this.router.navigateByUrl('/login', { replaceUrl: true });
+      await this.cierreSesion.confirmarYSalir();
     } catch (error) {
       const toast = await this.toastController.create({
         message: error instanceof Error ? error.message : 'No se pudo cerrar la sesión.',

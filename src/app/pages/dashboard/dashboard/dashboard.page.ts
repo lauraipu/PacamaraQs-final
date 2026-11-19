@@ -26,6 +26,7 @@ import {
 import { addIcons } from 'ionicons';
 import { keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
+import { CierreSesionService } from '../../../core/auth/cierre-sesion.service';
 import { SesionConRol, SesionService } from '../../../core/services/sesion';
 import { SupabaseService } from '../../../core/services/supabase';
 import { EstadoSesion, getFormatoById } from '../../../core/models/sesion.model';
@@ -104,6 +105,7 @@ export class DashboardPage implements OnInit {
 
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly cierreSesion = inject(CierreSesionService);
   private readonly sesionService = inject(SesionService);
   private readonly supabaseService = inject(SupabaseService);
   private readonly toastController = inject(ToastController);
@@ -336,10 +338,10 @@ export class DashboardPage implements OnInit {
   }
 
   async cerrarSesion(): Promise<void> {
+    if (this.isSigningOut) return;
     this.isSigningOut = true;
     try {
-      await this.authService.signOut();
-      await this.router.navigateByUrl('/login', { replaceUrl: true });
+      await this.cierreSesion.confirmarYSalir();
     } catch (error) {
       await this.mostrarToast(
         error instanceof Error ? error.message : 'No se pudo cerrar la sesión.'

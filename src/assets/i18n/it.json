@@ -17,7 +17,13 @@
     "cerrar": "Chiudi",
     "usar": "Usa \"{{p0}}\"",
     "sin_resultados": "Nessun risultato",
-    "seleccionado": "Selezionato"
+    "seleccionado": "Selezionato",
+    "confirmar_salida": {
+      "titulo": "Esci",
+      "mensaje": "Vuoi davvero uscire dal tuo account?",
+      "cancelar": "Annulla",
+      "confirmar": "Esci"
+    }
   },
   "login": {
     "titulo": "PacamaraQS",

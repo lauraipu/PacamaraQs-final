@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth';
+import { AuthService, RUTA_NUEVA_CONTRASENA } from '../services/auth';
 
 /**
  * Exige un usuario autenticado con cuenta real (no anónima).
@@ -13,6 +13,10 @@ export const authGuard: CanActivateFn = async (_route, state) => {
   try {
     await authService.asegurarInicializado();
     if (authService.autenticado()) {
+      // Entró con el enlace de recuperación: primero define la contraseña nueva.
+      if (authService.enRecuperacion()) {
+        return router.createUrlTree([RUTA_NUEVA_CONTRASENA]);
+      }
       // Ley 1581: sin la política aceptada (versión vigente) no se usa la app.
       if (state.url.startsWith('/aceptar-politica')) return true;
       try {

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonButton, IonContent, IonInput, IonSpinner, ToastController } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService, RUTA_NUEVA_CONTRASENA } from '../../../core/services/auth';
 import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
 import { mensajeDeError } from '../../../core/utils/errores';
 
@@ -39,6 +39,21 @@ export class LoginPage implements OnInit {
       void this.mostrarToast(this.t(error === 'cancelado' ? 'login.errores.google_cancelado' : 'login.errores.google'));
     });
   }
+
+  /**
+   * Ionic reutiliza la página de login si se vuelve a ella; ngOnInit no se
+   * repite. Al reentrar se vuelve a comprobar la sesión para no mostrar el
+   * formulario a alguien que sigue conectado.
+   */
+  ionViewWillEnter(): void {
+    if (this.primeraEntrada) {
+      this.primeraEntrada = false;
+      return;
+    }
+    void this.redirigirSiYaAutenticado(true);
+  }
+
+  private primeraEntrada = true;
 
   ngOnInit(): void {
     const authError = this.route.snapshot.queryParamMap.get('authError');
@@ -94,14 +109,17 @@ export class LoginPage implements OnInit {
   }
 
   async irARegistro(): Promise<void> {
-    await this.router.navigateByUrl('/registro');
+    await this.router.navigateByUrl('/registro', { replaceUrl: true });
   }
 
   /** Con sesión válida, /login no se muestra: se va directo al panel del rol. */
   private async redirigirSiYaAutenticado(permitido: boolean): Promise<void> {
     try {
       if (!permitido) return;
-      if (this.authService.enRecuperacion()) return;
+      if (this.authService.enRecuperacion()) {
+        await this.router.navigateByUrl(RUTA_NUEVA_CONTRASENA, { replaceUrl: true });
+        return;
+      }
       const destino = await this.authService.obtenerRutaInicio();
       if (destino && destino !== '/login') {
         await this.router.navigateByUrl(destino, { replaceUrl: true });

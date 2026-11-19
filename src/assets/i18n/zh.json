@@ -17,7 +17,13 @@
     "cerrar": "关闭",
     "usar": "使用“{{p0}}”",
     "sin_resultados": "无结果",
-    "seleccionado": "已选择"
+    "seleccionado": "已选择",
+    "confirmar_salida": {
+      "titulo": "退出登录",
+      "mensaje": "确定要退出您的账户吗？",
+      "cancelar": "取消",
+      "confirmar": "退出登录"
+    }
   },
   "login": {
     "titulo": "PacamaraQS",

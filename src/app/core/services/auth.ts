@@ -22,6 +22,20 @@ export interface UsuarioActual {
 /** Ruta a la que llega el enlace del correo de recuperación de contraseña. */
 export const RUTA_NUEVA_CONTRASENA = '/nueva-contrasena';
 
+/**
+ * El enlace del correo de recuperación llega con `type=recovery` en la URL.
+ * Se lee al cargar este archivo (antes de crear el cliente de Supabase, que
+ * borra los tokens de la URL) para obligar a terminar el cambio de contraseña
+ * antes de entrar a la app, aunque Supabase devuelva a la raíz del sitio.
+ */
+const RECUPERACION_EN_URL = typeof window !== 'undefined'
+  && /(^|[#?&])type=recovery(&|$)/.test(`${window.location.hash}&${window.location.search}`);
+const MARCA_RECUPERACION = 'pacamaraqs.recuperacion';
+
+function leerMarcaRecuperacion(): boolean {
+  try { return sessionStorage.getItem(MARCA_RECUPERACION) === '1'; } catch { return false; }
+}
+
 /** Versión de la política de privacidad aceptada en el registro. */
 export const VERSION_POLITICA = '1.0';
 
@@ -44,7 +58,7 @@ export class AuthService {
   private readonly _errorOAuth = signal<ErrorOAuth | null>(null);
   readonly errorOAuth = this._errorOAuth.asReadonly();
   /** true mientras hay una sesión abierta desde el enlace de recuperación. */
-  private readonly _enRecuperacion = signal(false);
+  private readonly _enRecuperacion = signal(RECUPERACION_EN_URL || leerMarcaRecuperacion());
   readonly enRecuperacion = this._enRecuperacion.asReadonly();
 
   readonly usuario = this._usuario.asReadonly();
@@ -58,6 +72,7 @@ export class AuthService {
   private cargaRol: Promise<RolGlobal> | null = null;
 
   constructor() {
+    if (RECUPERACION_EN_URL) this.marcarRecuperacion(true);
     this.supabase.client.auth.onAuthStateChange((evento, sesion) => {
       // No se llama a supabase.auth dentro del callback: supabase-js mantiene
       // un lock durante el evento y una llamada anidada puede bloquearse.
@@ -213,7 +228,7 @@ export class AuthService {
   async actualizarContrasena(contrasena: string): Promise<void> {
     const { error } = await this.supabase.client.auth.updateUser({ password: contrasena });
     if (error) throw error;
-    this._enRecuperacion.set(false);
+    this.marcarRecuperacion(false);
   }
 
   async signOut(): Promise<void> {
@@ -295,7 +310,7 @@ export class AuthService {
     }
 
     if (evento === 'PASSWORD_RECOVERY') {
-      this._enRecuperacion.set(true);
+      this.marcarRecuperacion(true);
       // Si Supabase devolvió a otra ruta (p. ej. la URL del sitio), se lleva al formulario.
       setTimeout(() => {
         if (!this.router.url.startsWith(RUTA_NUEVA_CONTRASENA)) {
@@ -338,8 +353,17 @@ export class AuthService {
     return rol;
   }
 
+  /** Recuerda (también al recargar la pestaña) que falta definir la contraseña nueva. */
+  private marcarRecuperacion(activa: boolean): void {
+    this._enRecuperacion.set(activa);
+    try {
+      if (activa) sessionStorage.setItem(MARCA_RECUPERACION, '1');
+      else sessionStorage.removeItem(MARCA_RECUPERACION);
+    } catch { /* almacenamiento no disponible: basta con la señal */ }
+  }
+
   private limpiarEstado(): void {
-    this._enRecuperacion.set(false);
+    this.marcarRecuperacion(false);
     this._usuario.set(null);
     this._rol.set(null);
     this._versionPolitica.set(undefined);

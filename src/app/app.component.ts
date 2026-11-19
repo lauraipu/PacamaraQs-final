@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular';
+import { BotonAtrasService } from './core/navegacion/boton-atras.service';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
-  constructor() {}
+  constructor() {
+    inject(BotonAtrasService).iniciar();
+  }
 }
