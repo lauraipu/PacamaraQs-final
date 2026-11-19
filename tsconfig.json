@@ -20,7 +20,13 @@
     "module": "es2020",
     "lib": ["es2022", "dom"],
     "skipLibCheck": true,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "paths": {
+      "@core/*": ["./src/app/core/*"],
+      "@domain/*": ["./src/app/domain/*"],
+      "@shared/*": ["./src/app/shared/*"],
+      "@features/*": ["./src/app/features/*"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
