@@ -38,7 +38,8 @@
       "sesion": "Impossibile convalidare la sessione. Accedi di nuovo.",
       "google_cancelado": "Accesso con Google annullato.",
       "google": "Impossibile accedere con Google. Riprova."
-    }
+    },
+    "olvidaste": "Hai dimenticato la password?"
   },
   "registro": {
     "volver": "Torna all'accesso",
@@ -64,6 +65,60 @@
       "no_coinciden": "Le password non coincidono.",
       "politica": "Devi accettare l'informativa sul trattamento dei dati per continuare.",
       "generico": "Impossibile completare la registrazione."
+    }
+  },
+  "recuperar": {
+    "volver": "Torna all’accesso",
+    "titulo": "Recupera password",
+    "subtitulo": "Inserisci l’email del tuo account e ti invieremo un link per creare una nuova password.",
+    "correo": "Email",
+    "enviar": "Invia link",
+    "nota_google": "Se accedi con Google non ti serve una password: usa «Continua con Google».",
+    "revisa_titulo": "Controlla la tua email",
+    "revisa_texto": "Se {{correo}} è registrato, ti abbiamo inviato un link per creare una nuova password. Scade tra 1 ora.",
+    "revisa_spam": "Se non lo vedi entro qualche minuto, controlla la cartella spam o posta indesiderata.",
+    "reenviar": "Invia di nuovo",
+    "reenviar_en": "Invia di nuovo tra {{s}} s",
+    "otro_correo": "Usa un’altra email",
+    "verificando": "Verifica del link…",
+    "invalido_titulo": "Link non valido",
+    "invalido_texto": "Il link è scaduto o è già stato usato. Richiedine uno nuovo per continuare.",
+    "pedir_otro": "Richiedi un nuovo link",
+    "nueva_titulo": "Crea la tua nuova password",
+    "nueva_subtitulo": "Account: {{correo}}",
+    "guardar": "Salva password",
+    "actualizada": "Password aggiornata.",
+    "listo_titulo": "Password aggiornata",
+    "listo_texto": "Ora puoi accedere con la nuova password, qui o nell’app.",
+    "continuar": "Continua",
+    "errores": {
+      "correo_invalido": "Inserisci un’email valida.",
+      "limite": "Hai già richiesto diversi link. Attendi qualche minuto e riprova.",
+      "red": "Nessuna connessione. Controlla la rete e riprova."
+    }
+  },
+  "contrasena": {
+    "nueva": "Nuova password",
+    "confirmar": "Conferma password",
+    "fortaleza": "Sicurezza della password",
+    "nivel_0": "Scrivi una password",
+    "nivel_1": "Debole",
+    "nivel_2": "Discreta",
+    "nivel_3": "Sicura",
+    "nivel_4": "Molto sicura",
+    "req_longitud": "Almeno {{n}} caratteri",
+    "req_mayuscula": "Una lettera maiuscola (A-Z)",
+    "req_minuscula": "Una lettera minuscola (a-z)",
+    "req_numero": "Un numero (0-9)",
+    "req_simbolo": "Un simbolo, ad esempio ! @ # $ % & * -",
+    "req_sin_datos": "Non deve contenere il tuo nome né la tua email",
+    "cumple": "soddisfatto",
+    "falta": "mancante",
+    "errores": {
+      "insegura": "La password non soddisfa tutti i requisiti.",
+      "no_coinciden": "Le password non coincidono.",
+      "igual": "La nuova password deve essere diversa da quella precedente.",
+      "generico": "Impossibile aggiornare la password. Riprova."
     }
   },
   "politica": {

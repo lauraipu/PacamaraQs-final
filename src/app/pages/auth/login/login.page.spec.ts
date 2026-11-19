@@ -40,6 +40,7 @@ describe('LoginPage', () => {
             obtenerRutaInicio,
             rutaInicioPorRol,
             errorOAuth: () => null,
+            enRecuperacion: () => false,
             limpiarErrorOAuth: vi.fn()
           }
         },

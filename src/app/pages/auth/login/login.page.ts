@@ -101,6 +101,7 @@ export class LoginPage implements OnInit {
   private async redirigirSiYaAutenticado(permitido: boolean): Promise<void> {
     try {
       if (!permitido) return;
+      if (this.authService.enRecuperacion()) return;
       const destino = await this.authService.obtenerRutaInicio();
       if (destino && destino !== '/login') {
         await this.router.navigateByUrl(destino, { replaceUrl: true });

@@ -4,6 +4,7 @@ import { App } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
+import { environment } from '../../../environments/environment';
 import { SupabaseService } from './supabase';
 
 /** Deep link de regreso del OAuth en la APK (Supabase → Redirect URLs + AndroidManifest). */
@@ -17,6 +18,9 @@ export interface UsuarioActual {
   email: string;
   nombre: string;
 }
+
+/** Ruta a la que llega el enlace del correo de recuperación de contraseña. */
+export const RUTA_NUEVA_CONTRASENA = '/nueva-contrasena';
 
 /** Versión de la política de privacidad aceptada en el registro. */
 export const VERSION_POLITICA = '1.0';
@@ -39,6 +43,9 @@ export class AuthService {
   private readonly _versionPolitica = signal<string | null | undefined>(undefined);
   private readonly _errorOAuth = signal<ErrorOAuth | null>(null);
   readonly errorOAuth = this._errorOAuth.asReadonly();
+  /** true mientras hay una sesión abierta desde el enlace de recuperación. */
+  private readonly _enRecuperacion = signal(false);
+  readonly enRecuperacion = this._enRecuperacion.asReadonly();
 
   readonly usuario = this._usuario.asReadonly();
   readonly rol = this._rol.asReadonly();
@@ -187,6 +194,28 @@ export class AuthService {
     return data;
   }
 
+  /* ── Recuperación de contraseña ───────────────────────────────────────
+   * El enlace del correo siempre abre la versión web (Vercel): funciona
+   * aunque el correo se lea en otro dispositivo y no depende de que el
+   * celular abra la app. Allí se define la contraseña nueva y luego se
+   * entra normalmente desde la app.
+   * Supabase → Auth → URL Configuration → Redirect URLs debe incluir
+   * `${environment.urlWeb}/nueva-contrasena` (y localhost en desarrollo).
+   */
+  async solicitarRecuperacion(email: string): Promise<void> {
+    const base = Capacitor.isNativePlatform() ? environment.urlWeb : window.location.origin;
+    const { error } = await this.supabase.client.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${base}${RUTA_NUEVA_CONTRASENA}`
+    });
+    if (error) throw error;
+  }
+
+  async actualizarContrasena(contrasena: string): Promise<void> {
+    const { error } = await this.supabase.client.auth.updateUser({ password: contrasena });
+    if (error) throw error;
+    this._enRecuperacion.set(false);
+  }
+
   async signOut(): Promise<void> {
     const { error } = await this.supabase.client.auth.signOut();
     this.limpiarEstado();
@@ -265,6 +294,16 @@ export class AuthService {
       return;
     }
 
+    if (evento === 'PASSWORD_RECOVERY') {
+      this._enRecuperacion.set(true);
+      // Si Supabase devolvió a otra ruta (p. ej. la URL del sitio), se lleva al formulario.
+      setTimeout(() => {
+        if (!this.router.url.startsWith(RUTA_NUEVA_CONTRASENA)) {
+          void this.router.navigateByUrl(RUTA_NUEVA_CONTRASENA, { replaceUrl: true });
+        }
+      }, 0);
+    }
+
     const anterior = this._usuario();
     this._usuario.set(this.mapearUsuario(sesion.user));
 
@@ -300,6 +339,7 @@ export class AuthService {
   }
 
   private limpiarEstado(): void {
+    this._enRecuperacion.set(false);
     this._usuario.set(null);
     this._rol.set(null);
     this._versionPolitica.set(undefined);
