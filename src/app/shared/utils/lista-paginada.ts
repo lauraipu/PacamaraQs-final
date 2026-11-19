@@ -1,5 +1,5 @@
 import { computed, signal } from '@angular/core';
-import { Pagina } from '../data-access/admin.models';
+import { Pagina } from './pagina';
 
 type Cargador<T, F> = (filtro: F, limite: number, desde: number) => Promise<Pagina<T>>;
 

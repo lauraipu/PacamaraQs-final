@@ -23,10 +23,7 @@ export const ESTADOS_ELIMINABLES: readonly EstadoSesionAdmin[] = ['esperando', '
 /** Límite de base de datos del plan gratuito de Supabase (500 MB). */
 export const LIMITE_BD_BYTES = 500 * 1024 * 1024;
 
-export interface Pagina<T> {
-  total: number;
-  filas: T[];
-}
+export type { Pagina } from '@shared/utils/pagina';
 
 export interface ActividadDia {
   dia: Date;

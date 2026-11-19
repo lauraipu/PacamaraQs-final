@@ -8,8 +8,8 @@ import { AdminRepository } from '../data-access/admin.repository';
 import {
   AdminEvento, FiltroAuditoria, OPERACIONES_AUDITORIA, OperacionAuditoria, TABLAS_AUDITORIA, TablaAuditoria
 } from '../data-access/admin.models';
-import { formatearFecha } from './formato';
-import { ListaPaginada } from './lista-paginada';
+import { formatearFecha } from '@shared/utils/formato';
+import { ListaPaginada } from '@shared/utils/lista-paginada';
 
 addIcons({ refreshOutline, cloudOfflineOutline, searchOutline, lockClosedOutline });
 

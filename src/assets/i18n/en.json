@@ -23,7 +23,9 @@
       "mensaje": "Are you sure you want to sign out?",
       "cancelar": "Cancel",
       "confirmar": "Sign out"
-    }
+    },
+    "si": "Yes",
+    "no": "No"
   },
   "login": {
     "titulo": "PacamaraQS",

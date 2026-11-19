@@ -14,8 +14,8 @@ import { AvisosService } from '@core/errores/avisos.service';
 import { AuthService } from '@core/auth/auth.service';
 import { AdminRepository } from '../data-access/admin.repository';
 import { AdminUsuario, FiltroUsuarios, RolAdminVista } from '../data-access/admin.models';
-import { formatearFecha, iniciales } from './formato';
-import { ListaPaginada } from './lista-paginada';
+import { formatearFecha, iniciales } from '@shared/utils/formato';
+import { ListaPaginada } from '@shared/utils/lista-paginada';
 
 addIcons({
   refreshOutline, cloudOfflineOutline, searchOutline, shieldCheckmarkOutline, warningOutline,

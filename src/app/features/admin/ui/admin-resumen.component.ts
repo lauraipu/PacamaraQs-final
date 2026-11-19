@@ -8,7 +8,7 @@ import { AdminRepository } from '../data-access/admin.repository';
 import {
   AdminResumen, ESTADOS_SESION, FORMATOS_SESION, LIMITE_BD_BYTES
 } from '../data-access/admin.models';
-import { formatearDiaCorto, megabytes } from './formato';
+import { formatearDiaCorto, megabytes } from '@shared/utils/formato';
 
 addIcons({ refreshOutline, cloudOfflineOutline });
 

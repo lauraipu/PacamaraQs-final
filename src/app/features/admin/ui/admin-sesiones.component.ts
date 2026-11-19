@@ -9,8 +9,8 @@ import { AdminRepository } from '../data-access/admin.repository';
 import {
   AdminSesion, ESTADOS_ELIMINABLES, ESTADOS_SESION, EstadoSesionAdmin, FiltroSesiones
 } from '../data-access/admin.models';
-import { formatearFecha } from './formato';
-import { ListaPaginada } from './lista-paginada';
+import { formatearFecha } from '@shared/utils/formato';
+import { ListaPaginada } from '@shared/utils/lista-paginada';
 
 addIcons({ refreshOutline, cloudOfflineOutline, searchOutline, trashOutline });
 

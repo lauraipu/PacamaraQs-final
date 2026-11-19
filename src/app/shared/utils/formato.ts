@@ -1,3 +1,4 @@
+/** Formateo visual (fechas, tamaños, iniciales) según el idioma activo. Sin lógica de negocio. */
 const LOCALES: Record<string, string> = { es: 'es-CO', en: 'en-US', it: 'it-IT', zh: 'zh-CN' };
 
 export function localeDe(idioma: string): string {
