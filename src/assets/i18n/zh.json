@@ -45,7 +45,8 @@
       "rol": "无法验证您的角色，请重试或联系管理员。",
       "sesion": "无法验证会话，请重新登录。",
       "google_cancelado": "已取消 Google 登录。",
-      "google": "无法使用 Google 登录，请重试。"
+      "google": "无法使用 Google 登录，请重试。",
+      "desactivada": "你的账户已停用。如认为有误，请写信至 PacamaraQS@gmail.com。"
     },
     "olvidaste": "忘记密码？"
   },
@@ -762,7 +763,20 @@
       "confirmar_quitar_titulo": "取消管理员角色？",
       "confirmar_quitar_texto": "{{nombre}} 将成为杯测师并失去面板访问权限。",
       "confirmar": "确认",
-      "rol_actualizado": "完成：{{nombre}} 现在是{{rol}}。"
+      "rol_actualizado": "完成：{{nombre}} 现在是{{rol}}。",
+      "desactivado": "已停用",
+      "reactivar": "重新启用",
+      "reactivado": "{{nombre}} 可以重新登录。",
+      "editar_aria": "编辑 {{nombre}}",
+      "eliminar_aria": "删除 {{nombre}}",
+      "editar_titulo": "编辑用户",
+      "nombre": "姓名",
+      "nombre_invalido": "请输入 2 到 80 个字符。",
+      "rol": "角色",
+      "no_tu_rol": "不能更改自己的角色。",
+      "cancelar": "取消",
+      "guardar": "保存",
+      "guardado": "已保存更改。"
     },
     "sesiones": {
       "personal": "个人",
@@ -772,7 +786,8 @@
       "evaluaciones": "评估",
       "muestras": "样品",
       "creada": "创建于",
-      "filtro_estado": "状态"
+      "filtro_estado": "状态",
+      "eliminar_aria": "删除会话 {{nombre}}"
     },
     "auditoria": {
       "filtro_tabla": "类型",
@@ -788,13 +803,26 @@
         "INSERT": "创建",
         "UPDATE": "更新",
         "DELETE": "删除",
-        "CAMBIO_ROL": "角色变更"
+        "CAMBIO_ROL": "角色变更",
+        "EDICION": "编辑",
+        "DESACTIVACION": "停用",
+        "REACTIVACION": "重新启用",
+        "ELIMINACION": "删除"
       },
       "sistema": "系统",
       "nota_privacidad": "为保护隐私，不显示杯测师的分数和答案。",
       "muestra": "样品 {{n}}",
       "listo": "已就绪",
       "no_listo": "未就绪"
+    },
+    "eliminar": {
+      "titulo": "确认删除？",
+      "confirmar": "删除",
+      "usuario_texto": "确定要删除 {{nombre}} 吗？此操作无法撤销。如果该用户已有评估或会话，将停用其账户以保留历史记录。",
+      "sesion_texto": "确定要删除会话\"{{nombre}}\"吗？其样品、参与者和评估都将被删除。此操作无法撤销。",
+      "usuario_eliminado": "{{nombre}} 已删除。",
+      "usuario_desactivado": "{{nombre}} 有历史记录：账户已停用，无法再登录。",
+      "sesion_eliminada": "会话\"{{nombre}}\"已删除。"
     }
   },
   "estado": {

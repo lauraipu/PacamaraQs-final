@@ -45,7 +45,8 @@
       "rol": "Impossibile verificare il tuo ruolo. Riprova o contatta l'amministratore.",
       "sesion": "Impossibile convalidare la sessione. Accedi di nuovo.",
       "google_cancelado": "Accesso con Google annullato.",
-      "google": "Impossibile accedere con Google. Riprova."
+      "google": "Impossibile accedere con Google. Riprova.",
+      "desactivada": "Il tuo account è disattivato. Scrivi a PacamaraQS@gmail.com se pensi sia un errore."
     },
     "olvidaste": "Hai dimenticato la password?"
   },
@@ -762,7 +763,20 @@
       "confirmar_quitar_titulo": "Rimuovere il ruolo di amministratore?",
       "confirmar_quitar_texto": "{{nombre}} diventerà assaggiatore e perderà l'accesso al pannello.",
       "confirmar": "Conferma",
-      "rol_actualizado": "Fatto: {{nombre}} ora è {{rol}}."
+      "rol_actualizado": "Fatto: {{nombre}} ora è {{rol}}.",
+      "desactivado": "Disattivato",
+      "reactivar": "Riattiva",
+      "reactivado": "{{nombre}} può accedere di nuovo.",
+      "editar_aria": "Modifica {{nombre}}",
+      "eliminar_aria": "Elimina {{nombre}}",
+      "editar_titulo": "Modifica utente",
+      "nombre": "Nome",
+      "nombre_invalido": "Scrivi da 2 a 80 caratteri.",
+      "rol": "Ruolo",
+      "no_tu_rol": "Non puoi cambiare il tuo ruolo.",
+      "cancelar": "Annulla",
+      "guardar": "Salva",
+      "guardado": "Modifiche salvate."
     },
     "sesiones": {
       "personal": "Personale",
@@ -772,7 +786,8 @@
       "evaluaciones": "Valutazioni",
       "muestras": "Campioni",
       "creada": "Creata",
-      "filtro_estado": "Stato"
+      "filtro_estado": "Stato",
+      "eliminar_aria": "Elimina la sessione {{nombre}}"
     },
     "auditoria": {
       "filtro_tabla": "Tipo",
@@ -788,13 +803,26 @@
         "INSERT": "Creato",
         "UPDATE": "Aggiornato",
         "DELETE": "Eliminato",
-        "CAMBIO_ROL": "Cambio ruolo"
+        "CAMBIO_ROL": "Cambio ruolo",
+        "EDICION": "Modifica",
+        "DESACTIVACION": "Disattivazione",
+        "REACTIVACION": "Riattivazione",
+        "ELIMINACION": "Eliminazione"
       },
       "sistema": "Sistema",
       "nota_privacidad": "Per privacy non vengono mostrati punteggi né risposte degli assaggiatori.",
       "muestra": "Campione {{n}}",
       "listo": "pronto",
       "no_listo": "non pronto"
+    },
+    "eliminar": {
+      "titulo": "Eliminare?",
+      "confirmar": "Elimina",
+      "usuario_texto": "Sei sicuro di voler eliminare {{nombre}}? L'azione non si può annullare. Se ha già valutazioni o sessioni, l'account verrà disattivato per conservare lo storico.",
+      "sesion_texto": "Sei sicuro di voler eliminare la sessione \"{{nombre}}\"? Verranno rimossi campioni, partecipanti e valutazioni. L'azione non si può annullare.",
+      "usuario_eliminado": "{{nombre}} è stato eliminato.",
+      "usuario_desactivado": "{{nombre}} aveva uno storico: l'account è stato disattivato e non può più accedere.",
+      "sesion_eliminada": "La sessione \"{{nombre}}\" è stata eliminata."
     }
   },
   "estado": {

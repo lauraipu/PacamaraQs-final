@@ -3,13 +3,16 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { IonButton, IonIcon, IonSearchbar, IonSelect, IonSelectOption, IonSpinner } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
-import { cloudOfflineOutline, refreshOutline, searchOutline } from 'ionicons/icons';
+import { cloudOfflineOutline, refreshOutline, searchOutline, trashOutline } from 'ionicons/icons';
+import { AvisosService } from '../../../core/avisos/avisos.service';
 import { AdminRepository } from '../data-access/admin.repository';
-import { AdminSesion, ESTADOS_SESION, EstadoSesionAdmin, FiltroSesiones } from '../data-access/admin.models';
+import {
+  AdminSesion, ESTADOS_ELIMINABLES, ESTADOS_SESION, EstadoSesionAdmin, FiltroSesiones
+} from '../data-access/admin.models';
 import { formatearFecha } from './formato';
 import { ListaPaginada } from './lista-paginada';
 
-addIcons({ refreshOutline, cloudOfflineOutline, searchOutline });
+addIcons({ refreshOutline, cloudOfflineOutline, searchOutline, trashOutline });
 
 /**
  * Pestaña "Sesiones": todas las cataciones con su estado y avance.
@@ -24,6 +27,12 @@ addIcons({ refreshOutline, cloudOfflineOutline, searchOutline });
   styles: [`
     .se-cabeza { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 8px; }
     .se-ident { min-width: 0; flex: 1 1 220px; }
+    .se-lado { display: flex; align-items: center; gap: 4px; }
+    .se-eliminar {
+      --color: var(--app-error); --padding-start: 0; --padding-end: 0;
+      width: 40px; height: 40px; margin: 0;
+    }
+    .se-eliminar ion-icon { font-size: 20px; }
   `],
   template: `
     <div class="ad-filtros">
@@ -64,10 +73,22 @@ addIcons({ refreshOutline, cloudOfflineOutline, searchOutline });
                 <p class="ad-fila__titulo">{{ s.nombre }}</p>
                 <p class="ad-fila__sub">{{ 'admin.sesiones.organizador' | transloco }}: {{ s.organizador }}</p>
               </div>
-              <div class="ad-chips">
-                <span class="ad-chip">{{ 'admin.formatos.' + s.formato | transloco }}</span>
-                @if (s.esPersonal) { <span class="ad-chip">{{ 'admin.sesiones.personal' | transloco }}</span> }
-                <span [class]="'ad-chip ' + claseEstado(s.estado)">{{ 'admin.estados.' + s.estado | transloco }}</span>
+              <div class="se-lado">
+                <div class="ad-chips">
+                  <span class="ad-chip">{{ 'admin.formatos.' + s.formato | transloco }}</span>
+                  @if (s.esPersonal) { <span class="ad-chip">{{ 'admin.sesiones.personal' | transloco }}</span> }
+                  <span [class]="'ad-chip ' + claseEstado(s.estado)">{{ 'admin.estados.' + s.estado | transloco }}</span>
+                </div>
+                @if (sePuedeEliminar(s)) {
+                  <ion-button fill="clear" size="small" class="se-eliminar" [disabled]="eliminando() === s.id"
+                    (click)="eliminar(s)" [attr.aria-label]="'admin.sesiones.eliminar_aria' | transloco: { nombre: s.nombre }">
+                    @if (eliminando() === s.id) {
+                      <ion-spinner name="crescent"></ion-spinner>
+                    } @else {
+                      <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true"></ion-icon>
+                    }
+                  </ion-button>
+                }
               </div>
             </div>
             <dl class="ad-datos">
@@ -93,6 +114,7 @@ addIcons({ refreshOutline, cloudOfflineOutline, searchOutline });
 })
 export class AdminSesionesComponent implements OnInit {
   private readonly repo = inject(AdminRepository);
+  private readonly avisos = inject(AvisosService);
   private readonly transloco = inject(TranslocoService);
   private readonly idioma = toSignal(this.transloco.langChanges$, { initialValue: this.transloco.getActiveLang() });
 
@@ -100,6 +122,7 @@ export class AdminSesionesComponent implements OnInit {
   readonly lista = new ListaPaginada<AdminSesion, FiltroSesiones>((f, l, d) => this.repo.listarSesiones(f, l, d));
   readonly busqueda = signal('');
   readonly estado = signal<'todos' | EstadoSesionAdmin>('todos');
+  readonly eliminando = signal<string | null>(null);
 
   ngOnInit(): void {
     void this.recargar();
@@ -121,6 +144,33 @@ export class AdminSesionesComponent implements OnInit {
 
   masResultados(): Promise<void> {
     return this.lista.siguiente(this.filtro());
+  }
+
+  /** Las completadas y canceladas son historial: no se ofrecen para borrar. */
+  sePuedeEliminar(sesion: AdminSesion): boolean {
+    return ESTADOS_ELIMINABLES.includes(sesion.estado);
+  }
+
+  async eliminar(sesion: AdminSesion): Promise<void> {
+    const ok = await this.avisos.confirmar({
+      titulo: 'admin.eliminar.titulo',
+      mensaje: 'admin.eliminar.sesion_texto',
+      confirmar: 'admin.eliminar.confirmar',
+      peligro: true,
+      params: { nombre: sesion.nombre }
+    });
+    if (!ok) return;
+
+    this.eliminando.set(sesion.id);
+    try {
+      await this.repo.eliminarSesion(sesion.id);
+      await this.recargar();
+      await this.avisos.exito('admin.eliminar.sesion_eliminada', { nombre: sesion.nombre });
+    } catch (error) {
+      await this.avisos.error(error);
+    } finally {
+      this.eliminando.set(null);
+    }
   }
 
   claseEstado(estado: EstadoSesionAdmin): string {

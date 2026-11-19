@@ -139,6 +139,7 @@ export class LoginPage implements OnInit {
     const mensaje = mensajeDeError(error, this.t(generico));
     if (/invalid login credentials/i.test(mensaje)) return this.t('login.errores.credenciales');
     if (/email not confirmed/i.test(mensaje)) return this.t('login.errores.no_confirmado');
+    if (/banned/i.test(mensaje)) return this.t('login.errores.desactivada');
     if (/failed to fetch|network/i.test(mensaje)) return this.t('login.errores.red');
     return mensaje;
   }

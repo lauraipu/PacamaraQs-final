@@ -45,7 +45,8 @@
       "rol": "No se pudo verificar tu rol. Intenta de nuevo o contacta al administrador.",
       "sesion": "No se pudo validar la sesión. Inicia sesión nuevamente.",
       "google_cancelado": "Se canceló el inicio de sesión con Google.",
-      "google": "No se pudo iniciar sesión con Google. Intenta de nuevo."
+      "google": "No se pudo iniciar sesión con Google. Intenta de nuevo.",
+      "desactivada": "Tu cuenta está desactivada. Escribe a PacamaraQS@gmail.com si crees que es un error."
     },
     "olvidaste": "¿Olvidaste tu contraseña?"
   },
@@ -762,7 +763,20 @@
       "confirmar_quitar_titulo": "¿Quitar rol de administrador?",
       "confirmar_quitar_texto": "{{nombre}} pasará a ser catador y perderá el acceso al panel.",
       "confirmar": "Confirmar",
-      "rol_actualizado": "Listo: {{nombre}} ahora es {{rol}}."
+      "rol_actualizado": "Listo: {{nombre}} ahora es {{rol}}.",
+      "desactivado": "Desactivado",
+      "reactivar": "Reactivar",
+      "reactivado": "{{nombre}} puede volver a entrar.",
+      "editar_aria": "Editar a {{nombre}}",
+      "eliminar_aria": "Eliminar a {{nombre}}",
+      "editar_titulo": "Editar usuario",
+      "nombre": "Nombre",
+      "nombre_invalido": "Escribe entre 2 y 80 caracteres.",
+      "rol": "Rol",
+      "no_tu_rol": "No puedes cambiar tu propio rol.",
+      "cancelar": "Cancelar",
+      "guardar": "Guardar",
+      "guardado": "Cambios guardados."
     },
     "sesiones": {
       "personal": "Personal",
@@ -772,7 +786,8 @@
       "evaluaciones": "Evaluaciones",
       "muestras": "Muestras",
       "creada": "Creada",
-      "filtro_estado": "Estado"
+      "filtro_estado": "Estado",
+      "eliminar_aria": "Eliminar la sesión {{nombre}}"
     },
     "auditoria": {
       "filtro_tabla": "Tipo",
@@ -788,13 +803,26 @@
         "INSERT": "Creó",
         "UPDATE": "Actualizó",
         "DELETE": "Eliminó",
-        "CAMBIO_ROL": "Cambio de rol"
+        "CAMBIO_ROL": "Cambio de rol",
+        "EDICION": "Edición",
+        "DESACTIVACION": "Desactivación",
+        "REACTIVACION": "Reactivación",
+        "ELIMINACION": "Eliminación"
       },
       "sistema": "Sistema",
       "nota_privacidad": "Por privacidad no se muestran puntajes ni respuestas de los catadores.",
       "muestra": "Muestra {{n}}",
       "listo": "listo",
       "no_listo": "no listo"
+    },
+    "eliminar": {
+      "titulo": "¿Eliminar?",
+      "confirmar": "Eliminar",
+      "usuario_texto": "¿Estás seguro de que deseas eliminar a {{nombre}}? Esta acción no se puede deshacer. Si ya tiene evaluaciones o sesiones, se desactivará su cuenta para conservar el historial.",
+      "sesion_texto": "¿Estás seguro de que deseas eliminar la sesión \"{{nombre}}\"? Se borrarán sus muestras, participantes y evaluaciones. Esta acción no se puede deshacer.",
+      "usuario_eliminado": "{{nombre}} fue eliminado.",
+      "usuario_desactivado": "{{nombre}} tenía historial: su cuenta quedó desactivada y ya no puede entrar.",
+      "sesion_eliminada": "La sesión \"{{nombre}}\" fue eliminada."
     }
   },
   "estado": {

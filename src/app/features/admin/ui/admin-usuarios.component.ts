@@ -1,12 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
-  IonButton, IonIcon, IonSearchbar, IonSegment, IonSegmentButton, IonLabel, IonSpinner
+  IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonModal, IonSearchbar,
+  IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar
 } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import {
-  cloudOfflineOutline, refreshOutline, searchOutline, shieldCheckmarkOutline, warningOutline
+  banOutline, closeOutline, cloudOfflineOutline, createOutline, refreshOutline, searchOutline,
+  shieldCheckmarkOutline, trashOutline, warningOutline
 } from 'ionicons/icons';
 import { AvisosService } from '../../../core/avisos/avisos.service';
 import { AuthService } from '../../../core/services/auth';
@@ -15,7 +17,10 @@ import { AdminUsuario, FiltroUsuarios, RolAdminVista } from '../data-access/admi
 import { formatearFecha, iniciales } from './formato';
 import { ListaPaginada } from './lista-paginada';
 
-addIcons({ refreshOutline, cloudOfflineOutline, searchOutline, shieldCheckmarkOutline, warningOutline });
+addIcons({
+  refreshOutline, cloudOfflineOutline, searchOutline, shieldCheckmarkOutline, warningOutline,
+  createOutline, trashOutline, closeOutline, banOutline
+});
 
 type FiltroRol = 'todos' | RolAdminVista;
 
@@ -23,7 +28,10 @@ type FiltroRol = 'todos' | RolAdminVista;
 @Component({
   selector: 'app-admin-usuarios',
   standalone: true,
-  imports: [IonButton, IonIcon, IonSearchbar, IonSegment, IonSegmentButton, IonLabel, IonSpinner, TranslocoPipe],
+  imports: [
+    IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonModal, IonSearchbar,
+    IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar, TranslocoPipe
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./admin-comun.scss', './admin-usuarios.component.scss'],
   template: `
@@ -57,7 +65,7 @@ type FiltroRol = 'todos' | RolAdminVista;
     } @else {
       <ul class="ad-lista">
         @for (u of lista.filas(); track u.id) {
-          <li class="ad-fila us-fila">
+          <li class="ad-fila us-fila" [class.us-fila--inactiva]="!u.activo">
             <div class="us-cabeza">
               <span class="us-avatar" aria-hidden="true">{{ inicialesDe(u.nombre) }}</span>
               <div class="us-ident">
@@ -70,6 +78,9 @@ type FiltroRol = 'todos' | RolAdminVista;
                   <span class="ad-chip ad-chip--ok"><ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon>{{ 'admin.usuarios.dos_pasos' | transloco }}</span>
                 } @else if (u.rol === 'administrador') {
                   <span class="ad-chip ad-chip--alerta"><ion-icon name="warning-outline" aria-hidden="true"></ion-icon>{{ 'admin.usuarios.sin_dos_pasos' | transloco }}</span>
+                }
+                @if (!u.activo) {
+                  <span class="ad-chip ad-chip--error"><ion-icon name="ban-outline" aria-hidden="true"></ion-icon>{{ 'admin.usuarios.desactivado' | transloco }}</span>
                 }
                 @if (u.id === miId()) {
                   <span class="ad-chip">{{ 'admin.usuarios.tu' | transloco }}</span>
@@ -84,17 +95,33 @@ type FiltroRol = 'todos' | RolAdminVista;
               <div><dt>{{ 'admin.usuarios.alta' | transloco }}</dt><dd>{{ fecha(u.creadoEn) }}</dd></div>
             </dl>
 
-            @if (u.id !== miId()) {
-              <div class="us-acciones">
-                <ion-button size="small" fill="outline" [disabled]="cambiando() === u.id" (click)="cambiarRol(u)">
-                  @if (cambiando() === u.id) {
-                    <ion-spinner name="crescent"></ion-spinner>
-                  } @else {
-                    {{ (u.rol === 'administrador' ? 'admin.usuarios.quitar_admin' : 'admin.usuarios.hacer_admin') | transloco }}
-                  }
+            <div class="us-acciones">
+              @if (!u.activo) {
+                <ion-button size="small" fill="outline" [disabled]="ocupado() === u.id" (click)="reactivar(u)">
+                  @if (ocupado() === u.id) { <ion-spinner name="crescent"></ion-spinner> } @else { {{ 'admin.usuarios.reactivar' | transloco }} }
                 </ion-button>
-              </div>
-            }
+              } @else {
+                @if (u.id !== miId()) {
+                  <ion-button size="small" fill="outline" class="us-rol" [disabled]="ocupado() === u.id" (click)="cambiarRol(u)">
+                    @if (ocupado() === u.id) {
+                      <ion-spinner name="crescent"></ion-spinner>
+                    } @else {
+                      {{ (u.rol === 'administrador' ? 'admin.usuarios.quitar_admin' : 'admin.usuarios.hacer_admin') | transloco }}
+                    }
+                  </ion-button>
+                }
+                <ion-button size="small" fill="clear" class="us-icono" [disabled]="ocupado() === u.id"
+                  (click)="abrirEdicion(u)" [attr.aria-label]="'admin.usuarios.editar_aria' | transloco: { nombre: u.nombre }">
+                  <ion-icon slot="icon-only" name="create-outline" aria-hidden="true"></ion-icon>
+                </ion-button>
+                @if (u.id !== miId()) {
+                  <ion-button size="small" fill="clear" class="us-icono us-icono--peligro" [disabled]="ocupado() === u.id"
+                    (click)="eliminar(u)" [attr.aria-label]="'admin.usuarios.eliminar_aria' | transloco: { nombre: u.nombre }">
+                    <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true"></ion-icon>
+                  </ion-button>
+                }
+              }
+            </div>
           </li>
         }
       </ul>
@@ -107,6 +134,49 @@ type FiltroRol = 'todos' | RolAdminVista;
         </div>
       }
     }
+
+    <ion-modal class="us-modal modal-compacto" [isOpen]="!!edicion()" (didDismiss)="cerrarEdicion()">
+      <ng-template>
+        <ion-header class="ion-no-border">
+          <ion-toolbar>
+            <ion-title>{{ 'admin.usuarios.editar_titulo' | transloco }}</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="cerrarEdicion()" [attr.aria-label]="'admin.usuarios.cancelar' | transloco">
+                <ion-icon slot="icon-only" name="close-outline" aria-hidden="true"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding us-modal__contenido">
+          @if (edicion(); as e) {
+            <form class="us-form" (submit)="$event.preventDefault(); guardarEdicion()">
+              <p class="ad-fila__sub">{{ e.email }}</p>
+              <ion-input class="custom-input" fill="outline" labelPlacement="stacked"
+                [label]="'admin.usuarios.nombre' | transloco" [value]="nombreEdicion()"
+                (ionInput)="nombreEdicion.set($any($event).detail.value ?? '')"
+                [maxlength]="80" autocomplete="off" required
+                [errorText]="'admin.usuarios.nombre_invalido' | transloco"
+                [class.ion-invalid]="!nombreValido()" [class.ion-touched]="!nombreValido()"></ion-input>
+              <ion-select class="us-select" fill="outline" labelPlacement="stacked" interface="popover"
+                [label]="'admin.usuarios.rol' | transloco" [value]="rolEdicion()"
+                [disabled]="e.id === miId()" (ionChange)="rolEdicion.set($any($event).detail.value)">
+                <ion-select-option value="catador">{{ 'admin.roles.catador' | transloco }}</ion-select-option>
+                <ion-select-option value="administrador">{{ 'admin.roles.administrador' | transloco }}</ion-select-option>
+              </ion-select>
+              @if (e.id === miId()) {
+                <p class="ad-fila__sub">{{ 'admin.usuarios.no_tu_rol' | transloco }}</p>
+              }
+              <div class="us-form__acciones">
+                <ion-button fill="outline" type="button" (click)="cerrarEdicion()">{{ 'admin.usuarios.cancelar' | transloco }}</ion-button>
+                <ion-button class="primary-btn" type="submit" [disabled]="guardando() || !nombreValido()">
+                  @if (guardando()) { <ion-spinner name="crescent"></ion-spinner> } @else { {{ 'admin.usuarios.guardar' | transloco }} }
+                </ion-button>
+              </div>
+            </form>
+          }
+        </ion-content>
+      </ng-template>
+    </ion-modal>
   `
 })
 export class AdminUsuariosComponent implements OnInit {
@@ -119,7 +189,15 @@ export class AdminUsuariosComponent implements OnInit {
   readonly lista = new ListaPaginada<AdminUsuario, FiltroUsuarios>((f, l, d) => this.repo.listarUsuarios(f, l, d));
   readonly busqueda = signal('');
   readonly rol = signal<FiltroRol>('todos');
-  readonly cambiando = signal<string | null>(null);
+  readonly ocupado = signal<string | null>(null);
+  readonly edicion = signal<AdminUsuario | null>(null);
+  readonly nombreEdicion = signal('');
+  readonly rolEdicion = signal<RolAdminVista>('catador');
+  readonly guardando = signal(false);
+  readonly nombreValido = computed(() => {
+    const largo = this.nombreEdicion().trim().length;
+    return largo >= 2 && largo <= 80;
+  });
   readonly miId = () => this.auth.usuario()?.id ?? null;
 
   ngOnInit(): void {
@@ -156,7 +234,7 @@ export class AdminUsuariosComponent implements OnInit {
     });
     if (!ok) return;
 
-    this.cambiando.set(usuario.id);
+    this.ocupado.set(usuario.id);
     try {
       await this.repo.cambiarRol(usuario.id, nuevo);
       if (this.rol() !== 'todos') {
@@ -171,7 +249,70 @@ export class AdminUsuariosComponent implements OnInit {
     } catch (error) {
       await this.avisos.error(error);
     } finally {
-      this.cambiando.set(null);
+      this.ocupado.set(null);
+    }
+  }
+
+  abrirEdicion(usuario: AdminUsuario): void {
+    this.nombreEdicion.set(usuario.nombre === usuario.email ? '' : usuario.nombre);
+    this.rolEdicion.set(usuario.rol);
+    this.edicion.set(usuario);
+  }
+
+  cerrarEdicion(): void {
+    if (!this.guardando()) this.edicion.set(null);
+  }
+
+  async guardarEdicion(): Promise<void> {
+    const usuario = this.edicion();
+    if (!usuario || this.guardando() || !this.nombreValido()) return;
+    this.guardando.set(true);
+    try {
+      await this.repo.editarUsuario(usuario.id, this.nombreEdicion(), this.rolEdicion());
+      this.guardando.set(false);
+      this.edicion.set(null);
+      await this.recargar();
+      await this.avisos.exito('admin.usuarios.guardado');
+    } catch (error) {
+      await this.avisos.error(error);
+    } finally {
+      this.guardando.set(false);
+    }
+  }
+
+  async eliminar(usuario: AdminUsuario): Promise<void> {
+    const ok = await this.avisos.confirmar({
+      titulo: 'admin.eliminar.titulo',
+      mensaje: 'admin.eliminar.usuario_texto',
+      confirmar: 'admin.eliminar.confirmar',
+      peligro: true,
+      params: { nombre: usuario.nombre }
+    });
+    if (!ok) return;
+
+    this.ocupado.set(usuario.id);
+    try {
+      const resultado = await this.repo.eliminarUsuario(usuario.id);
+      await this.recargar();
+      await this.avisos.exito(resultado === 'eliminado' ? 'admin.eliminar.usuario_eliminado' : 'admin.eliminar.usuario_desactivado',
+        { nombre: usuario.nombre });
+    } catch (error) {
+      await this.avisos.error(error);
+    } finally {
+      this.ocupado.set(null);
+    }
+  }
+
+  async reactivar(usuario: AdminUsuario): Promise<void> {
+    this.ocupado.set(usuario.id);
+    try {
+      await this.repo.reactivarUsuario(usuario.id);
+      this.lista.actualizar(f => f.id === usuario.id, f => ({ ...f, activo: true, desactivadoEn: null }));
+      await this.avisos.exito('admin.usuarios.reactivado', { nombre: usuario.nombre });
+    } catch (error) {
+      await this.avisos.error(error);
+    } finally {
+      this.ocupado.set(null);
     }
   }
 

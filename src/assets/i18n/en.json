@@ -45,7 +45,8 @@
       "rol": "Your role could not be verified. Try again or contact the administrator.",
       "sesion": "Your session could not be validated. Please sign in again.",
       "google_cancelado": "Google sign-in was cancelled.",
-      "google": "Could not sign in with Google. Please try again."
+      "google": "Could not sign in with Google. Please try again.",
+      "desactivada": "Your account is deactivated. Write to PacamaraQS@gmail.com if you think this is a mistake."
     },
     "olvidaste": "Forgot your password?"
   },
@@ -762,7 +763,20 @@
       "confirmar_quitar_titulo": "Remove administrator role?",
       "confirmar_quitar_texto": "{{nombre}} will become a cupper and lose access to the panel.",
       "confirmar": "Confirm",
-      "rol_actualizado": "Done: {{nombre}} is now {{rol}}."
+      "rol_actualizado": "Done: {{nombre}} is now {{rol}}.",
+      "desactivado": "Deactivated",
+      "reactivar": "Reactivate",
+      "reactivado": "{{nombre}} can sign in again.",
+      "editar_aria": "Edit {{nombre}}",
+      "eliminar_aria": "Delete {{nombre}}",
+      "editar_titulo": "Edit user",
+      "nombre": "Name",
+      "nombre_invalido": "Enter 2 to 80 characters.",
+      "rol": "Role",
+      "no_tu_rol": "You cannot change your own role.",
+      "cancelar": "Cancel",
+      "guardar": "Save",
+      "guardado": "Changes saved."
     },
     "sesiones": {
       "personal": "Personal",
@@ -772,7 +786,8 @@
       "evaluaciones": "Evaluations",
       "muestras": "Samples",
       "creada": "Created",
-      "filtro_estado": "Status"
+      "filtro_estado": "Status",
+      "eliminar_aria": "Delete session {{nombre}}"
     },
     "auditoria": {
       "filtro_tabla": "Type",
@@ -788,13 +803,26 @@
         "INSERT": "Created",
         "UPDATE": "Updated",
         "DELETE": "Deleted",
-        "CAMBIO_ROL": "Role change"
+        "CAMBIO_ROL": "Role change",
+        "EDICION": "Edit",
+        "DESACTIVACION": "Deactivation",
+        "REACTIVACION": "Reactivation",
+        "ELIMINACION": "Deletion"
       },
       "sistema": "System",
       "nota_privacidad": "For privacy, cuppers' scores and answers are not shown.",
       "muestra": "Sample {{n}}",
       "listo": "ready",
       "no_listo": "not ready"
+    },
+    "eliminar": {
+      "titulo": "Delete?",
+      "confirmar": "Delete",
+      "usuario_texto": "Are you sure you want to delete {{nombre}}? This cannot be undone. If they already have evaluations or sessions, their account will be deactivated to keep the history.",
+      "sesion_texto": "Are you sure you want to delete the session \"{{nombre}}\"? Its samples, participants and evaluations will be removed. This cannot be undone.",
+      "usuario_eliminado": "{{nombre}} was deleted.",
+      "usuario_desactivado": "{{nombre}} had history: the account was deactivated and can no longer sign in.",
+      "sesion_eliminada": "The session \"{{nombre}}\" was deleted."
     }
   },
   "estado": {

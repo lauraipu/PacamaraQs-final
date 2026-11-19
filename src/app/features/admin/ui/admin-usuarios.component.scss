@@ -26,5 +26,41 @@
 
 .us-ident { min-width: 0; }
 
-.us-acciones { display: flex; justify-content: flex-end; }
-.us-acciones ion-button { min-width: 180px; }
+.us-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.us-rol { min-width: 180px; }
+
+.us-icono {
+  --color: var(--app-primary-dark);
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+
+  ion-icon { font-size: 20px; }
+}
+
+.us-icono--peligro { --color: var(--app-error); }
+
+.us-fila--inactiva { background: var(--app-bg-subtle); }
+.us-fila--inactiva .ad-fila__titulo { color: var(--app-text-muted); }
+
+.us-modal { --width: min(480px, 100vw); --height: min(440px, 100vh); --border-radius: var(--app-radius-card); }
+.us-modal__contenido { --background: var(--app-bg-screen); }
+
+.us-form { display: grid; gap: 14px; }
+.us-select { --border-radius: var(--app-radius-control); }
+
+.us-form__acciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}

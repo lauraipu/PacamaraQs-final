@@ -144,9 +144,13 @@ export class AdminAuditoriaComponent implements OnInit {
 
   claseOperacion(operacion: string): string {
     switch (operacion) {
-      case 'INSERT': return 'ad-chip--ok';
-      case 'DELETE': return 'ad-chip--error';
-      case 'CAMBIO_ROL': return 'ad-chip--oscuro';
+      case 'INSERT':
+      case 'REACTIVACION': return 'ad-chip--ok';
+      case 'DELETE':
+      case 'ELIMINACION':
+      case 'DESACTIVACION': return 'ad-chip--error';
+      case 'CAMBIO_ROL':
+      case 'EDICION': return 'ad-chip--oscuro';
       default: return '';
     }
   }
@@ -155,6 +159,17 @@ export class AdminAuditoriaComponent implements OnInit {
   detalle(e: AdminEvento): string {
     const d = e.datos;
     const texto = (clave: string) => (typeof d[clave] === 'string' ? d[clave] as string : null);
+    if (e.operacion === 'EDICION') {
+      const cambios: string[] = [];
+      if (texto('nombre_anterior') !== texto('nombre_nuevo')) cambios.push(`${texto('nombre_anterior')} → ${texto('nombre_nuevo')}`);
+      if (texto('rol_anterior') !== texto('rol_nuevo')) {
+        cambios.push(`${this.transloco.translate(`admin.roles.${texto('rol_anterior')}`)} → ${this.transloco.translate(`admin.roles.${texto('rol_nuevo')}`)}`);
+      }
+      return cambios.join(' · ');
+    }
+    if (e.operacion === 'DESACTIVACION' || e.operacion === 'ELIMINACION') {
+      return texto('nombre') ?? texto('email') ?? '';
+    }
     if (e.operacion === 'CAMBIO_ROL') {
       const antes = texto('rol_anterior');
       const despues = texto('rol_nuevo');

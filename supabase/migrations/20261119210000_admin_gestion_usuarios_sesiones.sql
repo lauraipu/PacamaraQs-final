@@ -1,0 +1,18 @@
+-- Fase 3 · Gestión desde el panel: editar/eliminar usuarios y eliminar sesiones.
+-- Aplicada en Supabase el 2026-11-19 (migración admin_gestion_usuarios_sesiones).
+-- Ver el texto completo con:  select pg_get_functiondef('public.admin_eliminar_usuario'::regproc);
+--
+-- Resumen de reglas:
+--  · usuarios.activo / desactivado_en: borrado lógico para cuentas con historial.
+--  · es_usuario_real() exige activo = true (corta el acceso de inmediato vía RLS).
+--  · admin_editar_usuario(p_id, p_nombre, p_rol): nombre 2–80, sin cambiar el propio rol,
+--    un desactivado no puede ser administrador; queda en auditoría (EDICION).
+--  · admin_eliminar_usuario(p_id) → 'eliminado' | 'desactivado':
+--      sin historial  → DELETE auth.users (cascada a usuarios, participantes, uso_escaner)
+--      con historial  → activo=false, rol catador, banned_until +100 años, cierra sesiones
+--                       abiertas y lo saca de salas en espera. No puede eliminarse a sí mismo.
+--  · admin_reactivar_usuario(p_id): revierte la desactivación.
+--  · admin_eliminar_sesion(p_id): solo 'esperando' o 'en_progreso'; ON DELETE CASCADE
+--    limpia muestras, participantes, evaluaciones, cierres y fichas extrínsecas.
+--  · admin_listar_usuarios devuelve además activo y desactivado_en.
+-- Todas validan exigir_admin() (rol administrador + sesión aal2).

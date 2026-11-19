@@ -352,7 +352,7 @@ ion-modal.guia-modal .ion-page { position: relative; contain: content; }
     --max-width: 420px;
   }
 
-  ion-modal:not(.guia-modal):not(.modal-sheet):not(.modal-card) {
+  ion-modal:not(.guia-modal):not(.modal-sheet):not(.modal-card):not(.modal-compacto) {
     --width: min(720px, 92vw);
     --height: min(86vh, 860px);
     --border-radius: var(--app-radius-card, 16px);
