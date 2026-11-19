@@ -4,13 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
-import { BaseCataForm } from '../../../core/cva/base-cata-form';
-import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
+import { BaseCataForm } from '../../base-cata-form';
+import { EstadoFichaComponent } from '@shared/components/estado-ficha/estado-ficha.component';
 import { ETIQUETAS_HEDONICAS } from '@domain/cva/cva';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TrPipe } from '../../../core/i18n/tr';
-import { BotonGuiaComponent } from '../../../shared/components/boton-guia/boton-guia.component';
+import { TrPipe } from '@core/i18n/tr';
+import { BotonGuiaComponent } from '@shared/components/boton-guia/boton-guia.component';
 addIcons({ arrowBackOutline });
 
 type AtributoHedonico =

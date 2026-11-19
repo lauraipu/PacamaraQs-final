@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 import { RUEDA_SABORES, TIPOS_DEFECTO } from '@domain/cva/cva';
 import { EstadoSesion } from '@domain/sesion/sesion.model';
 import { AuthService } from '@core/auth/auth.service';
-import { FichaEvaluacion, ItemCola, OfflineSyncService } from '../../../core/services/offline-sync';
+import { FichaEvaluacion, ItemCola, OfflineSyncService } from '@core/data-access/evaluaciones/cola-offline.service';
 import { EventoSala, RealtimeService } from '@core/realtime/sala-realtime.service';
 import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { CombinedFormPage } from './combined-form.page';

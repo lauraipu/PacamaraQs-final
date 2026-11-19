@@ -10,9 +10,9 @@ import {
   documentTextOutline,
   lockClosedOutline
 } from 'ionicons/icons';
-import { BaseCataForm } from '../../../core/cva/base-cata-form';
-import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
-import { GustosPredominantesComponent } from '../../../shared/components/gustos-predominantes/gustos-predominantes.component';
+import { BaseCataForm } from '../../base-cata-form';
+import { EstadoFichaComponent } from '@shared/components/estado-ficha/estado-ficha.component';
+import { GustosPredominantesComponent } from '@shared/components/gustos-predominantes/gustos-predominantes.component';
 import {
   DESCRIPTORES_MOUTHFEEL,
   ETIQUETAS_HEDONICAS,
@@ -21,8 +21,8 @@ import {
 } from '@domain/cva/cva';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TrPipe } from '../../../core/i18n/tr';
-import { BotonGuiaComponent } from '../../../shared/components/boton-guia/boton-guia.component';
+import { TrPipe } from '@core/i18n/tr';
+import { BotonGuiaComponent } from '@shared/components/boton-guia/boton-guia.component';
 addIcons({
   arrowBackOutline,
   chevronDownOutline,

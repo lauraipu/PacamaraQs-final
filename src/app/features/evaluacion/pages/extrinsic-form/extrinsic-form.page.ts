@@ -4,15 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
-import { BaseCataForm } from '../../../core/cva/base-cata-form';
-import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
+import { BaseCataForm } from '../../base-cata-form';
+import { EstadoFichaComponent } from '@shared/components/estado-ficha/estado-ficha.component';
 import { CARACTERES_NUMERICOS, formatearNumeroEs, parsearNumeroEs } from '@domain/utils/numeros';
 import { aTitulo, divisionDe, MONEDAS, PAISES_CAFE, regionesDe, TIPOS_PROCESO } from '@domain/origenes/origenes';
-import { OpcionBuscable, SelectorBuscableComponent } from '../../../shared/components/selector-buscable/selector-buscable.component';
+import { OpcionBuscable, SelectorBuscableComponent } from '@shared/components/selector-buscable/selector-buscable.component';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TrPipe } from '../../../core/i18n/tr';
-import { BotonGuiaComponent } from '../../../shared/components/boton-guia/boton-guia.component';
+import { TrPipe } from '@core/i18n/tr';
+import { BotonGuiaComponent } from '@shared/components/boton-guia/boton-guia.component';
 /** Campos numéricos del bloque de comercio. */
 type CampoNumerico = 'farmPrice' | 'lotSizeKg';
 

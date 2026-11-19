@@ -31,7 +31,7 @@ import { SesionConRol, SesionesRepository } from '@core/data-access/sesiones/ses
 import { EstadoSesion, getFormatoById } from '@domain/sesion/sesion.model';
 import {
   ModoEscaneo, ResultadoEscaneo, ScannerModalComponent
-} from '@shared/components/scanner-modal/scanner-modal.component';
+} from '../../escaner/scanner-modal/scanner-modal.component';
 
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TrPipe } from '@core/i18n/tr';

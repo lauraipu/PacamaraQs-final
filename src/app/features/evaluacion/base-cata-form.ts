@@ -4,13 +4,13 @@ import { AlertController, NavController, ToastController } from '@ionic/angular'
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { EstadoSesion, getFormatoById } from '@domain/sesion/sesion.model';
-import { AuthService } from '../auth/auth.service';
-import { EvaluacionAtributo, FichaEvaluacion, OfflineSyncService } from '../services/offline-sync';
-import { EventoSala, RealtimeService, SalaRealtime } from '../realtime/sala-realtime.service';
-import { SesionesRepository } from '../data-access/sesiones/sesiones.repository';
-import { mensajeDeError } from '../errores/errores';
-import { AvisosService } from '../errores/avisos.service';
-import { ConSalidaControlada } from '../auth/guards/salida-formulario.guard';
+import { AuthService } from '@core/auth/auth.service';
+import { EvaluacionAtributo, FichaEvaluacion, OfflineSyncService } from '@core/data-access/evaluaciones/cola-offline.service';
+import { EventoSala, RealtimeService, SalaRealtime } from '@core/realtime/sala-realtime.service';
+import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
+import { mensajeDeError } from '@core/errores/errores';
+import { AvisosService } from '@core/errores/avisos.service';
+import { ConSalidaControlada } from '@core/auth/guards/salida-formulario.guard';
 
 const ATRIBUTOS_HEDONICOS = new Set([
   'fragancia', 'aroma', 'sabor', 'saborResidual', 'acidez', 'dulzor', 'sensacionEnBoca'

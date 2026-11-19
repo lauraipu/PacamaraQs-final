@@ -17,14 +17,13 @@ import {
   parsearNumeroEs, sanearCalidad, sanearIntensidad, sanearTazas, tituloFormatoEscaneo
 } from '@domain/escaneo/ficha-escaneada';
 import { AuthService } from '@core/auth/auth.service';
-import { ImagenPreparada, ScannerService } from '../../../core/services/scanner';
-// eslint-disable-next-line no-restricted-imports -- temporal: este modal pasa a features/evaluacion en el paso 8.
+import { ImagenPreparada, ScannerService } from '../escaner.service';
 import { SesionConRol, SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { mensajeDeError } from '@core/errores/errores';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TrPipe } from '../../../core/i18n/tr';
-import { BotonGuiaComponent } from '../boton-guia/boton-guia.component';
+import { TrPipe } from '@core/i18n/tr';
+import { BotonGuiaComponent } from '@shared/components/boton-guia/boton-guia.component';
 export type ModoEscaneo = 'sesion' | 'muestra';
 
 /** Valor de ion-input → número (acepta coma decimal); vacío → null. */

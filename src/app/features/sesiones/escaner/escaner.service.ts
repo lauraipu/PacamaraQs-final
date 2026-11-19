@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import {
   extraerJson, FichaEscaneada, FORMATOS_ESCANEO, payloadFichaPersonal, respuestaSimulada, sanearFicha
 } from '@domain/escaneo/ficha-escaneada';
-import { AuthService } from '../auth/auth.service';
-import { OfflineSyncService, ResultadoEnvio } from './offline-sync';
-import { SupabaseService } from '../supabase/supabase.client';
+import { AuthService } from '@core/auth/auth.service';
+import { OfflineSyncService, ResultadoEnvio } from '@core/data-access/evaluaciones/cola-offline.service';
+import { SupabaseService } from '@core/supabase/supabase.client';
 
 /** Edge Function de Supabase que guarda la llave de Gemini y arma el prompt. */
 const FUNCION_IA = 'analizar-ficha';

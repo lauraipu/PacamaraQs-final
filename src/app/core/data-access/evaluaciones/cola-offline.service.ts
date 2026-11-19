@@ -1,8 +1,8 @@
 import { computed, DestroyRef, effect, inject, Injectable, signal, untracked } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { esErrorPermanente, mensajeDeError } from '../errores/errores';
-import { AuthService } from '../auth/auth.service';
-import { SupabaseService } from '../supabase/supabase.client';
+import { esErrorPermanente, mensajeDeError } from '../../errores/errores';
+import { AuthService } from '../../auth/auth.service';
+import { SupabaseService } from '../../supabase/supabase.client';
 
 export interface EvaluacionAtributo {
   atributo: string;

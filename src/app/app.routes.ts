@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { salidaFormularioGuard } from '@core/auth/guards/salida-formulario.guard';
 import { authGuard } from '@core/auth/guards/auth.guard';
 import { organizerGuard } from '@core/auth/guards/organizer.guard';
 import { roleGuard } from '@core/auth/guards/role.guard';
@@ -29,32 +28,9 @@ export const routes: Routes = [
     data: { roles: ROLES_ADMIN }
   },
   {
-    path: 'affective-form/:sesionId',
-    loadComponent: () => import('./pages/evaluation/affective-form/affective-form.page').then(m => m.AffectiveFormPage),
-    canActivate: [authGuard, roleGuard],
-    canDeactivate: [salidaFormularioGuard],
-    data: { roles: ROLES_APP }
-  },
-  {
-    path: 'combined-form/:sesionId',
-    loadComponent: () => import('./pages/evaluation/combined-form/combined-form.page').then(m => m.CombinedFormPage),
-    canActivate: [authGuard, roleGuard],
-    canDeactivate: [salidaFormularioGuard],
-    data: { roles: ROLES_APP }
-  },
-  {
-    path: 'descriptive-form/:sesionId',
-    loadComponent: () => import('./pages/evaluation/descriptive-form/descriptive-form.page').then(m => m.DescriptiveFormPage),
-    canActivate: [authGuard, roleGuard],
-    canDeactivate: [salidaFormularioGuard],
-    data: { roles: ROLES_APP }
-  },
-  {
-    path: 'extrinsic-form/:sesionId',
-    loadComponent: () => import('./pages/evaluation/extrinsic-form/extrinsic-form.page').then(m => m.ExtrinsicFormPage),
-    canActivate: [authGuard, roleGuard],
-    canDeactivate: [salidaFormularioGuard],
-    data: { roles: ROLES_APP }
+    // Feature evaluacion: los 4 formularios CVA (combinado, afectivo, descriptivo, extrínseco).
+    path: '',
+    loadChildren: () => import('@features/evaluacion/evaluacion.routes').then(m => m.EVALUACION_ROUTES)
   },
   {
     path: 'session/:id/results',
