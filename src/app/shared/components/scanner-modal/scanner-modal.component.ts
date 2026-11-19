@@ -1,5 +1,6 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Capacitor } from '@capacitor/core';
 import {
   IonBadge, IonButton, IonButtons, IonCheckbox, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonSegment, IonSegmentButton,
   IonSelect, IonSelectOption, IonSpinner, IonTextarea, IonTitle, IonToolbar, ModalController, ToastController
@@ -65,6 +66,8 @@ export class ScannerModalComponent implements OnInit {
   @Input() modo: ModoEscaneo = 'muestra';
 
   readonly formatos = FORMATOS_ESCANEO;
+  /** En navegador de computador `capture` se ignora: se abre el selector de archivos. */
+  readonly esWeb = !Capacitor.isNativePlatform();
   readonly modoSimulado = this.scanner.modoSimulado;
 
   readonly imagen = signal<ImagenPreparada | null>(null);

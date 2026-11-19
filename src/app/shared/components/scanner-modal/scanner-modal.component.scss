@@ -204,3 +204,11 @@
   .sc-steps li { flex-direction: column; text-align: center; gap: 2px; }
   .sc-review__head { flex-wrap: wrap; }
 }
+
+.sc-nota-web {
+  max-width: 34ch;
+  margin-top: 4px;
+  color: var(--app-text-faint);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}

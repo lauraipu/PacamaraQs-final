@@ -231,6 +231,9 @@
         <span class="sc-drop__icon" aria-hidden="true"><ion-icon name="camera-outline"></ion-icon></span>
         <strong>{{ 'escaner.abrir_camara_o_subir' | transloco }}</strong>
         <small>{{ 'escaner.toma_la_ficha_completa' | transloco }}</small>
+        @if (esWeb) {
+          <small class="sc-nota-web">{{ 'escaner.nota_web' | transloco }}</small>
+        }
       }
       <input type="file" accept="image/*" capture="environment" class="sc-file" (change)="alSeleccionarArchivo($event)" [disabled]="preparandoImagen()">
     </label>
