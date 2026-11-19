@@ -22,19 +22,20 @@ import {
 import { FormatoCva, getFormatoById } from '@domain/sesion/sesion.model';
 import {
   AtributoCva, CupperResultSummary, SampleConsolidatedResult, SessionResults, ValorAtributo
-} from '../../../core/models/session-results.model';
+} from '../../models/resultados.model';
 import { ArchivosService } from '@core/plataforma/archivos.service';
-import { ImpresionService } from '@core/plataforma/impresion.service';
-import { ResultsService } from '../../../core/services/results';
+import { ImpresionService } from '../../export/impresion.service';
+import { ResultadosRepository } from '../../data-access/resultados.repository';
+import { armarFichasTecnicas } from '../../presentacion/ficha-tecnica.vista';
 import { codigoDeError, mensajeDeError } from '@core/errores/errores';
-import { CupperResultCardComponent } from '../../../shared/components/cupper-result-card/cupper-result-card.component';
+import { CupperResultCardComponent } from '../../ui/cupper-result-card/cupper-result-card.component';
 import {
   FormatoReporteSca, ScaReportTemplateComponent
-} from '../../../shared/components/sca-report-template/sca-report-template.component';
+} from '../../ui/sca-report-template/sca-report-template.component';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { tr, TrPipe } from '../../../core/i18n/tr';
-import { BotonGuiaComponent } from '../../../shared/components/boton-guia/boton-guia.component';
+import { tr, TrPipe } from '@core/i18n/tr';
+import { BotonGuiaComponent } from '@shared/components/boton-guia/boton-guia.component';
 export interface Clasificacion {
   etiqueta: string;
   color: string;
@@ -258,7 +259,7 @@ function atributosDeFicha(atributos: Partial<Record<string, ValorAtributo>>): At
 })
 export class ResultsPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly resultsService = inject(ResultsService);
+  private readonly resultsService = inject(ResultadosRepository);
   private readonly impresion = inject(ImpresionService);
   private readonly navCtrl = inject(NavController);
   private readonly toastCtrl = inject(ToastController);
@@ -445,7 +446,8 @@ export class ResultsPage implements OnInit {
   });
 
   /* ── Vista Extrínseco ─────────────────────────────────────────────────── */
-  readonly fichasTecnicas = computed(() => this.resultados()?.fichasTecnicas ?? []);
+  /** La ficha técnica se arma aquí con las reglas del dominio (el repositorio solo trae datos). */
+  readonly fichasTecnicas = computed(() => armarFichasTecnicas(this.resultados()?.fuentesFicha ?? []));
 
   /* ── Gráficas de perfil (radar) ───────────────────────────────────────── */
   readonly mostrarGraficas = signal(false);
@@ -813,7 +815,7 @@ export class ResultsPage implements OnInit {
     if (!r || this.imprimiendo()) return;
     this.imprimiendo.set(true);
     try {
-      const { generarReporteXlsx } = await import('../../../core/export/reporte-xlsx');
+      const { generarReporteXlsx } = await import('../../export/reporte-xlsx');
       const { blob, nombre } = await generarReporteXlsx(r);
       await this.descargar(blob, nombre);
     } catch (error) {
@@ -847,7 +849,7 @@ export class ResultsPage implements OnInit {
     const filas: unknown[][] = [];
     if (this.esExtrinseco()) {
       filas.push(['Muestra', 'Sección', 'Campo', 'Valor']);
-      for (const f of r.fichasTecnicas) {
+      for (const f of this.fichasTecnicas()) {
         for (const s of f.secciones) for (const c of s.campos) filas.push([f.numeroMuestra, s.titulo, c.etiqueta, c.valor]);
         filas.push([f.numeroMuestra, 'Certificaciones', '', f.certificaciones.join(', ')]);
         if (f.notas) filas.push([f.numeroMuestra, 'Notas', '', f.notas]);

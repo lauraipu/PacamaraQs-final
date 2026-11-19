@@ -1,4 +1,10 @@
-import { construirFichasTecnicas, textoDeCampo } from './ficha-tecnica.mapper';
+import { aFuentesFicha } from '../data-access/resultados.mapper';
+import { ExtrinsecaRegistradaDto, FichaExtrinsecaDto } from '../data-access/resultados.dto';
+import { armarFichasTecnicas, textoDeCampo } from './ficha-tecnica.vista';
+
+/** La misma cadena que usa la app: DTO → fuentes (mapper) → ficha (dominio + presentación). */
+const construirFichasTecnicas = (fichas: FichaExtrinsecaDto[], registradas: ExtrinsecaRegistradaDto[]) =>
+  armarFichasTecnicas(aFuentesFicha(fichas, registradas));
 
 const formulario = {
   farming: { country: 'Colombia', region: 'Huila', farmName: 'La Esperanza', producers: '', species: 'Arábica', variety: 'Pacamara', harvestDate: '2026-05', other: '' },

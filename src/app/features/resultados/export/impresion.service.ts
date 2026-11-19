@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { ESTILOS_HOJA_SCA } from '../services/estilos-hoja-sca';
+import { ESTILOS_HOJA_SCA } from './estilos-hoja-sca';
 
 /**
  * Hoja de estilos del reporte impreso. Va dentro del iframe, así que no

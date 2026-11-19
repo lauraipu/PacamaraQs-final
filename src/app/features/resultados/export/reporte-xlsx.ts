@@ -1,6 +1,7 @@
 import type { Workbook, Worksheet } from 'exceljs';
-import { CupperResultSummary, SessionResults } from '../models/session-results.model';
-import { tr } from '../i18n/tr';
+import { CupperResultSummary, SessionResults } from '../models/resultados.model';
+import { armarFichasTecnicas } from '../presentacion/ficha-tecnica.vista';
+import { tr } from '@core/i18n/tr';
 
 /**
  * Reporte Excel (.xlsx) de una sesión, de lo general al detalle:
@@ -288,7 +289,7 @@ function hojaFichasTecnicas(libro: Workbook, r: SessionResults): void {
     { header: tr('Campo'), key: 'campo', width: 26 },
     { header: tr('Valor'), key: 'valor', width: 48 }
   ];
-  for (const f of r.fichasTecnicas) {
+  for (const f of armarFichasTecnicas(r.fuentesFicha)) {
     const base = { muestra: f.numeroMuestra, por: f.registradaPor ?? '' };
     for (const s of f.secciones) for (const c of s.campos) h.addRow({ ...base, seccion: tr(s.titulo), campo: tr(c.etiqueta), valor: c.valor === '—' ? '' : tr(c.valor) });
     h.addRow({ ...base, seccion: tr('Certificaciones'), campo: '', valor: f.certificaciones.map(c => tr(c)).join(', ') });

@@ -96,15 +96,3 @@ export function aTitulo(texto: string): string {
     .map((p, i) => (i > 0 && MINUSCULAS.has(p) ? p : p.charAt(0).toLocaleUpperCase('es') + p.slice(1)))
     .join(' ');
 }
-
-/** Precio con su moneda: 25000, 'COP' → "$ 25.000 COP". */
-export function formatearPrecio(valor: number, moneda = 'COP'): string {
-  try {
-    const n = new Intl.NumberFormat('es-CO', {
-      style: 'currency', currency: moneda, currencyDisplay: 'narrowSymbol', minimumFractionDigits: 0, maximumFractionDigits: 2
-    }).format(valor);
-    return `${n.replace(/\u00a0/g, ' ')} ${moneda}`;
-  } catch {
-    return `${valor.toLocaleString('es-CO', { maximumFractionDigits: 2 })} ${moneda}`;
-  }
-}

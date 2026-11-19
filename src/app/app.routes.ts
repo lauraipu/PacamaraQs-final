@@ -1,8 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/auth/guards/auth.guard';
-import { organizerGuard } from '@core/auth/guards/organizer.guard';
 import { roleGuard } from '@core/auth/guards/role.guard';
-import { ROLES_ADMIN, ROLES_APP } from '@core/auth/roles';
+import { ROLES_ADMIN } from '@core/auth/roles';
 
 export const routes: Routes = [
   {
@@ -33,10 +32,9 @@ export const routes: Routes = [
     loadChildren: () => import('@features/evaluacion/evaluacion.routes').then(m => m.EVALUACION_ROUTES)
   },
   {
+    // Feature resultados: panel de resultados del organizador (/session/:id/results).
     path: 'session/:id/results',
-    loadComponent: () => import('./pages/session/results/results.page').then(m => m.ResultsPage),
-    canActivate: [authGuard, roleGuard, organizerGuard],
-    data: { roles: ROLES_APP }
+    loadChildren: () => import('@features/resultados/resultados.routes').then(m => m.RESULTADOS_ROUTES)
   },
   {
     path: '',

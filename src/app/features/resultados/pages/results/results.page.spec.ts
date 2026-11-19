@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { NavController, ToastController } from '@ionic/angular';
-import { SampleConsolidatedResult, SessionResults } from '../../../core/models/session-results.model';
-import { ResultsService } from '../../../core/services/results';
-import { ImpresionService } from '@core/plataforma/impresion.service';
+import { SampleConsolidatedResult, SessionResults } from '../../models/resultados.model';
+import { ResultadosRepository } from '../../data-access/resultados.repository';
+import { ImpresionService } from '../../export/impresion.service';
 import { clasificarPuntaje, etiquetaHedonica, ResultsPage } from './results.page';
 
 const muestra = (numeroMuestra: number, puntaje: number, cambios: Partial<SampleConsolidatedResult> = {}): SampleConsolidatedResult => ({
@@ -41,7 +41,7 @@ const resultadosBase = (muestras: SampleConsolidatedResult[]): SessionResults =>
   ],
   atributosPorMuestra: [],
   votosHedonicos: [],
-  fichasTecnicas: []
+  fuentesFicha: []
 });
 
 const ficha = (numeroMuestra: number, puntaje: number, atributos = {}) => ({
@@ -87,7 +87,7 @@ describe('ResultsPage', () => {
     TestBed.configureTestingModule({
       imports: [ResultsPage],
       providers: [
-        { provide: ResultsService, useValue: { obtenerResultadosSesion } },
+        { provide: ResultadosRepository, useValue: { obtenerResultadosSesion } },
         { provide: ImpresionService, useValue: { imprimir } },
         { provide: NavController, useValue: { navigateRoot: vi.fn(), navigateForward } },
         { provide: ToastController, useValue: { create: vi.fn().mockResolvedValue({ present: vi.fn() }) } },

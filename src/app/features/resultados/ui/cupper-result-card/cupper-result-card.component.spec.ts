@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CupperResultSummary } from '../../../core/models/session-results.model';
+import { CupperResultSummary } from '../../models/resultados.model';
 import { CupperResultCardComponent } from './cupper-result-card.component';
 
 const catadorBase = (cambios: Partial<CupperResultSummary> = {}): CupperResultSummary => ({

@@ -1,3 +1,5 @@
+import { FuenteFicha } from '@domain/ficha-tecnica/ficha-tecnica';
+
 /** Atributos CVA tal como los guarda el CHECK de evaluacion_atributos. */
 export type AtributoCva =
   | 'fragancia' | 'aroma' | 'sabor' | 'sabor_residual' | 'acidez' | 'dulzor' | 'sensacion_boca';
@@ -77,8 +79,8 @@ export interface SessionResults {
   atributosPorMuestra: PromedioAtributo[];
   /** Distribución de la Impresión Global (1–9) por muestra. */
   votosHedonicos: VotoHedonico[];
-  /** Solo formato extrínseco. */
-  fichasTecnicas: FichaTecnica[];
+  /** Solo formato extrínseco: datos crudos; la ficha la arma presentacion/ficha-tecnica.vista. */
+  fuentesFicha: FuenteFicha[];
 }
 
 export interface PromedioAtributo {

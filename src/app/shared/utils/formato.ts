@@ -23,3 +23,15 @@ export function megabytes(bytes: number): string {
 export function iniciales(nombre: string): string {
   return nombre.split(/\s+/).filter(Boolean).slice(0, 2).map(p => p[0]?.toUpperCase() ?? '').join('') || '?';
 }
+
+/** Precio con su moneda: 25000, 'COP' → "$ 25.000 COP". */
+export function formatearPrecio(valor: number, moneda = 'COP'): string {
+  try {
+    const n = new Intl.NumberFormat('es-CO', {
+      style: 'currency', currency: moneda, currencyDisplay: 'narrowSymbol', minimumFractionDigits: 0, maximumFractionDigits: 2
+    }).format(valor);
+    return `${n.replace(/\u00a0/g, ' ')} ${moneda}`;
+  } catch {
+    return `${valor.toLocaleString('es-CO', { maximumFractionDigits: 2 })} ${moneda}`;
+  }
+}

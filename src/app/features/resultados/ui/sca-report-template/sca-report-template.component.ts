@@ -4,10 +4,10 @@ import { ETIQUETAS_HEDONICAS } from '@domain/cva/cva';
 import {
   AtributoHoja, BOCA_SCA, circuloMarcado, DEFECTOS_SCA, DESCRIPTORES_SCA, etiquetaCalidad, GUSTOS_SCA, HojaSca
 } from '@domain/cva/hoja-sca';
-import { FichaTecnica } from '../../../core/models/session-results.model';
+import { FichaTecnica } from '../../models/resultados.model';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { tr, TrPipe } from '../../../core/i18n/tr';
+import { tr, TrPipe } from '@core/i18n/tr';
 /** Recuadro de notas de la hoja que corresponde a cada atributo. */
 const NOTA_DE_ATRIBUTO: Readonly<Record<AtributoHoja, 'olfativo' | 'gustativo' | 'acidez' | 'dulzor' | 'boca'>> = {
   fragancia: 'olfativo', aroma: 'olfativo', sabor: 'gustativo', sabor_residual: 'gustativo',

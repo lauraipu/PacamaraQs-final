@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CupperResultSummary } from '../../../core/models/session-results.model';
+import { CupperResultSummary } from '../../models/resultados.model';
 
 import { TranslocoPipe } from '@jsverse/transloco';
 @Component({

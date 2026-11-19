@@ -1,31 +1,17 @@
-import { FichaTecnica, FichaTecnicaSeccion } from '../models/session-results.model';
-import { divisionDe, etiquetaProceso, formatearPrecio } from '@domain/origenes/origenes';
+import {
+  datoPreferente, FuenteFicha, precioPreferente, Registro, unirCertificaciones
+} from '@domain/ficha-tecnica/ficha-tecnica';
+import { divisionDe, etiquetaProceso } from '@domain/origenes/origenes';
+import { formatearPrecio } from '@shared/utils/formato';
+import { FichaTecnica, FichaTecnicaSeccion } from '../models/resultados.model';
 
-/** Ficha extrínseca serializada en evaluaciones.notas (formulario de ExtrinsicFormPage). */
-export interface FichaExtrinsecaDto {
-  numero_muestra: number;
-  nombre: string | null;
-  registrado_en: string | null;
-  formulario: Record<string, unknown> | null;
-}
-
-/** Fila de evaluacion_extrinseca (sin ids) + nombres de certificaciones. */
-export interface ExtrinsecaRegistradaDto {
-  numero_muestra: number;
-  datos: Record<string, unknown> | null;
-  certificaciones: string[] | null;
-}
-
-type Registro = Record<string, unknown>;
+/**
+ * Presentación de la ficha técnica: aplica las reglas del dominio y arma las
+ * secciones con sus etiquetas (textos fuente que la vista traduce con tr()) y
+ * los valores ya formateados para pantalla, PDF, CSV y Excel.
+ */
 
 const SIN_DATO = '—';
-
-const CERTIFICACIONES_FORMULARIO: Readonly<Record<string, string>> = {
-  c4: '4C',
-  fairTrade: 'Fair Trade',
-  organic: 'Orgánico',
-  rainforest: 'Rainforest Alliance'
-};
 
 const comoRegistro = (valor: unknown): Registro =>
   valor !== null && typeof valor === 'object' && !Array.isArray(valor) ? (valor as Registro) : {};
@@ -41,52 +27,26 @@ export function textoDeCampo(valor: unknown): string {
 
 /** 25000 → "$ 25.000 COP". */
 export function formatearCop(valor: number): string {
-  return formatearPrecio(valor, 'COP').replace(/\u00a0/g, ' ');
+  return formatearPrecio(valor, 'COP').replace(/ /g, ' ');
 }
 
-/**
- * Une las dos fuentes posibles de la ficha técnica de una muestra:
- *  1. La tabla estructurada `evaluacion_extrinseca` (tiene precio, importador…).
- *  2. El formulario extrínseco que la app guarda hoy en `evaluaciones.notas`.
- * La tabla tiene prioridad campo a campo; el formulario rellena los vacíos.
- */
-export function construirFichasTecnicas(
-  fichas: readonly FichaExtrinsecaDto[],
-  registradas: readonly ExtrinsecaRegistradaDto[]
-): FichaTecnica[] {
-  const pendientes = [...registradas];
-  const tomarRegistro = (numeroMuestra: number): ExtrinsecaRegistradaDto | null => {
-    const indice = pendientes.findIndex(r => Number(r.numero_muestra) === numeroMuestra);
-    return indice >= 0 ? pendientes.splice(indice, 1)[0] : null;
-  };
-
-  const resultado = fichas.map(ficha => {
-    const numeroMuestra = Number(ficha.numero_muestra);
-    return construirFicha(numeroMuestra, ficha, tomarRegistro(numeroMuestra));
-  });
-  for (const registro of pendientes) {
-    resultado.push(construirFicha(Number(registro.numero_muestra), null, registro));
-  }
-  return resultado.sort((a, b) => a.numeroMuestra - b.numeroMuestra);
+/** Fichas listas para mostrar, ordenadas por número de muestra. */
+export function armarFichasTecnicas(fuentes: readonly FuenteFicha[]): FichaTecnica[] {
+  return fuentes.map(armarFicha).sort((a, b) => a.numeroMuestra - b.numeroMuestra);
 }
 
-function construirFicha(
-  numeroMuestra: number,
-  ficha: FichaExtrinsecaDto | null,
-  registro: ExtrinsecaRegistradaDto | null
-): FichaTecnica {
-  const formulario = comoRegistro(ficha?.formulario);
+function armarFicha(fuente: FuenteFicha): FichaTecnica {
+  const formulario = fuente.formulario;
   const cultivo = comoRegistro(formulario['farming']);
   const proceso = comoRegistro(formulario['processing']);
   const comercio = comoRegistro(formulario['trading']);
   const certForm = comoRegistro(formulario['certifications']);
-  const tabla = comoRegistro(registro?.datos);
+  const tabla = fuente.tabla;
 
-  const valor = (claveTabla: string | null, valorFormulario?: unknown): string =>
-    (claveTabla ? textoDeCampo(tabla[claveTabla]) : '') || textoDeCampo(valorFormulario) || SIN_DATO;
+  const valor = (claveTabla: string, valorFormulario?: unknown): string =>
+    textoDeCampo(datoPreferente(tabla[claveTabla], valorFormulario)) || SIN_DATO;
 
-  const precioNumero = typeof tabla['precio_finca'] === 'number' ? tabla['precio_finca']
-    : typeof comercio['farmPrice'] === 'number' ? comercio['farmPrice'] : null;
+  const precioNumero = precioPreferente(tabla['precio_finca'], comercio['farmPrice']);
   const moneda = textoDeCampo(comercio['currency']) || 'COP';
   const precio = precioNumero === null ? '' : formatearPrecio(precioNumero, moneda);
   const pais = valor('pais', cultivo['country']);
@@ -138,21 +98,16 @@ function construirFicha(
   ].filter(c => c.valor !== '');
   if (otros.length > 0) secciones.push({ titulo: 'Información adicional', campos: otros });
 
-  const certificaciones = new Set<string>(
-    (registro?.certificaciones ?? []).map(textoDeCampo).filter(Boolean)
-  );
-  for (const [clave, etiqueta] of Object.entries(CERTIFICACIONES_FORMULARIO)) {
-    if (certForm[clave] === true) certificaciones.add(etiqueta);
-  }
-  const otraCert = textoDeCampo(certForm['other']);
-  if (otraCert) certificaciones.add(otraCert);
-
   return {
-    numeroMuestra,
-    registradaPor: ficha?.nombre ?? null,
-    registradaEn: ficha?.registrado_en ?? (textoDeCampo(tabla['creado_en']) || null),
+    numeroMuestra: fuente.numeroMuestra,
+    registradaPor: fuente.registradaPor,
+    registradaEn: fuente.registradoEnFicha ?? (textoDeCampo(tabla['creado_en']) || null),
     secciones,
-    certificaciones: [...certificaciones].sort((a, b) => a.localeCompare(b, 'es')),
+    certificaciones: unirCertificaciones(
+      fuente.certificacionesTabla.map(textoDeCampo).filter(Boolean),
+      certForm,
+      textoDeCampo(certForm['other'])
+    ),
     notas: textoDeCampo(formulario['notes'])
   };
 }
