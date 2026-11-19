@@ -23,9 +23,7 @@
       "mensaje": "Vuoi davvero uscire dal tuo account?",
       "cancelar": "Annulla",
       "confirmar": "Esci"
-    },
-    "si": "Sì",
-    "no": "No"
+    }
   },
   "login": {
     "titulo": "PacamaraQS",

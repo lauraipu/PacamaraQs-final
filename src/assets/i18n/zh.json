@@ -23,9 +23,7 @@
       "mensaje": "确定要退出您的账户吗？",
       "cancelar": "取消",
       "confirmar": "退出登录"
-    },
-    "si": "是",
-    "no": "否"
+    }
   },
   "login": {
     "titulo": "PacamaraQS",

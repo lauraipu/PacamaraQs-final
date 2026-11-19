@@ -19,7 +19,7 @@ src/app/
   core/              singletons: supabase/, auth/ (+guards/, roles.ts, dos-pasos), errores/, i18n/, guias/,
                      plataforma/, realtime/ (sala en vivo), data-access/ (sesiones, cola offline de evaluaciones)
   domain/            TypeScript puro (reglas CVA/SCA, catálogos, ficha técnica). Sin Angular ni Supabase.
-  shared/            UI pura (components/), pipes/ (fecha, precio, siNo, respaldo, megabytes), utils/
+  shared/            UI pura (components/), pipes/ (respaldo), utils/ (formato, lista-paginada, pagina)
   features/<x>/      auth, perfil, sesiones (+escaner/), evaluacion, resultados, admin
                      cada una: <x>.routes.ts, pages/, y si aplica data-access/ (dto, mapper, repository), models/, ui/
 ```

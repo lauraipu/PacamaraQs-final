@@ -23,9 +23,7 @@
       "mensaje": "¿Seguro que quieres salir de tu cuenta?",
       "cancelar": "Cancelar",
       "confirmar": "Cerrar sesión"
-    },
-    "si": "Sí",
-    "no": "No"
+    }
   },
   "login": {
     "titulo": "PacamaraQS",
