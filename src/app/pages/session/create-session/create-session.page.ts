@@ -165,7 +165,7 @@ export class CreateSessionPage {
         this.changeDetector.markForCheck();
       }, 2000);
       const toast = await this.toastController.create({
-        message: this.transloco.translate('codigo_copiado_f5fksp'),
+        message: this.transloco.translate('txt.codigo_copiado_f5fksp'),
         duration: 2000,
         color: 'dark'
       });
@@ -173,7 +173,7 @@ export class CreateSessionPage {
     } catch (error) {
       this.error = this.mensajeError(error);
       const toast = await this.toastController.create({
-        message: this.transloco.translate('no_se_pudo_copiar_el_codigo_p0_v6ndnc', { p0: this.mensajeError(error) }),
+        message: this.transloco.translate('txt.no_se_pudo_copiar_el_codigo_p0_v6ndnc', { p0: this.mensajeError(error) }),
         duration: 3500,
         color: 'danger'
       });
@@ -192,6 +192,6 @@ export class CreateSessionPage {
   }
 
   private mensajeError(error: unknown): string {
-    return error instanceof Error ? error.message : this.transloco.translate('ocurrio_un_error_inesperado_ps7ccd');
+    return error instanceof Error ? error.message : this.transloco.translate('txt.ocurrio_un_error_inesperado_ps7ccd');
   }
 }

@@ -194,7 +194,7 @@ export class WaitingRoomPage implements OnDestroy {
       await conTiempoLimite(this.authService.asegurarInicializado(), TIEMPO_MAXIMO_CARGA_MS);
       const usuario = this.authService.usuario();
       if (!vigente()) return;
-      if (!usuario) throw new Error(this.transloco.translate('debes_iniciar_sesion_para_ver_es_dfbyqh'));
+      if (!usuario) throw new Error(this.transloco.translate('txt.debes_iniciar_sesion_para_ver_es_dfbyqh'));
 
       const [sesion, participantes] = await conTiempoLimite(
         Promise.all([
@@ -204,7 +204,7 @@ export class WaitingRoomPage implements OnDestroy {
         TIEMPO_MAXIMO_CARGA_MS
       );
       if (!vigente()) return;
-      if (!sesion) throw new Error(this.transloco.translate('no_se_encontro_la_sesion_o_no_pe_1e33yn'));
+      if (!sesion) throw new Error(this.transloco.translate('txt.no_se_encontro_la_sesion_o_no_pe_1e33yn'));
       this.sesion.set(sesion);
       this.participantes.set(participantes);
 
@@ -216,7 +216,7 @@ export class WaitingRoomPage implements OnDestroy {
 
       const esOrganizador = sesion.organizadorId === usuario.id;
       if (!esOrganizador && !participantes.some(p => p.usuarioId === usuario.id)) {
-        throw new Error(this.transloco.translate('ya_no_formas_parte_de_esta_sesio_pyo0hz'));
+        throw new Error(this.transloco.translate('txt.ya_no_formas_parte_de_esta_sesio_pyo0hz'));
       }
 
       const sala = this.realtimeService.abrirSala({
@@ -410,7 +410,7 @@ export class WaitingRoomPage implements OnDestroy {
       const toast = await this.toastController.create({ message: '¡Código copiado!', duration: 2000, color: 'dark' });
       await toast.present();
     } catch {
-      this.error.set(this.transloco.translate('no_se_pudo_copiar_el_codigo_fj869g'));
+      this.error.set(this.transloco.translate('txt.no_se_pudo_copiar_el_codigo_fj869g'));
     }
   }
 
@@ -445,7 +445,7 @@ export class WaitingRoomPage implements OnDestroy {
       return true;
     } catch {
       this.redirigiendo = false;
-      this.error.set(this.transloco.translate('no_se_pudo_abrir_la_pantalla_de_gqih7d'));
+      this.error.set(this.transloco.translate('txt.no_se_pudo_abrir_la_pantalla_de_gqih7d'));
       return false;
     }
   }
