@@ -24,7 +24,7 @@ import {
   ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline } from 'ionicons/icons';
+import { keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline, settingsOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
 import { CierreSesionService } from '../../../core/auth/cierre-sesion.service';
 import { SesionConRol, SesionService } from '../../../core/services/sesion';
@@ -36,6 +36,7 @@ import {
 
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TrPipe } from '../../../core/i18n/tr';
+import { BotonGuiaComponent } from '../../../shared/components/boton-guia/boton-guia.component';
 interface SesionItemUi {
   id: string;
   titulo: string;
@@ -66,7 +67,7 @@ export function normalizarTexto(texto: string | null | undefined): string {
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [TrPipe, TranslocoPipe, 
+  imports: [BotonGuiaComponent, TrPipe, TranslocoPipe, 
     IonContent,
     IonHeader,
     IonToolbar,
@@ -117,7 +118,7 @@ export class DashboardPage implements OnInit {
 
   constructor() {
     // arrow-forward-outline se usa en el modal "Unirme" y no estaba registrado.
-    addIcons({ keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline });
+    addIcons({ keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline, settingsOutline });
   }
 
   ngOnInit(): void {
@@ -335,6 +336,13 @@ export class DashboardPage implements OnInit {
       this.isJoining = false;
       this.changeDetector.markForCheck();
     }
+  }
+
+  irAConfiguracion(): void {
+    // Libera el foco antes de navegar: Ionic marca la página que sale con
+    // aria-hidden y el foco no puede quedar dentro de un elemento oculto.
+    (document.activeElement as HTMLElement | null)?.blur();
+    void this.router.navigateByUrl('/configuracion');
   }
 
   async cerrarSesion(): Promise<void> {

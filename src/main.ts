@@ -1,6 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
-import { inject, isDevMode, provideAppInitializer } from '@angular/core';
+import { inject, isDevMode, provideAppInitializer, ErrorHandler } from '@angular/core';
 import { RouteReuseStrategy, provideRouter, withComponentInputBinding, withPreloading, PreloadAllModules } from '@angular/router';
 import { ActionSheetController, AlertController, IonicRouteStrategy, provideIonicAngular, ToastController } from '@ionic/angular';
 import { provideTransloco } from '@jsverse/transloco';
@@ -13,10 +13,13 @@ import {
   ActionSheetControllerTraducido, AlertControllerTraducido, ToastControllerTraducido
 } from './app/core/i18n/overlays-traducidos';
 
+import { ManejadorErrores } from './app/core/avisos/manejador-errores';
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
+    // Errores no capturados: aviso claro en vez de una app colgada.
+    { provide: ErrorHandler, useClass: ManejadorErrores },
     // Toasts, alertas y hojas de acción se traducen al idioma activo.
     { provide: ToastController, useClass: ToastControllerTraducido },
     { provide: AlertController, useClass: AlertControllerTraducido },

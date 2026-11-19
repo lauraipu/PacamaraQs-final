@@ -296,3 +296,39 @@ ion-card { max-width: 100%; }
   app-create-session .continue-button { flex: 1 1 100%; }
   app-create-session .summary-row { flex-wrap: wrap; gap: 4px 12px; }
 }
+
+/* Preferencias de accesibilidad (Configuración). El tema por defecto no cambia. */
+:root.high-contrast {
+  --app-bg-screen: #ffffff;
+  --app-bg-card: #ffffff;
+  --app-bg-subtle: #e5e7eb;
+  --app-text-main: #000000;
+  --app-text-muted: #1f2937;
+  --app-text-faint: #374151;
+  --app-border: #374151;
+  --app-border-input: #000000;
+  --app-primary-dark: #000000;
+  --app-primary-hover: #1f2937;
+  --ion-background-color: #ffffff;
+  --ion-text-color: #000000;
+  --ion-color-primary: #000000;
+  --ion-color-primary-rgb: 0, 0, 0;
+  --ion-color-medium: #1f2937;
+}
+:root.high-contrast :focus-visible { outline: 3px solid #000000; outline-offset: 2px; }
+.a11y-sin-animaciones *, .a11y-sin-animaciones *::before, .a11y-sin-animaciones *::after {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Confirmaciones de acciones que no se pueden deshacer. */
+.alerta-boton-peligro { color: var(--app-error, #e7000b) !important; font-weight: 700; }
+
+/* Guías de primer uso: hoja inferior que se ajusta al contenido. */
+ion-modal.guia-modal {
+  --height: auto;
+  --max-width: 520px;
+  --border-radius: 16px 16px 0 0;
+}
+ion-modal.guia-modal ion-content { --padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+ion-modal.guia-modal .ion-page { position: relative; contain: content; }

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { salidaFormularioGuard } from './core/guards/salida-formulario.guard';
 import { authGuard } from './core/guards/auth.guard';
 import { organizerGuard } from './core/guards/organizer.guard';
 import { roleGuard } from './core/guards/role.guard';
@@ -19,6 +20,11 @@ export const routes: Routes = [
   {
     path: 'registro',
     loadComponent: () => import('./pages/auth/registro/registro.page').then(m => m.RegistroPage)
+  },
+  {
+    // Segundo paso del inicio de sesión. Sin guard: authGuard redirige aquí.
+    path: 'verificar-dos-pasos',
+    loadComponent: () => import('./pages/auth/verificar-dos-pasos/verificar-dos-pasos.page').then(m => m.VerificarDosPasosPage)
   },
   {
     path: 'recuperar',
@@ -43,6 +49,11 @@ export const routes: Routes = [
     data: { roles: ROLES_APP }
   },
   {
+    path: 'configuracion',
+    loadComponent: () => import('./pages/configuracion/configuracion.page').then(m => m.ConfiguracionPage),
+    canActivate: [authGuard]
+  },
+  {
     path: 'admin-dashboard',
     loadComponent: () => import('./pages/admin-dashboard/admin-dashboard.page').then(m => m.AdminDashboardPage),
     canActivate: [authGuard, roleGuard],
@@ -52,24 +63,28 @@ export const routes: Routes = [
     path: 'affective-form/:sesionId',
     loadComponent: () => import('./pages/evaluation/affective-form/affective-form.page').then(m => m.AffectiveFormPage),
     canActivate: [authGuard, roleGuard],
+    canDeactivate: [salidaFormularioGuard],
     data: { roles: ROLES_APP }
   },
   {
     path: 'combined-form/:sesionId',
     loadComponent: () => import('./pages/evaluation/combined-form/combined-form.page').then(m => m.CombinedFormPage),
     canActivate: [authGuard, roleGuard],
+    canDeactivate: [salidaFormularioGuard],
     data: { roles: ROLES_APP }
   },
   {
     path: 'descriptive-form/:sesionId',
     loadComponent: () => import('./pages/evaluation/descriptive-form/descriptive-form.page').then(m => m.DescriptiveFormPage),
     canActivate: [authGuard, roleGuard],
+    canDeactivate: [salidaFormularioGuard],
     data: { roles: ROLES_APP }
   },
   {
     path: 'extrinsic-form/:sesionId',
     loadComponent: () => import('./pages/evaluation/extrinsic-form/extrinsic-form.page').then(m => m.ExtrinsicFormPage),
     canActivate: [authGuard, roleGuard],
+    canDeactivate: [salidaFormularioGuard],
     data: { roles: ROLES_APP }
   },
   {

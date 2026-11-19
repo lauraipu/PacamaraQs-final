@@ -127,8 +127,11 @@
       "insegura": "La password non soddisfa tutti i requisiti.",
       "no_coinciden": "Le password non coincidono.",
       "igual": "La nuova password deve essere diversa da quella precedente.",
-      "generico": "Impossibile aggiornare la password. Riprova."
-    }
+      "generico": "Impossibile aggiornare la password. Riprova.",
+      "falta": "Alla password manca: {{req}}"
+    },
+    "ver_requisitos": "Vedi i requisiti della password",
+    "requisitos_titulo": "La password deve avere:"
   },
   "politica": {
     "titulo": "Informativa sul trattamento dei dati",
@@ -1164,5 +1167,188 @@
     "puntaje_catador_1fbr5gy": "Punteggio assaggiatore",
     "no_r5wqai": "No",
     "combinado_descriptivo_afectivo_tgsuum": "Combinato (Descrittivo + Affettivo)"
+  },
+  "config": {
+    "titulo": "Impostazioni",
+    "perfil": "Profilo",
+    "nombre": "Nome",
+    "correo": "Email",
+    "guardar": "Salva modifiche",
+    "seguridad": "Sicurezza",
+    "cambiar_contrasena": "Cambia password",
+    "guardar_contrasena": "Salva password",
+    "dos_pasos": "Verifica in due passaggi",
+    "activo": "Attiva",
+    "inactivo": "Disattiva",
+    "cerrar_todos": "Esci da tutti i dispositivi",
+    "cerrar_todos_mensaje": "Verrai disconnesso da questo e da tutti i tuoi dispositivi.",
+    "confirmar": "Conferma",
+    "idioma": "Lingua",
+    "accesibilidad": "Accessibilità",
+    "alto_contraste": "Alto contrasto",
+    "tamano_texto": "Dimensione del testo",
+    "reducir_animaciones": "Riduci animazioni",
+    "cuenta": "Account",
+    "cerrar_sesion": "Esci",
+    "guardado": "Modifiche salvate.",
+    "abrir": "Impostazioni",
+    "errores": {
+      "cargar": "Impossibile caricare i tuoi dati.",
+      "guardar": "Impossibile salvare le modifiche.",
+      "nombre": "Inserisci un nome valido."
+    },
+    "editar": "Modifica",
+    "cancelar": "Annulla",
+    "correo_bloqueado": "L’email non può essere modificata per motivi di sicurezza."
+  },
+  "dos_pasos": {
+    "verificar_titulo": "Verifica in due passaggi",
+    "verificar_texto": "Inserisci il codice di 6 cifre mostrato nella tua app di autenticazione.",
+    "codigo": "Codice di 6 cifre",
+    "verificar": "Verifica",
+    "ayuda_perdida": "Se hai perso l’accesso alla tua app di autenticazione, scrivi a PacamaraQS@gmail.com.",
+    "usar_otra_cuenta": "Usa un altro account",
+    "activar_titulo": "Attiva la verifica in due passaggi",
+    "paso_app": "Installa un’app di autenticazione, come Google Authenticator o Microsoft Authenticator.",
+    "paso_qr": "Nell’app, aggiungi un account e scansiona questo codice QR.",
+    "paso_codigo": "Inserisci il codice di 6 cifre mostrato nell’app.",
+    "qr_alt": "Codice QR per l’app di autenticazione",
+    "clave_manual": "Se non puoi scansionare, inserisci questa chiave nell’app (tocca per copiare):",
+    "copiar": "Copia chiave",
+    "copiado": "Chiave copiata.",
+    "activar": "Attiva",
+    "activada": "Verifica in due passaggi attivata.",
+    "desactivar_titulo": "Disattiva la verifica in due passaggi",
+    "desactivar_texto": "Inserisci un codice della tua app di autenticazione per confermare.",
+    "desactivar": "Disattiva",
+    "desactivada": "Verifica in due passaggi disattivata.",
+    "obligatorio_admin": "Gli account amministratore devono avere attiva la verifica in due passaggi.",
+    "admin_no_desactiva": "Gli amministratori non possono disattivare la verifica in due passaggi.",
+    "errores": {
+      "formato": "Il codice ha 6 cifre.",
+      "codigo": "Codice errato o scaduto. Prova con il codice attuale.",
+      "activar": "Impossibile avviare l’attivazione. Riprova."
+    }
+  },
+  "errores": {
+    "sin_conexion": "Nessuna connessione. Controlla la rete e riprova.",
+    "credenciales": "Email o password errati.",
+    "sesion_expirada": "La sessione è scaduta. Accedi di nuovo.",
+    "sin_permiso": "Non hai i permessi per farlo.",
+    "no_existe": "Ciò che cerchi non esiste più o non hai accesso.",
+    "duplicado": "Questo record esiste già.",
+    "limite": "Troppi tentativi. Attendi qualche minuto.",
+    "servidor": "Il server ha avuto un problema. Riprova tra poco.",
+    "inesperado": "Si è verificato un errore imprevisto. Se si ripete, ricarica l’app.",
+    "banner_sin_conexion": "Nessuna connessione. Le modifiche sono salvate su questo dispositivo e verranno inviate alla riconnessione.",
+    "conexion_restablecida": "Connessione ripristinata."
+  },
+  "formulario": {
+    "enviar_titulo": "Invia schede",
+    "enviar_mensaje": "Verranno inviate le schede di tutti i campioni. Dopo non potrai modificarle.",
+    "enviar": "Invia",
+    "salir_titulo": "Uscire dalla valutazione?",
+    "salir_mensaje": "I tuoi progressi sono salvati su questo dispositivo e potrai continuare più tardi.",
+    "salir": "Esci"
+  },
+  "guias": {
+    "comun": {
+      "paso": "Passo {{n}} di {{total}}",
+      "anterior": "Indietro",
+      "siguiente": "Avanti",
+      "saltar": "Salta",
+      "entendido": "Ho capito",
+      "ver_guia": "Vedi la guida di questa schermata"
+    },
+    "dashboard": {
+      "titulo": "Guida del pannello",
+      "0": {
+        "titulo": "Crea una sessione",
+        "texto": "Come organizzatore, crea una sessione di cupping: scegli il formato e il numero di campioni, poi condividi il codice."
+      },
+      "1": {
+        "titulo": "Unisciti con un codice",
+        "texto": "Se sei stato invitato, inserisci qui il codice della sessione per entrare nella sala d’attesa."
+      },
+      "2": {
+        "titulo": "Scansiona una scheda cartacea",
+        "texto": "Hai fatto il cupping su carta? Fotografa la scheda SCA e l’app la trasforma in una scheda digitale da rivedere."
+      }
+    },
+    "sala": {
+      "titulo": "Guida della sala d’attesa",
+      "0": {
+        "titulo": "Condividi il codice",
+        "texto": "L’organizzatore condivide il codice o il QR per far entrare gli assaggiatori."
+      },
+      "1": {
+        "titulo": "Segnala che sei pronto",
+        "texto": "Quando sei preparato, tocca «Pronto». L’organizzatore vede chi è pronto."
+      },
+      "2": {
+        "titulo": "Almeno 3 assaggiatori",
+        "texto": "Il cupping inizia con almeno 3 assaggiatori pronti. È alla cieca: nessuno vede le schede degli altri."
+      }
+    },
+    "formulario": {
+      "titulo": "Guida della valutazione",
+      "0": {
+        "titulo": "Un campione alla volta",
+        "texto": "Valuta ogni campione e prosegui con «Avanti». Puoi tornare indietro prima di inviare."
+      },
+      "1": {
+        "titulo": "Intensità e qualità",
+        "texto": "Sposta la barra per l’intensità e scegli la qualità da 1 a 9. Segna i descrittori che percepisci."
+      },
+      "2": {
+        "titulo": "Salvataggio automatico",
+        "texto": "I progressi si salvano sul dispositivo, anche senza internet."
+      },
+      "3": {
+        "titulo": "Invia alla fine",
+        "texto": "Quando hai completato tutti i campioni, tocca «Invia». Dopo non potrai modificarli."
+      }
+    },
+    "resultados": {
+      "titulo": "Guida dei risultati",
+      "0": {
+        "titulo": "Punteggi del panel",
+        "texto": "Qui vedi la media di ogni campione e la classifica del panel."
+      },
+      "1": {
+        "titulo": "Grafici",
+        "texto": "I grafici radar confrontano gli attributi di ogni campione."
+      },
+      "2": {
+        "titulo": "Esporta",
+        "texto": "Con «Esporta» scarichi il report PDF in formato SCA o i dati in Excel."
+      }
+    },
+    "escaner": {
+      "titulo": "Guida dello scanner",
+      "0": {
+        "titulo": "Scatta la foto",
+        "texto": "Fotografa la scheda intera, frontalmente e con buona luce."
+      },
+      "1": {
+        "titulo": "Rivedi i dati",
+        "texto": "L’IA legge la scheda; rivedi e correggi i valori prima di salvare."
+      },
+      "2": {
+        "titulo": "Salva",
+        "texto": "Una volta salvata, la scheda compare nei risultati come le altre valutazioni."
+      }
+    },
+    "configuracion": {
+      "titulo": "Guida delle impostazioni",
+      "0": {
+        "titulo": "Account sicuro",
+        "texto": "Cambia la password e attiva la verifica in due passaggi per proteggere il tuo account."
+      },
+      "1": {
+        "titulo": "Su misura",
+        "texto": "Scegli la lingua, la dimensione del testo, l’alto contrasto e riduci le animazioni se ti serve."
+      }
+    }
   }
 }

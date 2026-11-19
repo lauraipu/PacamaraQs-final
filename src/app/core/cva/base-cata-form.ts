@@ -9,6 +9,8 @@ import { EvaluacionAtributo, FichaEvaluacion, OfflineSyncService } from '../serv
 import { EventoSala, RealtimeService, SalaRealtime } from '../services/realtime';
 import { SesionService } from '../services/sesion';
 import { mensajeDeError } from '../utils/errores';
+import { AvisosService } from '../avisos/avisos.service';
+import { ConSalidaControlada } from '../guards/salida-formulario.guard';
 
 const ATRIBUTOS_HEDONICOS = new Set([
   'fragancia', 'aroma', 'sabor', 'saborResidual', 'acidez', 'dulzor', 'sensacionEnBoca'
@@ -36,7 +38,7 @@ const ATRIBUTOS_HEDONICOS = new Set([
  * fuera de un evento de plantilla se llama a markForCheck().
  */
 @Directive()
-export abstract class BaseCataForm<T extends object> implements OnInit, OnDestroy {
+export abstract class BaseCataForm<T extends object> implements OnInit, OnDestroy, ConSalidaControlada {
   protected readonly route = inject(ActivatedRoute);
   protected readonly navCtrl = inject(NavController);
   protected readonly toastCtrl = inject(ToastController);
@@ -46,6 +48,9 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
   protected readonly offlineSync = inject(OfflineSyncService);
   protected readonly realtimeService = inject(RealtimeService);
   protected readonly cdr = inject(ChangeDetectorRef);
+  protected readonly avisos = inject(AvisosService);
+  /** El combinado muestra su propia confirmación con el resumen de muestras. */
+  protected confirmarAntesDeEnviar = true;
 
   readonly totalMuestras = signal(1);
   readonly muestraActual = signal(1);
@@ -226,6 +231,11 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
   async finalizarCata(): Promise<void> {
     if (this.guardando()) return;
     this.guardarBorradorActual();
+    if (this.confirmarAntesDeEnviar && !(await this.avisos.confirmar({
+      titulo: 'formulario.enviar_titulo',
+      mensaje: 'formulario.enviar_mensaje',
+      confirmar: 'formulario.enviar'
+    }))) return;
 
     const abiertas = Array.from({ length: this.totalMuestras() }, (_, i) => i + 1)
       .filter(n => !this.muestrasCerradas().has(n));
@@ -266,7 +276,20 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
 
   volver(): void {
     this.guardarBorradorActual();
+    // salidaFormularioGuard pide la confirmación.
     void this.navCtrl.back();
+  }
+
+  /** canDeactivate: confirmar antes de dejar una evaluación sin enviar. */
+  async puedeSalir(): Promise<boolean> {
+    if (this.navegandoFuera || this.cargando() || this.error()) return true;
+    this.guardarBorradorActual();
+    const salir = await this.avisos.confirmar({
+      titulo: 'formulario.salir_titulo',
+      mensaje: 'formulario.salir_mensaje',
+      confirmar: 'formulario.salir'
+    });
+    return salir;
   }
 
   // ---------------------------------------------------------------------------

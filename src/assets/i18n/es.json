@@ -127,8 +127,11 @@
       "insegura": "La contraseña no cumple todos los requisitos.",
       "no_coinciden": "Las contraseñas no coinciden.",
       "igual": "La contraseña nueva debe ser distinta de la anterior.",
-      "generico": "No se pudo actualizar la contraseña. Intenta de nuevo."
-    }
+      "generico": "No se pudo actualizar la contraseña. Intenta de nuevo.",
+      "falta": "A la contraseña le falta: {{req}}"
+    },
+    "ver_requisitos": "Ver requisitos de la contraseña",
+    "requisitos_titulo": "Tu contraseña debe tener:"
   },
   "politica": {
     "titulo": "Política de tratamiento de datos",
@@ -1164,5 +1167,188 @@
     "puntaje_catador_1fbr5gy": "Puntaje catador",
     "no_r5wqai": "No",
     "combinado_descriptivo_afectivo_tgsuum": "Combinado (Descriptivo + Afectivo)"
+  },
+  "config": {
+    "titulo": "Configuración",
+    "perfil": "Perfil",
+    "nombre": "Nombre",
+    "correo": "Correo",
+    "guardar": "Guardar cambios",
+    "seguridad": "Seguridad",
+    "cambiar_contrasena": "Cambiar contraseña",
+    "guardar_contrasena": "Guardar contraseña",
+    "dos_pasos": "Verificación en dos pasos",
+    "activo": "Activa",
+    "inactivo": "Inactiva",
+    "cerrar_todos": "Cerrar sesión en todos los dispositivos",
+    "cerrar_todos_mensaje": "Se cerrará tu sesión en este y en todos tus dispositivos.",
+    "confirmar": "Confirmar",
+    "idioma": "Idioma",
+    "accesibilidad": "Accesibilidad",
+    "alto_contraste": "Alto contraste",
+    "tamano_texto": "Tamaño de texto",
+    "reducir_animaciones": "Reducir animaciones",
+    "cuenta": "Cuenta",
+    "cerrar_sesion": "Cerrar sesión",
+    "guardado": "Cambios guardados.",
+    "abrir": "Configuración",
+    "errores": {
+      "cargar": "No se pudieron cargar tus datos.",
+      "guardar": "No se pudieron guardar los cambios.",
+      "nombre": "Escribe un nombre válido."
+    },
+    "editar": "Editar",
+    "cancelar": "Cancelar",
+    "correo_bloqueado": "El correo no se puede modificar por seguridad."
+  },
+  "dos_pasos": {
+    "verificar_titulo": "Verificación en dos pasos",
+    "verificar_texto": "Escribe el código de 6 dígitos que muestra tu app de autenticación.",
+    "codigo": "Código de 6 dígitos",
+    "verificar": "Verificar",
+    "ayuda_perdida": "Si perdiste acceso a tu app de autenticación, escribe a PacamaraQS@gmail.com.",
+    "usar_otra_cuenta": "Usar otra cuenta",
+    "activar_titulo": "Activar verificación en dos pasos",
+    "paso_app": "Instala una app de autenticación, como Google Authenticator o Microsoft Authenticator.",
+    "paso_qr": "En la app, agrega una cuenta y escanea este código QR.",
+    "paso_codigo": "Escribe el código de 6 dígitos que aparece en la app.",
+    "qr_alt": "Código QR para la app de autenticación",
+    "clave_manual": "Si no puedes escanear, escribe esta clave en la app (toca para copiar):",
+    "copiar": "Copiar clave",
+    "copiado": "Clave copiada.",
+    "activar": "Activar",
+    "activada": "Verificación en dos pasos activada.",
+    "desactivar_titulo": "Desactivar verificación en dos pasos",
+    "desactivar_texto": "Escribe un código de tu app de autenticación para confirmar.",
+    "desactivar": "Desactivar",
+    "desactivada": "Verificación en dos pasos desactivada.",
+    "obligatorio_admin": "Las cuentas de administrador deben tener la verificación en dos pasos activa.",
+    "admin_no_desactiva": "Los administradores no pueden desactivar la verificación en dos pasos.",
+    "errores": {
+      "formato": "El código tiene 6 dígitos.",
+      "codigo": "Código incorrecto o vencido. Intenta con el código actual.",
+      "activar": "No se pudo iniciar la activación. Intenta de nuevo."
+    }
+  },
+  "errores": {
+    "sin_conexion": "Sin conexión. Revisa tu red e intenta de nuevo.",
+    "credenciales": "Correo o contraseña incorrectos.",
+    "sesion_expirada": "Tu sesión expiró. Inicia sesión de nuevo.",
+    "sin_permiso": "No tienes permiso para hacer esto.",
+    "no_existe": "Lo que buscas ya no existe o no tienes acceso.",
+    "duplicado": "Ese registro ya existe.",
+    "limite": "Hiciste demasiados intentos. Espera unos minutos.",
+    "servidor": "El servidor tuvo un problema. Intenta de nuevo en un momento.",
+    "inesperado": "Ocurrió un error inesperado. Si se repite, recarga la app.",
+    "banner_sin_conexion": "Sin conexión. Tus cambios se guardan en este dispositivo y se enviarán al reconectar.",
+    "conexion_restablecida": "Conexión restablecida."
+  },
+  "formulario": {
+    "enviar_titulo": "Enviar fichas",
+    "enviar_mensaje": "Se enviarán tus fichas de todas las muestras. Después no podrás modificarlas.",
+    "enviar": "Enviar",
+    "salir_titulo": "¿Salir de la evaluación?",
+    "salir_mensaje": "Tu avance queda guardado en este dispositivo y podrás continuar después.",
+    "salir": "Salir"
+  },
+  "guias": {
+    "comun": {
+      "paso": "Paso {{n}} de {{total}}",
+      "anterior": "Anterior",
+      "siguiente": "Siguiente",
+      "saltar": "Saltar",
+      "entendido": "Entendido",
+      "ver_guia": "Ver guía de esta pantalla"
+    },
+    "dashboard": {
+      "titulo": "Guía del panel",
+      "0": {
+        "titulo": "Crea una sesión",
+        "texto": "Como organizador, crea una sesión de catación: elige el formato, el número de muestras y comparte el código."
+      },
+      "1": {
+        "titulo": "Únete con un código",
+        "texto": "Si te invitaron, escribe aquí el código de la sesión para entrar a la sala de espera."
+      },
+      "2": {
+        "titulo": "Escanea una ficha física",
+        "texto": "¿Cataste en papel? Toma una foto de la ficha SCA y la app la convierte en una ficha digital que puedes revisar."
+      }
+    },
+    "sala": {
+      "titulo": "Guía de la sala de espera",
+      "0": {
+        "titulo": "Comparte el código",
+        "texto": "El organizador comparte el código o el QR para que los catadores se unan."
+      },
+      "1": {
+        "titulo": "Marca que estás listo",
+        "texto": "Cuando estés preparado, toca «Listo». El organizador ve quién está listo."
+      },
+      "2": {
+        "titulo": "Mínimo 3 catadores",
+        "texto": "La catación empieza cuando hay al menos 3 catadores listos. La evaluación es ciega: nadie ve las fichas de los demás."
+      }
+    },
+    "formulario": {
+      "titulo": "Guía de la evaluación",
+      "0": {
+        "titulo": "Una muestra a la vez",
+        "texto": "Evalúa cada muestra y avanza con «Siguiente». Puedes volver a las anteriores antes de enviar."
+      },
+      "1": {
+        "titulo": "Intensidad y calidad",
+        "texto": "Mueve la barra para la intensidad y elige del 1 al 9 la calidad. Marca los descriptores que percibas."
+      },
+      "2": {
+        "titulo": "Se guarda solo",
+        "texto": "Tu avance se guarda en el dispositivo, incluso sin internet."
+      },
+      "3": {
+        "titulo": "Envía al terminar",
+        "texto": "Cuando completes todas las muestras, toca «Enviar». Después ya no podrás modificarlas."
+      }
+    },
+    "resultados": {
+      "titulo": "Guía de resultados",
+      "0": {
+        "titulo": "Puntajes del panel",
+        "texto": "Aquí ves el promedio de cada muestra y el ranking del panel."
+      },
+      "1": {
+        "titulo": "Gráficas",
+        "texto": "Las gráficas de radar comparan los atributos de cada muestra."
+      },
+      "2": {
+        "titulo": "Exporta",
+        "texto": "Con «Exportar» descargas el reporte en PDF con formato SCA o los datos en Excel."
+      }
+    },
+    "escaner": {
+      "titulo": "Guía del escáner",
+      "0": {
+        "titulo": "Toma la foto",
+        "texto": "Fotografía la ficha completa, de frente y con buena luz."
+      },
+      "1": {
+        "titulo": "Revisa los datos",
+        "texto": "La IA lee la ficha; revisa y corrige cualquier valor antes de guardar."
+      },
+      "2": {
+        "titulo": "Guarda",
+        "texto": "Al guardar, la ficha queda en tus resultados como una evaluación más."
+      }
+    },
+    "configuracion": {
+      "titulo": "Guía de configuración",
+      "0": {
+        "titulo": "Tu cuenta, segura",
+        "texto": "Cambia tu contraseña y activa la verificación en dos pasos para proteger tu cuenta."
+      },
+      "1": {
+        "titulo": "A tu medida",
+        "texto": "Elige el idioma, el tamaño del texto, el alto contraste y reduce las animaciones si lo necesitas."
+      }
+    }
   }
 }

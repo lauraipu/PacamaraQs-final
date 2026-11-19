@@ -1,0 +1,101 @@
+.cfg-toolbar { --background: var(--app-bg-card); --color: var(--app-text-main); }
+.cfg-content { --background: var(--app-bg-screen); }
+
+.cfg {
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 16px 12px 32px;
+  display: grid;
+  gap: 12px;
+}
+
+.cfg-card {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-bg-card);
+}
+
+.cfg-card__titulo {
+  margin: 0;
+  color: var(--app-text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cfg-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--app-border);
+  background: none;
+  color: var(--app-text-main);
+  font: inherit;
+  font-size: 0.9375rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cfg-estado { color: var(--app-text-muted); font-size: 0.8125rem; }
+.cfg-sub { display: grid; gap: 12px; }
+
+.cfg-select {
+  --padding-start: 0;
+  --padding-end: 0;
+  min-height: 44px;
+  color: var(--app-text-main);
+  font-size: 0.9375rem;
+}
+
+.cfg-toggle {
+  min-height: 44px;
+  color: var(--app-text-main);
+  font-size: 0.9375rem;
+  --track-background-checked: var(--app-primary-dark);
+}
+
+.cfg-rango { display: grid; gap: 4px; color: var(--app-text-main); font-size: 0.9375rem; }
+.cfg-a { color: var(--app-text-muted); font-weight: 600; }
+.cfg-a--s { font-size: 0.75rem; }
+.cfg-a--l { font-size: 1.125rem; }
+
+.cfg-peligro, .cfg-salir { --border-radius: 8px; min-height: 44px; margin: 0; text-transform: none; font-weight: 600; }
+.cfg-salir { --color: var(--app-text-main); --border-color: var(--app-border); }
+
+.cfg-dato { display: grid; gap: 4px; min-width: 0; }
+.cfg-dato__label { color: var(--app-text-muted); font-size: 0.75rem; font-weight: 600; }
+.cfg-dato__fila {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0;
+  min-height: 44px; padding: 8px 4px; margin: 0 -4px; border: 0; border-radius: 8px;
+  background: none; font: inherit; text-align: left; cursor: pointer;
+}
+.cfg-dato__fila:active { background: var(--app-bg-subtle); }
+.cfg-lapiz { flex: none; color: var(--app-text-muted); font-size: 18px; }
+.cfg-dato__valor { margin: 0; color: var(--app-text-main); font-size: 0.9375rem; overflow-wrap: anywhere; }
+.cfg-dato__nota { color: var(--app-text-faint); font-size: 0.75rem; }
+.cfg-editar { --color: var(--app-primary-dark); flex: none; margin: 0; min-height: 36px; text-transform: none; font-weight: 600; }
+.cfg-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.cfg-acciones ion-button { flex: 1 1 120px; margin: 0; min-height: 44px; text-transform: none; }
+.cfg-cancelar { --color: var(--app-text-main); --border-color: var(--app-border); --border-radius: 8px; }
+.cfg-peligro { margin-top: 16px; }
+
+.cfg-modal-2fa { --width: min(420px, 100vw); --height: auto; --max-height: 92vh; --border-radius: 16px; }
+.cfg-2fa { display: grid; gap: 14px; padding-bottom: 8px; }
+.cfg-2fa__titulo { margin: 0; color: var(--app-text-main); font-size: 1.125rem; font-weight: 700; }
+.cfg-2fa__pasos { margin: 0; padding-left: 20px; color: var(--app-text-muted); font-size: 0.875rem; line-height: 1.5; }
+.cfg-2fa__qr { justify-self: center; width: min(200px, 60vw); aspect-ratio: 1; background: #ffffff; padding: 8px; border: 1px solid var(--app-border); border-radius: 12px; }
+.cfg-2fa__secreto {
+  display: grid; gap: 4px; padding: 10px 12px; border: 1px dashed var(--app-border); border-radius: 8px;
+  background: var(--app-bg-subtle); color: var(--app-text-muted); font: inherit; font-size: 0.75rem; text-align: left; cursor: pointer;
+}
+.cfg-2fa__secreto code { color: var(--app-text-main); font-family: var(--app-font-mono); font-size: 0.8125rem; overflow-wrap: anywhere; }
+.codigo-2fa { font-family: var(--app-font-mono); font-size: 1.25rem; letter-spacing: 0.3em; text-align: center; }

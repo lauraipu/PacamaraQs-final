@@ -1,0 +1,121 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="cfg-toolbar">
+    <ion-buttons slot="start"><ion-back-button defaultHref="/dashboard" text=""></ion-back-button></ion-buttons>
+    <ion-title>{{ 'config.titulo' | transloco }}</ion-title>
+    <ion-buttons slot="end"><app-boton-guia guia="configuracion"></app-boton-guia></ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cfg-content">
+  <main class="cfg">
+    <section class="cfg-card">
+      <h2 class="cfg-card__titulo">{{ 'config.perfil' | transloco }}</h2>
+      <div class="cfg-dato">
+        <span class="cfg-dato__label">{{ 'config.nombre' | transloco }}</span>
+        @if (!editandoNombre()) {
+          <button type="button" class="cfg-dato__fila" (click)="editarNombre()"
+            [attr.aria-label]="('config.editar' | transloco) + ': ' + nombre()">
+            <span class="cfg-dato__valor">{{ nombre() }}</span>
+            <ion-icon name="pencil-outline" class="cfg-lapiz" aria-hidden="true"></ion-icon>
+          </button>
+        } @else {
+          <ion-input class="custom-input" fill="outline" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" name="nombre" autocomplete="name"
+            [attr.aria-label]="'config.nombre' | transloco"></ion-input>
+          <div class="cfg-acciones">
+            <ion-button class="primary-btn" [disabled]="guardando()" (click)="guardarPerfil()">{{ 'config.guardar' | transloco }}</ion-button>
+            <ion-button fill="outline" class="cfg-cancelar" (click)="cancelarNombre()">{{ 'config.cancelar' | transloco }}</ion-button>
+          </div>
+        }
+      </div>
+      <div class="cfg-dato">
+        <span class="cfg-dato__label">{{ 'config.correo' | transloco }}</span>
+        <p class="cfg-dato__valor">{{ correo() }}</p>
+        <small class="cfg-dato__nota">{{ 'config.correo_bloqueado' | transloco }}</small>
+      </div>
+    </section>
+
+    <section class="cfg-card">
+      <h2 class="cfg-card__titulo">{{ 'config.seguridad' | transloco }}</h2>
+      <button type="button" class="cfg-fila" (click)="cambioContrasenaAbierto.set(!cambioContrasenaAbierto())">
+        <span>{{ 'config.cambiar_contrasena' | transloco }}</span>
+        <ion-icon [name]="cambioContrasenaAbierto() ? 'chevron-up-outline' : 'chevron-down-outline'" aria-hidden="true"></ion-icon>
+      </button>
+      @if (cambioContrasenaAbierto()) {
+        <div class="cfg-sub">
+          <app-campo-contrasena [(valor)]="nuevaContrasena" [datos]="{ nombre: nombre(), email: correo() }"></app-campo-contrasena>
+          <ion-button expand="block" class="primary-btn" (click)="guardarContrasena()">{{ 'config.guardar_contrasena' | transloco }}</ion-button>
+        </div>
+      }
+      <button type="button" class="cfg-fila" (click)="gestionar2fa()">
+        <span>{{ 'config.dos_pasos' | transloco }}</span>
+        <span class="cfg-estado">{{ (dosPasosActivo() ? 'config.activo' : 'config.inactivo') | transloco }}</span>
+      </button>
+      <ion-button expand="block" fill="outline" color="danger" class="cfg-peligro" (click)="cerrarEnTodos()">
+        {{ 'config.cerrar_todos' | transloco }}
+      </ion-button>
+    </section>
+
+    <section class="cfg-card">
+      <h2 class="cfg-card__titulo">{{ 'config.idioma' | transloco }}</h2>
+      <ion-select class="cfg-select" interface="action-sheet" [value]="idioma.actual()"
+        [attr.aria-label]="'config.idioma' | transloco" (ionChange)="guardarIdioma($event.detail.value)">
+        @for (i of idiomas; track i) {
+          <ion-select-option [value]="i" [attr.lang]="i">{{ 'idioma.' + i | transloco }}</ion-select-option>
+        }
+      </ion-select>
+    </section>
+
+    <section class="cfg-card">
+      <h2 class="cfg-card__titulo">{{ 'config.accesibilidad' | transloco }}</h2>
+      <ion-toggle class="cfg-toggle" [checked]="altoContraste()" (ionChange)="altoContraste.set($event.detail.checked)"
+        justify="space-between">{{ 'config.alto_contraste' | transloco }}</ion-toggle>
+      <div class="cfg-rango">
+        <span>{{ 'config.tamano_texto' | transloco }}</span>
+        <ion-range min="90" max="140" step="10" snaps [value]="tamanoTexto()" (ionChange)="tamanoTexto.set($any($event.detail.value))"
+          [attr.aria-label]="'config.tamano_texto' | transloco">
+          <span slot="start" class="cfg-a cfg-a--s">A</span><span slot="end" class="cfg-a cfg-a--l">A</span>
+        </ion-range>
+      </div>
+      <ion-toggle class="cfg-toggle" [checked]="reducirAnimaciones()" (ionChange)="reducirAnimaciones.set($event.detail.checked)"
+        justify="space-between">{{ 'config.reducir_animaciones' | transloco }}</ion-toggle>
+    </section>
+
+    <section class="cfg-card">
+      <h2 class="cfg-card__titulo">{{ 'config.cuenta' | transloco }}</h2>
+      <ion-button expand="block" fill="outline" class="cfg-salir" (click)="confirmarCerrarSesion()">{{ 'config.cerrar_sesion' | transloco }}</ion-button>
+    </section>
+  </main>
+
+  <ion-modal [isOpen]="modalDosPasos()" [backdropDismiss]="!dosPasosObligatorio()" (didDismiss)="cancelarActivacion()" class="cfg-modal-2fa">
+    <ng-template>
+      <ion-content class="ion-padding">
+        <div class="cfg-2fa">
+          <h2 class="cfg-2fa__titulo">{{ 'dos_pasos.activar_titulo' | transloco }}</h2>
+          <ol class="cfg-2fa__pasos">
+            <li>{{ 'dos_pasos.paso_app' | transloco }}</li>
+            <li>{{ 'dos_pasos.paso_qr' | transloco }}</li>
+            <li>{{ 'dos_pasos.paso_codigo' | transloco }}</li>
+          </ol>
+          @if (qrDosPasos(); as qr) {
+            <img class="cfg-2fa__qr" [src]="qr" [alt]="'dos_pasos.qr_alt' | transloco">
+          }
+          <button type="button" class="cfg-2fa__secreto" (click)="copiarSecreto()" [attr.aria-label]="'dos_pasos.copiar' | transloco">
+            <span>{{ 'dos_pasos.clave_manual' | transloco }}</span>
+            <code>{{ secretoDosPasos() }}</code>
+          </button>
+          <ion-input class="custom-input codigo-2fa" fill="outline" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+            placeholder="000000" [attr.aria-label]="'dos_pasos.codigo' | transloco"
+            [ngModel]="codigoDosPasos()" (ngModelChange)="escribirCodigo($event)"></ion-input>
+          <div class="cfg-acciones">
+            <ion-button class="primary-btn" [disabled]="activandoDosPasos()" (click)="confirmarActivacion()">
+              @if (activandoDosPasos()) { <ion-spinner name="crescent"></ion-spinner> } @else { {{ 'dos_pasos.activar' | transloco }} }
+            </ion-button>
+            @if (!dosPasosObligatorio()) {
+              <ion-button fill="outline" class="cfg-cancelar" (click)="modalDosPasos.set(false)">{{ 'config.cancelar' | transloco }}</ion-button>
+            }
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, Injector, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { App } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
@@ -18,6 +18,9 @@ export interface UsuarioActual {
   email: string;
   nombre: string;
 }
+
+/** Pantalla del segundo paso del inicio de sesión (código de la app de autenticación). */
+export const RUTA_DOS_PASOS = '/verificar-dos-pasos';
 
 /** Ruta a la que llega el enlace del correo de recuperación de contraseña. */
 export const RUTA_NUEVA_CONTRASENA = '/nueva-contrasena';
@@ -49,6 +52,9 @@ export const VERSION_POLITICA = '1.0';
 export class AuthService {
   private readonly supabase = inject(SupabaseService);
   private readonly router = inject(Router);
+  private readonly injector = inject(Injector);
+  /** true mientras el usuario cierra sesión a propósito (no es un vencimiento). */
+  private salidaVoluntaria = false;
 
   private readonly _usuario = signal<UsuarioActual | null>(null);
   private readonly _rol = signal<RolGlobal | null>(null);
@@ -231,10 +237,38 @@ export class AuthService {
     this.marcarRecuperacion(false);
   }
 
-  async signOut(): Promise<void> {
-    const { error } = await this.supabase.client.auth.signOut();
-    this.limpiarEstado();
+  /* ── Verificación en dos pasos (TOTP) ─────────────────────────────────
+   * tieneFactor: la cuenta tiene una app de autenticación activa.
+   * requiereCodigo: la sesión actual aún no pasó el segundo paso (aal1).
+   * getAuthenticatorAssuranceLevel lee el token local: no hace peticiones.
+   */
+  async estadoDosPasos(): Promise<{ tieneFactor: boolean; requiereCodigo: boolean }> {
+    const { data, error } = await this.supabase.client.auth.mfa.getAuthenticatorAssuranceLevel();
     if (error) throw error;
+    const tieneFactor = data.nextLevel === 'aal2';
+    return { tieneFactor, requiereCodigo: tieneFactor && data.currentLevel !== 'aal2' };
+  }
+
+  async verificarCodigoDosPasos(codigo: string): Promise<void> {
+    const mfa = this.supabase.client.auth.mfa;
+    const { data, error } = await mfa.listFactors();
+    if (error) throw error;
+    const factor = data.totp.find(f => f.status === 'verified');
+    if (!factor) throw new Error('La cuenta no tiene verificación en dos pasos.');
+    const { error: e } = await mfa.challengeAndVerify({ factorId: factor.id, code: codigo });
+    if (e) throw e;
+  }
+
+  /** scope 'global' cierra la sesión en todos los dispositivos de la cuenta. */
+  async signOut(scope: 'local' | 'global' = 'local'): Promise<void> {
+    this.salidaVoluntaria = true;
+    try {
+      const { error } = await this.supabase.client.auth.signOut({ scope });
+      this.limpiarEstado();
+      if (error) throw error;
+    } finally {
+      setTimeout(() => (this.salidaVoluntaria = false), 0);
+    }
   }
 
   /**
@@ -305,7 +339,12 @@ export class AuthService {
 
   private aplicarCambioSesion(evento: AuthChangeEvent, sesion: Session | null): void {
     if (evento === 'SIGNED_OUT' || !sesion?.user || sesion.user.is_anonymous) {
+      const habiaUsuario = this._usuario() !== null;
       this.limpiarEstado();
+      // La sesión venció o se cerró desde otro dispositivo: avisar y volver al login.
+      if (evento === 'SIGNED_OUT' && habiaUsuario && !this.salidaVoluntaria) {
+        setTimeout(() => void this.avisarSesionVencida(), 0);
+      }
       return;
     }
 
@@ -351,6 +390,15 @@ export class AuthService {
       this._versionPolitica.set(typeof data?.version_politica_aceptada === 'string' ? data.version_politica_aceptada : null);
     }
     return rol;
+  }
+
+  private async avisarSesionVencida(): Promise<void> {
+    const ruta = this.router.url;
+    const { AvisosService } = await import('../avisos/avisos.service');
+    void this.injector.get(AvisosService).info('errores.sesion_expirada');
+    const publicas = ['/login', '/registro', '/recuperar', RUTA_NUEVA_CONTRASENA];
+    if (publicas.some(p => ruta.startsWith(p))) return;
+    await this.router.navigate(['/login'], { queryParams: { returnUrl: ruta }, replaceUrl: true });
   }
 
   /** Recuerda (también al recargar la pestaña) que falta definir la contraseña nueva. */

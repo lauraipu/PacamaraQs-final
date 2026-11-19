@@ -127,8 +127,11 @@
       "insegura": "密码未满足全部要求。",
       "no_coinciden": "两次输入的密码不一致。",
       "igual": "新密码必须与旧密码不同。",
-      "generico": "无法更新密码，请重试。"
-    }
+      "generico": "无法更新密码，请重试。",
+      "falta": "密码还缺少：{{req}}"
+    },
+    "ver_requisitos": "查看密码要求",
+    "requisitos_titulo": "您的密码必须包含："
   },
   "politica": {
     "titulo": "数据处理政策",
@@ -1164,5 +1167,188 @@
     "puntaje_catador_1fbr5gy": "杯测师分数",
     "no_r5wqai": "否",
     "combinado_descriptivo_afectivo_tgsuum": "综合（描述性 + 情感）"
+  },
+  "config": {
+    "titulo": "设置",
+    "perfil": "个人资料",
+    "nombre": "姓名",
+    "correo": "邮箱",
+    "guardar": "保存更改",
+    "seguridad": "安全",
+    "cambiar_contrasena": "修改密码",
+    "guardar_contrasena": "保存密码",
+    "dos_pasos": "两步验证",
+    "activo": "已开启",
+    "inactivo": "未开启",
+    "cerrar_todos": "在所有设备上退出登录",
+    "cerrar_todos_mensaje": "将在此设备及您的所有设备上退出登录。",
+    "confirmar": "确认",
+    "idioma": "语言",
+    "accesibilidad": "无障碍",
+    "alto_contraste": "高对比度",
+    "tamano_texto": "文字大小",
+    "reducir_animaciones": "减少动画",
+    "cuenta": "账户",
+    "cerrar_sesion": "退出登录",
+    "guardado": "更改已保存。",
+    "abrir": "设置",
+    "errores": {
+      "cargar": "无法加载您的资料。",
+      "guardar": "无法保存更改。",
+      "nombre": "请输入有效的姓名。"
+    },
+    "editar": "编辑",
+    "cancelar": "取消",
+    "correo_bloqueado": "出于安全原因，邮箱无法修改。"
+  },
+  "dos_pasos": {
+    "verificar_titulo": "两步验证",
+    "verificar_texto": "请输入身份验证器应用中显示的 6 位验证码。",
+    "codigo": "6 位验证码",
+    "verificar": "验证",
+    "ayuda_perdida": "如果无法使用身份验证器应用，请发送邮件至 PacamaraQS@gmail.com。",
+    "usar_otra_cuenta": "使用其他账户",
+    "activar_titulo": "开启两步验证",
+    "paso_app": "安装身份验证器应用，例如 Google Authenticator 或 Microsoft Authenticator。",
+    "paso_qr": "在应用中添加账户并扫描此二维码。",
+    "paso_codigo": "输入应用中显示的 6 位验证码。",
+    "qr_alt": "身份验证器应用的二维码",
+    "clave_manual": "如果无法扫描，请在应用中输入此密钥（点击复制）：",
+    "copiar": "复制密钥",
+    "copiado": "密钥已复制。",
+    "activar": "开启",
+    "activada": "两步验证已开启。",
+    "desactivar_titulo": "关闭两步验证",
+    "desactivar_texto": "请输入身份验证器应用中的验证码以确认。",
+    "desactivar": "关闭",
+    "desactivada": "两步验证已关闭。",
+    "obligatorio_admin": "管理员账户必须开启两步验证。",
+    "admin_no_desactiva": "管理员不能关闭两步验证。",
+    "errores": {
+      "formato": "验证码为 6 位数字。",
+      "codigo": "验证码错误或已过期，请使用当前验证码。",
+      "activar": "无法开始开启流程，请重试。"
+    }
+  },
+  "errores": {
+    "sin_conexion": "无网络连接。请检查网络后重试。",
+    "credenciales": "邮箱或密码错误。",
+    "sesion_expirada": "登录已过期，请重新登录。",
+    "sin_permiso": "您没有执行此操作的权限。",
+    "no_existe": "您要查找的内容已不存在或您无权访问。",
+    "duplicado": "该记录已存在。",
+    "limite": "尝试次数过多，请等待几分钟。",
+    "servidor": "服务器出现问题，请稍后重试。",
+    "inesperado": "发生意外错误。如果再次出现，请重新加载应用。",
+    "banner_sin_conexion": "无网络连接。您的更改已保存在本设备上，重新连接后会自动发送。",
+    "conexion_restablecida": "网络已恢复。"
+  },
+  "formulario": {
+    "enviar_titulo": "提交评分表",
+    "enviar_mensaje": "将提交所有样品的评分表。提交后无法修改。",
+    "enviar": "提交",
+    "salir_titulo": "要退出评估吗？",
+    "salir_mensaje": "您的进度已保存在本设备上，可以稍后继续。",
+    "salir": "退出"
+  },
+  "guias": {
+    "comun": {
+      "paso": "第 {{n}} 步，共 {{total}} 步",
+      "anterior": "上一步",
+      "siguiente": "下一步",
+      "saltar": "跳过",
+      "entendido": "知道了",
+      "ver_guia": "查看本页指南"
+    },
+    "dashboard": {
+      "titulo": "主页指南",
+      "0": {
+        "titulo": "创建会话",
+        "texto": "作为组织者，创建杯测会话：选择格式和样品数量，然后分享代码。"
+      },
+      "1": {
+        "titulo": "用代码加入",
+        "texto": "如果您受到邀请，请在此输入会话代码进入等候室。"
+      },
+      "2": {
+        "titulo": "扫描纸质表",
+        "texto": "在纸上杯测？拍下 SCA 表格，应用会将其转换为可检查的电子表。"
+      }
+    },
+    "sala": {
+      "titulo": "等候室指南",
+      "0": {
+        "titulo": "分享代码",
+        "texto": "组织者分享代码或二维码，让杯测师加入。"
+      },
+      "1": {
+        "titulo": "标记准备就绪",
+        "texto": "准备好后点击“就绪”。组织者可以看到谁已就绪。"
+      },
+      "2": {
+        "titulo": "至少 3 名杯测师",
+        "texto": "至少 3 名杯测师就绪后开始杯测。评估为盲测：任何人都看不到他人的评分表。"
+      }
+    },
+    "formulario": {
+      "titulo": "评估指南",
+      "0": {
+        "titulo": "逐个评估样品",
+        "texto": "评估每个样品后点击“下一步”。提交前可以返回之前的样品。"
+      },
+      "1": {
+        "titulo": "强度与品质",
+        "texto": "拖动滑块设置强度，并选择 1 到 9 的品质分。勾选您感知到的风味描述。"
+      },
+      "2": {
+        "titulo": "自动保存",
+        "texto": "即使没有网络，您的进度也会保存在设备上。"
+      },
+      "3": {
+        "titulo": "完成后提交",
+        "texto": "所有样品完成后点击“提交”。提交后无法修改。"
+      }
+    },
+    "resultados": {
+      "titulo": "结果指南",
+      "0": {
+        "titulo": "小组得分",
+        "texto": "这里显示每个样品的平均分和小组排名。"
+      },
+      "1": {
+        "titulo": "图表",
+        "texto": "雷达图比较每个样品的各项属性。"
+      },
+      "2": {
+        "titulo": "导出",
+        "texto": "点击“导出”可下载 SCA 格式的 PDF 报告或 Excel 数据。"
+      }
+    },
+    "escaner": {
+      "titulo": "扫描指南",
+      "0": {
+        "titulo": "拍照",
+        "texto": "正面拍摄完整表格，并确保光线充足。"
+      },
+      "1": {
+        "titulo": "检查数据",
+        "texto": "AI 读取表格后，请在保存前检查并修正数值。"
+      },
+      "2": {
+        "titulo": "保存",
+        "texto": "保存后，该表会像其他评估一样出现在结果中。"
+      }
+    },
+    "configuracion": {
+      "titulo": "设置指南",
+      "0": {
+        "titulo": "保护您的账户",
+        "texto": "修改密码并开启两步验证以保护您的账户。"
+      },
+      "1": {
+        "titulo": "个性化",
+        "texto": "选择语言、文字大小、高对比度，并按需减少动画。"
+      }
+    }
   }
 }

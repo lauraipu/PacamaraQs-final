@@ -22,6 +22,7 @@ import {
 
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TrPipe } from '../../../core/i18n/tr';
+import { BotonGuiaComponent } from '../../../shared/components/boton-guia/boton-guia.component';
 addIcons({
   arrowBackOutline,
   chevronDownOutline,
@@ -75,7 +76,7 @@ export type AtributoCalificable =
   selector: 'app-combined-form',
   templateUrl: './combined-form.page.html',
   standalone: true,
-  imports: [TrPipe, TranslocoPipe, IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, GustosPredominantesComponent]
+  imports: [BotonGuiaComponent, TrPipe, TranslocoPipe, IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, GustosPredominantesComponent]
 })
 export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
 
@@ -212,6 +213,8 @@ export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
       this.formulario.defectos.tazasDefectuosas = operacion === 'sumar' ? Math.min(5, val + 1) : Math.max(0, val - 1);
     }
   }
+
+  protected override confirmarAntesDeEnviar = false;
 
   override async finalizarCata(): Promise<void> {
     // Las muestras cerradas por el organizador no se exigen.

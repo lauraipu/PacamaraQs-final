@@ -34,6 +34,7 @@ import {
 
 import { TranslocoPipe } from '@jsverse/transloco';
 import { tr, TrPipe } from '../../../core/i18n/tr';
+import { BotonGuiaComponent } from '../../../shared/components/boton-guia/boton-guia.component';
 export interface Clasificacion {
   etiqueta: string;
   color: string;
@@ -248,7 +249,7 @@ function atributosDeFicha(atributos: Partial<Record<string, ValorAtributo>>): At
   templateUrl: './results.page.html',
   styleUrls: ['./results.page.scss'],
   standalone: true,
-  imports: [TranslocoPipe, TrPipe, 
+  imports: [BotonGuiaComponent, TranslocoPipe, TrPipe, 
     IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonBackButton, IonButtons,
     IonIcon, IonSpinner, IonCard, IonCardContent, IonGrid, IonRow, IonCol, IonBadge, IonList,
     IonAccordionGroup, IonAccordion, IonItem, IonLabel, IonModal, IonSegment, IonSegmentButton,

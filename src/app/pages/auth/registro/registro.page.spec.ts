@@ -42,8 +42,8 @@ describe('RegistroPage', () => {
   it('rejects mismatched passwords before calling the auth service', async () => {
     component.nombre = 'Ana';
     component.email = 'ana@example.com';
-    component.password = 'secret1';
-    component.confirmPassword = 'secret2';
+    component.password = 'Taza-Limpia#2026';
+    component.confirmPassword = 'Taza-Limpia#2027';
     component.politicaAceptada = true;
 
     await component.registro();

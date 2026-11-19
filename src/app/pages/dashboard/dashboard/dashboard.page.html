@@ -5,8 +5,9 @@
       <div class="brand-subtitle">{{ nombreUsuario }}</div>
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button color="medium" (click)="cerrarSesion()" [disabled]="isSigningOut">
-        {{ 'dashboard.cerrar_sesion' | transloco }}
+      <app-boton-guia guia="dashboard"></app-boton-guia>
+      <ion-button class="btn-config" fill="clear" (click)="irAConfiguracion()" [attr.aria-label]="'config.abrir' | transloco">
+        <ion-icon slot="icon-only" name="settings-outline" aria-hidden="true"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

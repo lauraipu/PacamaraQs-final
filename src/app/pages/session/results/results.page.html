@@ -10,6 +10,7 @@
       }
     </ion-title>
     <ion-buttons slot="end">
+      <app-boton-guia guia="resultados"></app-boton-guia>
       <ion-button fill="outline" size="small" [disabled]="!resultados() || imprimiendo()"
         (click)="abrirMenuExportar()">
         <ion-icon name="download-outline" slot="start"></ion-icon>

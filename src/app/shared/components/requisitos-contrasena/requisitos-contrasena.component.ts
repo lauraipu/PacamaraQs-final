@@ -18,14 +18,17 @@ addIcons({ checkmarkCircle, ellipseOutline });
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="rc">
+      @if (modo() !== 'lista') {
       <div class="rc__medidor" role="meter" aria-valuemin="0" aria-valuemax="4"
         [attr.aria-valuenow]="nivel()" [attr.aria-label]="'contrasena.fortaleza' | transloco">
         @for (i of [1, 2, 3, 4]; track i) {
           <span class="rc__barra" [class.rc__barra--on]="nivel() >= i" [attr.data-nivel]="nivel()"></span>
         }
       </div>
-      <p class="rc__nivel">{{ ('contrasena.nivel_' + nivel()) | transloco }}</p>
-      <ul class="rc__lista" aria-live="polite">
+      <p class="rc__nivel" aria-live="polite">{{ ('contrasena.nivel_' + nivel()) | transloco }}</p>
+      }
+      @if (modo() !== 'medidor') {
+      <ul class="rc__lista">
         @for (r of requisitos(); track r.clave) {
           <li class="rc__item" [class.rc__item--ok]="r.cumple">
             <ion-icon [name]="r.cumple ? 'checkmark-circle' : 'ellipse-outline'" aria-hidden="true"></ion-icon>
@@ -34,6 +37,7 @@ addIcons({ checkmarkCircle, ellipseOutline });
           </li>
         }
       </ul>
+      }
     </div>
   `,
   styles: [`
@@ -52,6 +56,8 @@ addIcons({ checkmarkCircle, ellipseOutline });
   `]
 })
 export class RequisitosContrasenaComponent {
+  /** completo = medidor + lista; medidor = solo barras; lista = solo requisitos (popover). */
+  readonly modo = input<'completo' | 'medidor' | 'lista'>('completo');
   readonly contrasena = input('');
   readonly nombre = input<string | null>(null);
   readonly email = input<string | null>(null);

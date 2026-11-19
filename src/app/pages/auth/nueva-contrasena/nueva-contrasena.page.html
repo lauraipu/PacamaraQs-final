@@ -43,38 +43,25 @@
         <p class="subtitle">{{ 'recuperar.nueva_subtitulo' | transloco: { correo: correo() ?? '' } }}</p>
 
         <form class="auth-card" (ngSubmit)="guardar()">
-          <ion-input
-            [ngModel]="contrasena"
-            (ngModelChange)="alEscribir($event)"
-            name="contrasena"
-            [label]="'contrasena.nueva' | transloco"
-            labelPlacement="stacked"
-            [type]="mostrar ? 'text' : 'password'"
-            autocomplete="new-password"
-            fill="outline"
-            class="custom-input"
-            required
-          ></ion-input>
-
-          <app-requisitos-contrasena [contrasena]="valorActual()" [nombre]="nombre()" [email]="correo()"></app-requisitos-contrasena>
+          <app-campo-contrasena #campo [(valor)]="contrasena" [datos]="datos()"></app-campo-contrasena>
 
           <ion-input
             [(ngModel)]="confirmacion"
             name="confirmacion"
             [label]="'contrasena.confirmar' | transloco"
             labelPlacement="stacked"
-            [type]="mostrar ? 'text' : 'password'"
+            [type]="mostrarConfirmacion() ? 'text' : 'password'"
             autocomplete="new-password"
             fill="outline"
             class="custom-input"
             required
-          ></ion-input>
-
-          <ion-button type="button" fill="clear" class="password-toggle"
-            [attr.aria-label]="(mostrar ? 'registro.ocultar_aria' : 'registro.mostrar_aria') | transloco"
-            (click)="mostrar = !mostrar">
-            {{ (mostrar ? 'registro.ocultar' : 'registro.mostrar') | transloco }}
-          </ion-button>
+          >
+            <ion-button slot="end" fill="clear" type="button" class="campo-ojo"
+              [attr.aria-label]="(mostrarConfirmacion() ? 'registro.ocultar_aria' : 'registro.mostrar_aria') | transloco"
+              (click)="mostrarConfirmacion.set(!mostrarConfirmacion())">
+              <ion-icon slot="icon-only" [name]="mostrarConfirmacion() ? 'eye-off-outline' : 'eye-outline'" aria-hidden="true"></ion-icon>
+            </ion-button>
+          </ion-input>
 
           <ion-button expand="block" type="submit" class="primary-btn" [disabled]="guardando()">
             @if (guardando()) {

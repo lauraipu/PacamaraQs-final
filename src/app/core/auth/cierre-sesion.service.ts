@@ -16,6 +16,12 @@ export class CierreSesionService {
   private readonly transloco = inject(TranslocoService);
   private abierto = false;
 
+  /** Limpia el estado local y vuelve al login (tras un cierre de sesión ya hecho). */
+  async irAlLogin(): Promise<void> {
+    await this.authService.signOut().catch(() => undefined);
+    await this.router.navigateByUrl('/login', { replaceUrl: true });
+  }
+
   /** true si el usuario confirmó y se cerró la sesión. */
   async confirmarYSalir(): Promise<boolean> {
     if (this.abierto) return false;

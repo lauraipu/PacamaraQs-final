@@ -2,6 +2,7 @@
   <ion-toolbar class="sc-toolbar">
     <ion-title>{{ titulo() | tr }}</ion-title>
     <ion-buttons slot="end">
+      <app-boton-guia guia="escaner"></app-boton-guia>
       <ion-button [attr.aria-label]="'escaner.cerrar' | transloco" (click)="cerrar()" [disabled]="guardando()">
         <ion-icon slot="icon-only" name="close-outline"></ion-icon>
       </ion-button>

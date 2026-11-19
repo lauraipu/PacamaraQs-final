@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService, RUTA_NUEVA_CONTRASENA } from '../services/auth';
+import { AuthService, RUTA_DOS_PASOS, RUTA_NUEVA_CONTRASENA } from '../services/auth';
 
 /**
  * Exige un usuario autenticado con cuenta real (no anónima).
@@ -16,6 +16,14 @@ export const authGuard: CanActivateFn = async (_route, state) => {
       // Entró con el enlace de recuperación: primero define la contraseña nueva.
       if (authService.enRecuperacion()) {
         return router.createUrlTree([RUTA_NUEVA_CONTRASENA]);
+      }
+      // Cuenta con verificación en dos pasos: falta el código de esta sesión.
+      try {
+        if ((await authService.estadoDosPasos()).requiereCodigo) {
+          return router.createUrlTree([RUTA_DOS_PASOS], { queryParams: { returnUrl: state.url } });
+        }
+      } catch (error) {
+        console.error('No se pudo verificar el nivel de la sesión:', error);
       }
       // Ley 1581: sin la política aceptada (versión vigente) no se usa la app.
       if (state.url.startsWith('/aceptar-politica')) return true;

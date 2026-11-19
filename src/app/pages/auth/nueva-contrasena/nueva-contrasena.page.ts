@@ -1,14 +1,14 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonInput, IonSpinner, ToastController } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, checkmarkCircleOutline } from 'ionicons/icons';
-import { contrasenaEsSegura } from '../../../core/auth/politica-contrasena';
+import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '../../../core/auth/politica-contrasena';
 import { AuthService } from '../../../core/services/auth';
 import { codigoDeError, esSinConexion } from '../../../core/utils/errores';
-import { RequisitosContrasenaComponent } from '../../../shared/components/requisitos-contrasena/requisitos-contrasena.component';
+import { CampoContrasenaComponent } from '../../../shared/components/campo-contrasena/campo-contrasena.component';
 import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
 
 addIcons({ alertCircleOutline, checkmarkCircleOutline });
@@ -27,17 +27,16 @@ type Estado = 'verificando' | 'formulario' | 'invalido' | 'listo';
   standalone: true,
   imports: [
     IonContent, IonInput, IonButton, IonSpinner, IonIcon, FormsModule, RouterLink, TranslocoPipe,
-    SelectorIdiomaComponent, RequisitosContrasenaComponent
+    SelectorIdiomaComponent, CampoContrasenaComponent
   ]
 })
 export class NuevaContrasenaPage implements OnInit {
-  contrasena = '';
+  readonly contrasena = signal('');
   confirmacion = '';
-  mostrar = false;
+  readonly mostrarConfirmacion = signal(false);
   readonly estado = signal<Estado>('verificando');
   readonly guardando = signal(false);
-  /** Copia en signal para que el medidor se actualice al escribir (app zoneless). */
-  readonly valorActual = signal('');
+  private readonly campo = viewChild(CampoContrasenaComponent);
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -47,6 +46,7 @@ export class NuevaContrasenaPage implements OnInit {
   readonly usuario = this.authService.usuario;
   readonly correo = computed(() => this.usuario()?.email ?? null);
   readonly nombre = computed(() => this.usuario()?.nombre ?? null);
+  readonly datos = computed(() => ({ nombre: this.nombre(), email: this.correo() }));
 
   async ngOnInit(): Promise<void> {
     // Enlace vencido o ya usado: Supabase lo indica en la URL.
@@ -65,28 +65,26 @@ export class NuevaContrasenaPage implements OnInit {
     }
   }
 
-  alEscribir(valor: string | null | undefined): void {
-    this.contrasena = valor ?? '';
-    this.valorActual.set(this.contrasena);
-  }
-
   async guardar(): Promise<void> {
     if (this.guardando()) return;
-    if (!contrasenaEsSegura(this.contrasena, { nombre: this.nombre(), email: this.correo() })) {
-      await this.avisar('contrasena.errores.insegura');
+    const faltante = primerRequisitoFaltante(this.contrasena(), this.datos());
+    if (faltante) {
+      // Mensaje concreto + se abre la ayuda con la lista de requisitos.
+      const requisito = this.transloco.translate(`contrasena.req_${faltante}`, { n: LONGITUD_MINIMA_CONTRASENA });
+      await this.avisarTexto(this.transloco.translate('contrasena.errores.falta', { req: requisito }));
+      this.campo()?.abrirAyuda();
       return;
     }
-    if (this.contrasena !== this.confirmacion) {
+    if (this.contrasena() !== this.confirmacion) {
       await this.avisar('contrasena.errores.no_coinciden');
       return;
     }
 
     this.guardando.set(true);
     try {
-      await this.authService.actualizarContrasena(this.contrasena);
-      this.contrasena = '';
+      await this.authService.actualizarContrasena(this.contrasena());
+      this.contrasena.set('');
       this.confirmacion = '';
-      this.valorActual.set('');
       this.estado.set('listo');
       await this.avisar('recuperar.actualizada', 'success');
     } catch (error) {
@@ -110,8 +108,12 @@ export class NuevaContrasenaPage implements OnInit {
   }
 
   private async avisar(clave: string, color: 'danger' | 'success' = 'danger'): Promise<void> {
+    await this.avisarTexto(this.transloco.translate(clave), color);
+  }
+
+  private async avisarTexto(mensaje: string, color: 'danger' | 'success' = 'danger'): Promise<void> {
     const toast = await this.toastController.create({
-      message: this.transloco.translate(clave),
+      message: mensaje,
       duration: 3500,
       position: 'bottom',
       color

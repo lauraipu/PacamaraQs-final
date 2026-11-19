@@ -57,3 +57,8 @@ export function nivelContrasena(contrasena: string, datos: DatosPersonales = {})
   if (cumplidos >= 4) return 2;
   return 1;
 }
+
+/** Primer requisito que falta (para el mensaje de error al guardar), o null si cumple todo. */
+export function primerRequisitoFaltante(contrasena: string, datos: DatosPersonales = {}): ClaveRequisito | null {
+  return evaluarContrasena(contrasena, datos).find(requisito => !requisito.cumple)?.clave ?? null;
+}

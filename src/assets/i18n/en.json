@@ -127,8 +127,11 @@
       "insegura": "The password does not meet all the requirements.",
       "no_coinciden": "Passwords do not match.",
       "igual": "The new password must be different from the previous one.",
-      "generico": "The password could not be updated. Try again."
-    }
+      "generico": "The password could not be updated. Try again.",
+      "falta": "Your password is missing: {{req}}"
+    },
+    "ver_requisitos": "See password requirements",
+    "requisitos_titulo": "Your password must have:"
   },
   "politica": {
     "titulo": "Data processing policy",
@@ -1164,5 +1167,188 @@
     "puntaje_catador_1fbr5gy": "Cupper score",
     "no_r5wqai": "No",
     "combinado_descriptivo_afectivo_tgsuum": "Combined (Descriptive + Affective)"
+  },
+  "config": {
+    "titulo": "Settings",
+    "perfil": "Profile",
+    "nombre": "Name",
+    "correo": "Email",
+    "guardar": "Save changes",
+    "seguridad": "Security",
+    "cambiar_contrasena": "Change password",
+    "guardar_contrasena": "Save password",
+    "dos_pasos": "Two-step verification",
+    "activo": "On",
+    "inactivo": "Off",
+    "cerrar_todos": "Sign out of all devices",
+    "cerrar_todos_mensaje": "You will be signed out on this and all your devices.",
+    "confirmar": "Confirm",
+    "idioma": "Language",
+    "accesibilidad": "Accessibility",
+    "alto_contraste": "High contrast",
+    "tamano_texto": "Text size",
+    "reducir_animaciones": "Reduce motion",
+    "cuenta": "Account",
+    "cerrar_sesion": "Sign out",
+    "guardado": "Changes saved.",
+    "abrir": "Settings",
+    "errores": {
+      "cargar": "Your data could not be loaded.",
+      "guardar": "Changes could not be saved.",
+      "nombre": "Enter a valid name."
+    },
+    "editar": "Edit",
+    "cancelar": "Cancel",
+    "correo_bloqueado": "Your email cannot be changed for security reasons."
+  },
+  "dos_pasos": {
+    "verificar_titulo": "Two-step verification",
+    "verificar_texto": "Enter the 6-digit code shown in your authenticator app.",
+    "codigo": "6-digit code",
+    "verificar": "Verify",
+    "ayuda_perdida": "If you lost access to your authenticator app, write to PacamaraQS@gmail.com.",
+    "usar_otra_cuenta": "Use another account",
+    "activar_titulo": "Turn on two-step verification",
+    "paso_app": "Install an authenticator app, such as Google Authenticator or Microsoft Authenticator.",
+    "paso_qr": "In the app, add an account and scan this QR code.",
+    "paso_codigo": "Enter the 6-digit code shown in the app.",
+    "qr_alt": "QR code for the authenticator app",
+    "clave_manual": "If you cannot scan it, type this key in the app (tap to copy):",
+    "copiar": "Copy key",
+    "copiado": "Key copied.",
+    "activar": "Turn on",
+    "activada": "Two-step verification is on.",
+    "desactivar_titulo": "Turn off two-step verification",
+    "desactivar_texto": "Enter a code from your authenticator app to confirm.",
+    "desactivar": "Turn off",
+    "desactivada": "Two-step verification is off.",
+    "obligatorio_admin": "Administrator accounts must have two-step verification turned on.",
+    "admin_no_desactiva": "Administrators cannot turn off two-step verification.",
+    "errores": {
+      "formato": "The code has 6 digits.",
+      "codigo": "Wrong or expired code. Try the current code.",
+      "activar": "Setup could not start. Try again."
+    }
+  },
+  "errores": {
+    "sin_conexion": "No connection. Check your network and try again.",
+    "credenciales": "Wrong email or password.",
+    "sesion_expirada": "Your session expired. Please sign in again.",
+    "sin_permiso": "You do not have permission to do this.",
+    "no_existe": "What you are looking for no longer exists or you do not have access.",
+    "duplicado": "That record already exists.",
+    "limite": "Too many attempts. Wait a few minutes.",
+    "servidor": "The server had a problem. Try again in a moment.",
+    "inesperado": "An unexpected error occurred. If it happens again, reload the app.",
+    "banner_sin_conexion": "No connection. Your changes are saved on this device and will be sent when you reconnect.",
+    "conexion_restablecida": "Connection restored."
+  },
+  "formulario": {
+    "enviar_titulo": "Submit forms",
+    "enviar_mensaje": "Your forms for all samples will be submitted. You will not be able to change them afterwards.",
+    "enviar": "Submit",
+    "salir_titulo": "Leave the evaluation?",
+    "salir_mensaje": "Your progress is saved on this device and you can continue later.",
+    "salir": "Leave"
+  },
+  "guias": {
+    "comun": {
+      "paso": "Step {{n}} of {{total}}",
+      "anterior": "Back",
+      "siguiente": "Next",
+      "saltar": "Skip",
+      "entendido": "Got it",
+      "ver_guia": "See the guide for this screen"
+    },
+    "dashboard": {
+      "titulo": "Dashboard guide",
+      "0": {
+        "titulo": "Create a session",
+        "texto": "As an organizer, create a cupping session: choose the format and number of samples, then share the code."
+      },
+      "1": {
+        "titulo": "Join with a code",
+        "texto": "If you were invited, enter the session code here to go to the waiting room."
+      },
+      "2": {
+        "titulo": "Scan a paper form",
+        "texto": "Cupped on paper? Take a photo of the SCA form and the app turns it into a digital form you can review."
+      }
+    },
+    "sala": {
+      "titulo": "Waiting room guide",
+      "0": {
+        "titulo": "Share the code",
+        "texto": "The organizer shares the code or QR so cuppers can join."
+      },
+      "1": {
+        "titulo": "Mark yourself ready",
+        "texto": "When you are prepared, tap “Ready”. The organizer sees who is ready."
+      },
+      "2": {
+        "titulo": "At least 3 cuppers",
+        "texto": "Cupping starts when at least 3 cuppers are ready. It is blind: nobody sees the others’ forms."
+      }
+    },
+    "formulario": {
+      "titulo": "Evaluation guide",
+      "0": {
+        "titulo": "One sample at a time",
+        "texto": "Evaluate each sample and move on with “Next”. You can go back before submitting."
+      },
+      "1": {
+        "titulo": "Intensity and quality",
+        "texto": "Move the bar for intensity and choose quality from 1 to 9. Mark the descriptors you perceive."
+      },
+      "2": {
+        "titulo": "Saved automatically",
+        "texto": "Your progress is saved on the device, even without internet."
+      },
+      "3": {
+        "titulo": "Submit when done",
+        "texto": "When all samples are complete, tap “Submit”. You will not be able to change them afterwards."
+      }
+    },
+    "resultados": {
+      "titulo": "Results guide",
+      "0": {
+        "titulo": "Panel scores",
+        "texto": "Here you see each sample’s average and the panel ranking."
+      },
+      "1": {
+        "titulo": "Charts",
+        "texto": "Radar charts compare the attributes of each sample."
+      },
+      "2": {
+        "titulo": "Export",
+        "texto": "With “Export” you download the SCA-format PDF report or the data in Excel."
+      }
+    },
+    "escaner": {
+      "titulo": "Scanner guide",
+      "0": {
+        "titulo": "Take the photo",
+        "texto": "Photograph the whole form, straight on and in good light."
+      },
+      "1": {
+        "titulo": "Review the data",
+        "texto": "The AI reads the form; review and fix any value before saving."
+      },
+      "2": {
+        "titulo": "Save",
+        "texto": "Once saved, the form appears in your results like any other evaluation."
+      }
+    },
+    "configuracion": {
+      "titulo": "Settings guide",
+      "0": {
+        "titulo": "Keep your account safe",
+        "texto": "Change your password and turn on two-step verification to protect your account."
+      },
+      "1": {
+        "titulo": "Make it yours",
+        "texto": "Choose the language, text size, high contrast and reduce motion if you need it."
+      }
+    }
   }
 }

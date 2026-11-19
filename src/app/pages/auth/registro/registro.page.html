@@ -48,26 +48,8 @@
         class="custom-input"
         required
       ></ion-input>
-      <ion-input
-        [(ngModel)]="password"
-        name="password"
-        [label]="'registro.contrasena' | transloco"
-        labelPlacement="stacked"
-        [type]="showPassword ? 'text' : 'password'"
-        autocomplete="new-password"
-        fill="outline"
-        class="custom-input"
-        required
-      ></ion-input>
-      <ion-button
-        type="button"
-        fill="clear"
-        class="password-toggle"
-        [attr.aria-label]="(showPassword ? 'registro.ocultar_aria' : 'registro.mostrar_aria') | transloco"
-        (click)="showPassword = !showPassword"
-      >
-        {{ (showPassword ? 'registro.ocultar' : 'registro.mostrar') | transloco }}
-      </ion-button>
+      <app-campo-contrasena etiqueta="registro.contrasena" [valor]="password" (valorChange)="password = $event"
+        [datos]="{ nombre: nombre, email: email }"></app-campo-contrasena>
       <ion-input
         [(ngModel)]="confirmPassword"
         name="confirmPassword"
@@ -78,7 +60,13 @@
         fill="outline"
         class="custom-input"
         required
-      ></ion-input>
+      >
+        <ion-button slot="end" fill="clear" type="button" class="campo-ojo"
+          [attr.aria-label]="(showPassword ? 'registro.ocultar_aria' : 'registro.mostrar_aria') | transloco"
+          (click)="showPassword = !showPassword">
+          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" aria-hidden="true"></ion-icon>
+        </ion-button>
+      </ion-input>
 
       <ion-item lines="none" class="privacy-consent">
         <ion-checkbox

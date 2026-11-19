@@ -22,7 +22,13 @@ export const roleGuard: CanActivateFn = async route => {
     if (!authService.autenticado()) return router.createUrlTree(['/login']);
 
     const rol = await authService.obtenerRol();
-    if (rolesPermitidos.includes(rol)) return true;
+    if (rolesPermitidos.includes(rol)) {
+      // Verificación en dos pasos obligatoria para administradores.
+      if (rol === 'administrador' && !(await authService.estadoDosPasos()).tieneFactor) {
+        return router.createUrlTree(['/configuracion'], { queryParams: { dosPasos: 'requerido' } });
+      }
+      return true;
+    }
 
     return router.createUrlTree([authService.rutaInicioPorRol(rol)]);
   } catch (error) {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
@@ -11,6 +11,7 @@ import {
   IonTitle,
   IonToolbar,
   IonContent,
+  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
@@ -19,6 +20,8 @@ import {
 } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthService } from '../../../core/services/auth';
+import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '../../../core/auth/politica-contrasena';
+import { CampoContrasenaComponent } from '../../../shared/components/campo-contrasena/campo-contrasena.component';
 import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
 import { TextoPoliticaComponent } from '../../../shared/components/texto-politica/texto-politica.component';
 
@@ -45,7 +48,9 @@ import { TextoPoliticaComponent } from '../../../shared/components/texto-politic
     IonButtons,
     TranslocoPipe,
     SelectorIdiomaComponent,
-    TextoPoliticaComponent
+    TextoPoliticaComponent,
+    CampoContrasenaComponent,
+    IonIcon
   ]
 })
 export class RegistroPage {
@@ -59,6 +64,7 @@ export class RegistroPage {
   readonly isLoading = signal(false);
   readonly cargandoGoogle = signal(false);
   readonly politicaAbierta = signal(false);
+  private readonly campo = viewChild(CampoContrasenaComponent);
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -98,8 +104,11 @@ export class RegistroPage {
       await this.mostrarToast(this.t('registro.errores.completar'));
       return;
     }
-    if (this.password.length < 6) {
-      await this.mostrarToast(this.t('registro.errores.corta'));
+    const faltante = primerRequisitoFaltante(this.password, { nombre: this.nombre, email: this.email });
+    if (faltante) {
+      const requisito = this.transloco.translate(`contrasena.req_${faltante}`, { n: LONGITUD_MINIMA_CONTRASENA });
+      await this.mostrarToast(this.transloco.translate('contrasena.errores.falta', { req: requisito }));
+      this.campo()?.abrirAyuda();
       return;
     }
     if (this.password !== this.confirmPassword) {
