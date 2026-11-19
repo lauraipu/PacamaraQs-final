@@ -3,7 +3,7 @@ import { IonIcon } from '@ionic/angular';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, ellipseOutline } from 'ionicons/icons';
-import { evaluarContrasena, LONGITUD_MINIMA_CONTRASENA, nivelContrasena } from '../../../core/auth/politica-contrasena';
+import { evaluarContrasena, LONGITUD_MINIMA_CONTRASENA, nivelContrasena } from '@domain/contrasena/politica-contrasena';
 
 addIcons({ checkmarkCircle, ellipseOutline });
 

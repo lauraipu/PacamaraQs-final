@@ -3,7 +3,7 @@ import { IonButton, IonContent, IonIcon, IonInput, IonPopover } from '@ionic/ang
 import { TranslocoPipe } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { eyeOffOutline, eyeOutline, informationCircleOutline } from 'ionicons/icons';
-import { DatosPersonales, evaluarContrasena, RequisitoContrasena } from '../../../core/auth/politica-contrasena';
+import { DatosPersonales, evaluarContrasena, RequisitoContrasena } from '@domain/contrasena/politica-contrasena';
 import { RequisitosContrasenaComponent } from '../requisitos-contrasena/requisitos-contrasena.component';
 
 addIcons({ eyeOutline, eyeOffOutline, informationCircleOutline });

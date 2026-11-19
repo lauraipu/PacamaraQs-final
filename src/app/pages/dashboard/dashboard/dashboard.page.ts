@@ -29,7 +29,7 @@ import { AuthService } from '../../../core/services/auth';
 import { CierreSesionService } from '../../../core/auth/cierre-sesion.service';
 import { SesionConRol, SesionService } from '../../../core/services/sesion';
 import { SupabaseService } from '../../../core/services/supabase';
-import { EstadoSesion, getFormatoById } from '../../../core/models/sesion.model';
+import { EstadoSesion, getFormatoById } from '@domain/sesion/sesion.model';
 import {
   ModoEscaneo, ResultadoEscaneo, ScannerModalComponent
 } from '../../../shared/components/scanner-modal/scanner-modal.component';

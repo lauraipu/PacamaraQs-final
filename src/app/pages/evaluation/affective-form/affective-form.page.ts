@@ -6,7 +6,7 @@ import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import { BaseCataForm } from '../../../core/cva/base-cata-form';
 import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
-import { ETIQUETAS_HEDONICAS } from '../../../core/cva/cva';
+import { ETIQUETAS_HEDONICAS } from '@domain/cva/cva';
 
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TrPipe } from '../../../core/i18n/tr';

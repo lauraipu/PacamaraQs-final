@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { VERSION_POLITICA } from '../../../core/services/auth';
+import { VERSION_POLITICA } from '@domain/politica/politica';
 
 /** Resumen de la política de tratamiento de datos (Ley 1581 de 2012). Se reutiliza en registro y en la aceptación. */
 @Component({

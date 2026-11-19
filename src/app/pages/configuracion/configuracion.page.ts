@@ -10,7 +10,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { chevronDownOutline, chevronUpOutline, pencilOutline } from 'ionicons/icons';
 import { CierreSesionService } from '../../core/auth/cierre-sesion.service';
-import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '../../core/auth/politica-contrasena';
+import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '@domain/contrasena/politica-contrasena';
 import { Idioma, IDIOMAS, IdiomaService } from '../../core/i18n/idioma.service';
 import { AuthService } from '../../core/services/auth';
 import { SupabaseService } from '../../core/services/supabase';

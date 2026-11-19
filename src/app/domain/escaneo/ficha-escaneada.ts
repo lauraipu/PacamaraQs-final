@@ -1,5 +1,5 @@
 import { RUEDA_SABORES } from '../cva/cva';
-import { aTitulo, TIPOS_PROCESO } from '../cva/origenes';
+import { aTitulo, TIPOS_PROCESO } from '../origenes/origenes';
 import { parsearNumeroEs } from '../utils/numeros';
 
 export { parsearNumeroEs };

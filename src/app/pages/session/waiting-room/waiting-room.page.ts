@@ -12,7 +12,7 @@ import {
   peopleOutline, refreshOutline
 } from 'ionicons/icons';
 import { Subscription } from 'rxjs';
-import { EstadoSesion, getFormatoById, Participante, Sesion } from '../../../core/models/sesion.model';
+import { EstadoSesion, getFormatoById, Participante, Sesion } from '@domain/sesion/sesion.model';
 import { AuthService } from '../../../core/services/auth';
 import { EventoSala, GRACE_PERIOD_MS, RealtimeService, SalaRealtime } from '../../../core/services/realtime';
 import { SesionService } from '../../../core/services/sesion';

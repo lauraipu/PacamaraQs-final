@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { checkmarkCircleOutline, documentTextOutline, hourglassOutline, lockClosedOutline } from 'ionicons/icons';
 import { IonButton, IonContent, IonIcon, NavController } from '@ionic/angular';
-import { EstadoSesion, FormatoCva, getFormatoById } from '../../../core/models/sesion.model';
+import { EstadoSesion, FormatoCva, getFormatoById } from '@domain/sesion/sesion.model';
 import { AuthService } from '../../../core/services/auth';
 import { SesionService } from '../../../core/services/sesion';
 

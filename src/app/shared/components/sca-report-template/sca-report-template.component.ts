@@ -1,9 +1,9 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ETIQUETAS_HEDONICAS } from '../../../core/cva/cva';
+import { ETIQUETAS_HEDONICAS } from '@domain/cva/cva';
 import {
   AtributoHoja, BOCA_SCA, circuloMarcado, DEFECTOS_SCA, DESCRIPTORES_SCA, etiquetaCalidad, GUSTOS_SCA, HojaSca
-} from '../../../core/cva/hoja-sca';
+} from '@domain/cva/hoja-sca';
 import { FichaTecnica } from '../../../core/models/session-results.model';
 
 import { TranslocoPipe } from '@jsverse/transloco';

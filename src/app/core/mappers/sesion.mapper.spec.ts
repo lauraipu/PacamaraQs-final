@@ -1,4 +1,4 @@
-import { EstadoSesion } from '../models/sesion.model';
+import { EstadoSesion } from '@domain/sesion/sesion.model';
 import { participanteDtoToDomain, sesionDtoToDomain } from './sesion.mapper';
 
 describe('sesion mapper', () => {

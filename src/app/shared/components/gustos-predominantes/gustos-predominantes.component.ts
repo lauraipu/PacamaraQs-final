@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { GUSTOS_PREDOMINANTES, GustoPredominante } from '../../../core/scanner/ficha-escaneada';
+import { GUSTOS_PREDOMINANTES, GustoPredominante } from '@domain/escaneo/ficha-escaneada';
 
 import { TrPipe } from '../../../core/i18n/tr';
 const ETIQUETAS: Readonly<Record<GustoPredominante, string>> = {

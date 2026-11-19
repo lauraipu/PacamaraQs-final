@@ -1,4 +1,3 @@
-import { CupperResultSummary } from '../models/session-results.model';
 import { ETIQUETAS_HEDONICAS, RUEDA_SABORES } from './cva';
 
 /**
@@ -249,7 +248,20 @@ const numeroEn = (v: unknown, min: number, max: number): number | null => {
 };
 const unir = (...partes: string[]): string => partes.filter(Boolean).join(' · ');
 
-type FichaCatador = CupperResultSummary['puntajesPorMuestra'][number];
+/**
+ * Lo que la hoja SCA necesita de la ficha de un catador. Es un tipo propio del
+ * dominio: cualquier objeto con esta forma sirve (p. ej. una fila de resultados).
+ */
+export interface FichaCatador {
+  numeroMuestra: number;
+  puntaje: number;
+  defectos: string[];
+  tazasNoUniformes: number;
+  tazasDefectuosas: number;
+  impresionGlobal: number | null;
+  atributos: Partial<Record<string, { intensidad: number | null; calidad: number | null }>>;
+  formulario: Record<string, unknown> | null;
+}
 
 /** Lee una ficha (RPC + JSON del formulario) en la forma de la hoja SCA. */
 export function leerFichaSca(ficha: FichaCatador): FichaSca {

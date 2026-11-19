@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { AlertController, ToastController } from '@ionic/angular';
 import { Subject } from 'rxjs';
-import { EstadoSesion } from '../../../core/models/sesion.model';
+import { EstadoSesion } from '@domain/sesion/sesion.model';
 import { AuthService, UsuarioActual } from '../../../core/services/auth';
 import { EventoSala, PresenciaUsuario, RealtimeService } from '../../../core/services/realtime';
 import { ProgresoPanel, SesionService } from '../../../core/services/sesion';

@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import {
   extraerJson, FichaEscaneada, FORMATOS_ESCANEO, payloadFichaPersonal, respuestaSimulada, sanearFicha
-} from '../scanner/ficha-escaneada';
+} from '@domain/escaneo/ficha-escaneada';
 import { AuthService } from './auth';
 import { OfflineSyncService, ResultadoEnvio } from './offline-sync';
 import { SupabaseService } from './supabase';

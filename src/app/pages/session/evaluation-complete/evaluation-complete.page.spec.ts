@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { EstadoSesion, Sesion } from '../../../core/models/sesion.model';
+import { EstadoSesion, Sesion } from '@domain/sesion/sesion.model';
 import { AuthService } from '../../../core/services/auth';
 import { SesionService } from '../../../core/services/sesion';
 import { EvaluationCompletePage } from './evaluation-complete.page';

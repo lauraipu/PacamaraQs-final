@@ -1,5 +1,5 @@
 import { FichaTecnica, FichaTecnicaSeccion } from '../models/session-results.model';
-import { divisionDe, etiquetaProceso, formatearPrecio } from '../cva/origenes';
+import { divisionDe, etiquetaProceso, formatearPrecio } from '@domain/origenes/origenes';
 
 /** Ficha extrínseca serializada en evaluaciones.notas (formulario de ExtrinsicFormPage). */
 export interface FichaExtrinsecaDto {

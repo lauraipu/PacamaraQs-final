@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { EstadoSesion, getFormatoById } from '../models/sesion.model';
+import { EstadoSesion, getFormatoById } from '@domain/sesion/sesion.model';
 import { AuthService } from '../services/auth';
 import { EvaluacionAtributo, FichaEvaluacion, OfflineSyncService } from '../services/offline-sync';
 import { EventoSala, RealtimeService, SalaRealtime } from '../services/realtime';

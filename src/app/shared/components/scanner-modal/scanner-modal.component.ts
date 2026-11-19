@@ -10,12 +10,12 @@ import {
   alertCircleOutline, cameraOutline, checkmarkCircleOutline, closeOutline, flaskOutline, imageOutline,
   refreshOutline, sparklesOutline
 } from 'ionicons/icons';
-import { casillasDeDescriptores, DESCRIPTORES_SCA } from '../../../core/cva/hoja-sca';
-import { EstadoSesion, FormatoCva, getFormatoById } from '../../../core/models/sesion.model';
+import { casillasDeDescriptores, DESCRIPTORES_SCA } from '@domain/cva/hoja-sca';
+import { EstadoSesion, FormatoCva, getFormatoById } from '@domain/sesion/sesion.model';
 import {
   aplicarCorrecciones, AtributoEscaneado, calcularPuntajeCva, FichaEscaneada, FORMATOS_ESCANEO, FormatoEscaneo,
   parsearNumeroEs, sanearCalidad, sanearIntensidad, sanearTazas, tituloFormatoEscaneo
-} from '../../../core/scanner/ficha-escaneada';
+} from '@domain/escaneo/ficha-escaneada';
 import { AuthService } from '../../../core/services/auth';
 import { ImagenPreparada, ScannerService } from '../../../core/services/scanner';
 import { SesionConRol, SesionService } from '../../../core/services/sesion';

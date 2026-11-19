@@ -22,7 +22,7 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, informationCircleOutline } from 'ionicons/icons';
-import { EstadoSesion, FormatoCva, Sesion } from '../../../core/models/sesion.model';
+import { EstadoSesion, FormatoCva, Sesion } from '@domain/sesion/sesion.model';
 import { AuthService } from '../../../core/services/auth';
 import { SesionService } from '../../../core/services/sesion';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';

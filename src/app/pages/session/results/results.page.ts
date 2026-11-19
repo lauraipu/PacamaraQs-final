@@ -14,12 +14,12 @@ import {
   checkmarkCircleOutline, closeOutline, documentTextOutline, downloadOutline, gridOutline, hourglassOutline, lockClosedOutline,
   medalOutline, ribbonOutline, trophyOutline
 } from 'ionicons/icons';
-import { ETIQUETAS_HEDONICAS } from '../../../core/cva/cva';
+import { ETIQUETAS_HEDONICAS } from '@domain/cva/cva';
 import {
   BOCA_SCA, circuloMarcado, consolidarFichas, DEFECTOS_SCA, DESCRIPTORES_SCA, etiquetaCalidad, FormatoHoja,
   AtributoHoja, GUSTOS_SCA, HojaSca, leerFichaSca, puntajePanel
-} from '../../../core/cva/hoja-sca';
-import { FormatoCva, getFormatoById } from '../../../core/models/sesion.model';
+} from '@domain/cva/hoja-sca';
+import { FormatoCva, getFormatoById } from '@domain/sesion/sesion.model';
 import {
   AtributoCva, CupperResultSummary, SampleConsolidatedResult, SessionResults, ValorAtributo
 } from '../../../core/models/session-results.model';

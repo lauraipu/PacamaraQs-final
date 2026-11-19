@@ -20,7 +20,7 @@ import {
 } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthService } from '../../../core/services/auth';
-import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '../../../core/auth/politica-contrasena';
+import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '@domain/contrasena/politica-contrasena';
 import { CampoContrasenaComponent } from '../../../shared/components/campo-contrasena/campo-contrasena.component';
 import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
 import { TextoPoliticaComponent } from '../../../shared/components/texto-politica/texto-politica.component';

@@ -18,7 +18,7 @@ import {
   ETIQUETAS_HEDONICAS,
   RUEDA_SABORES,
   TIPOS_DEFECTO
-} from '../../../core/cva/cva';
+} from '@domain/cva/cva';
 
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TrPipe } from '../../../core/i18n/tr';

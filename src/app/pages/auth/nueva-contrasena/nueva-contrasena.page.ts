@@ -5,7 +5,7 @@ import { IonButton, IonContent, IonIcon, IonInput, IonSpinner, ToastController }
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, checkmarkCircleOutline } from 'ionicons/icons';
-import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '../../../core/auth/politica-contrasena';
+import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '@domain/contrasena/politica-contrasena';
 import { AuthService } from '../../../core/services/auth';
 import { codigoDeError, esSinConexion } from '../../../core/utils/errores';
 import { CampoContrasenaComponent } from '../../../shared/components/campo-contrasena/campo-contrasena.component';

@@ -6,8 +6,8 @@ import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import { BaseCataForm } from '../../../core/cva/base-cata-form';
 import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
-import { CARACTERES_NUMERICOS, formatearNumeroEs, parsearNumeroEs } from '../../../core/utils/numeros';
-import { aTitulo, divisionDe, MONEDAS, PAISES_CAFE, regionesDe, TIPOS_PROCESO } from '../../../core/cva/origenes';
+import { CARACTERES_NUMERICOS, formatearNumeroEs, parsearNumeroEs } from '@domain/utils/numeros';
+import { aTitulo, divisionDe, MONEDAS, PAISES_CAFE, regionesDe, TIPOS_PROCESO } from '@domain/origenes/origenes';
 import { OpcionBuscable, SelectorBuscableComponent } from '../../../shared/components/selector-buscable/selector-buscable.component';
 
 import { TranslocoPipe } from '@jsverse/transloco';

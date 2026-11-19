@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
 import { SupabaseService } from './supabase';
+import { VERSION_POLITICA } from '@domain/politica/politica';
 
 /** Deep link de regreso del OAuth en la APK (Supabase → Redirect URLs + AndroidManifest). */
 export const REDIRECCION_NATIVA = 'com.pacamaraqs.app://auth/callback';
@@ -38,9 +39,6 @@ const MARCA_RECUPERACION = 'pacamaraqs.recuperacion';
 function leerMarcaRecuperacion(): boolean {
   try { return sessionStorage.getItem(MARCA_RECUPERACION) === '1'; } catch { return false; }
 }
-
-/** Versión de la política de privacidad aceptada en el registro. */
-export const VERSION_POLITICA = '1.0';
 
 /**
  * Estado global de autenticación con Signals (app zoneless).

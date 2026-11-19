@@ -7,7 +7,7 @@ import { arrowBackOutline, chevronDownOutline, chevronForwardOutline } from 'ion
 import { BaseCataForm } from '../../../core/cva/base-cata-form';
 import { EstadoFichaComponent } from '../../../shared/components/estado-ficha/estado-ficha.component';
 import { GustosPredominantesComponent } from '../../../shared/components/gustos-predominantes/gustos-predominantes.component';
-import { RUEDA_SABORES } from '../../../core/cva/cva';
+import { RUEDA_SABORES } from '@domain/cva/cva';
 
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TrPipe } from '../../../core/i18n/tr';
