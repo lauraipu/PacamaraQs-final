@@ -28,10 +28,13 @@ export class GuiaService {
     try {
       const vistas = await this.cargarVistas();
       if (vistas.has(id) || this.abierta) return;
-      vistas.add(id); // antes de abrir: aunque falle, no se reintenta en bucle
-      await this.abrir(id);
+      // Se guarda ANTES de abrir el modal (dispositivo y cuenta): si la persona
+      // navega, recarga o cierra sin tocar "Entendido", igual queda marcada
+      // como vista y no vuelve a aparecer.
+      vistas.add(id);
       this.guardarLocal(vistas);
       this.repositorio.marcarVista(id);
+      await this.abrir(id);
     } catch (error) {
       console.warn('[Guías]', error);
     }
