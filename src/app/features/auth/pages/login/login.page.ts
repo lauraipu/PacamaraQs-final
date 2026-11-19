@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonButton, IonContent, IonInput, IonSpinner, ToastController } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthService, RUTA_NUEVA_CONTRASENA } from '@core/auth/auth.service';
-import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
+import { SelectorIdiomaComponent } from '@shared/components/selector-idioma/selector-idioma.component';
 import { mensajeDeError } from '@core/errores/errores';
 
 @Component({

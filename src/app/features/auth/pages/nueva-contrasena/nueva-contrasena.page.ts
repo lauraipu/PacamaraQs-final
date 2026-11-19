@@ -8,8 +8,8 @@ import { alertCircleOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '@domain/contrasena/politica-contrasena';
 import { AuthService } from '@core/auth/auth.service';
 import { codigoDeError, esSinConexion } from '@core/errores/errores';
-import { CampoContrasenaComponent } from '../../../shared/components/campo-contrasena/campo-contrasena.component';
-import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
+import { CampoContrasenaComponent } from '@shared/components/campo-contrasena/campo-contrasena.component';
+import { SelectorIdiomaComponent } from '@shared/components/selector-idioma/selector-idioma.component';
 
 addIcons({ alertCircleOutline, checkmarkCircleOutline });
 

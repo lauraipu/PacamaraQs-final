@@ -7,33 +7,10 @@ import { ROLES_ADMIN, ROLES_APP } from '@core/auth/roles';
 
 export const routes: Routes = [
   {
-    path: 'login',
-    loadComponent: () => import('./pages/auth/login/login.page').then(m => m.LoginPage)
-  },
-  {
-    path: 'registro',
-    loadComponent: () => import('./pages/auth/registro/registro.page').then(m => m.RegistroPage)
-  },
-  {
-    // Segundo paso del inicio de sesión. Sin guard: authGuard redirige aquí.
-    path: 'verificar-dos-pasos',
-    loadComponent: () => import('./pages/auth/verificar-dos-pasos/verificar-dos-pasos.page').then(m => m.VerificarDosPasosPage)
-  },
-  {
-    path: 'recuperar',
-    loadComponent: () => import('./pages/auth/recuperar/recuperar.page').then(m => m.RecuperarPage)
-  },
-  {
-    // Destino del enlace del correo de recuperación: sin guard, la sesión
-    // de recuperación la crea Supabase al cargar la página.
-    path: 'nueva-contrasena',
-    loadComponent: () => import('./pages/auth/nueva-contrasena/nueva-contrasena.page').then(m => m.NuevaContrasenaPage)
-  },
-  {
-    // Aceptación obligatoria de la política de datos (p. ej. primer ingreso con Google).
-    path: 'aceptar-politica',
-    loadComponent: () => import('./pages/auth/aceptar-politica/aceptar-politica.page').then(m => m.AceptarPoliticaPage),
-    canActivate: [authGuard]
+    // Feature auth: login, registro, 2FA, recuperar, nueva contraseña y política.
+    // Montada en '' para conservar las URL (correos de Supabase, OAuth y APK).
+    path: '',
+    loadChildren: () => import('@features/auth/auth.routes').then(m => m.AUTH_ROUTES)
   },
   {
     path: 'dashboard',

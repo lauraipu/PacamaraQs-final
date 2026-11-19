@@ -4,8 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonCheckbox, IonContent, IonSpinner, ToastController } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthService } from '@core/auth/auth.service';
-import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
-import { TextoPoliticaComponent } from '../../../shared/components/texto-politica/texto-politica.component';
+import { SelectorIdiomaComponent } from '@shared/components/selector-idioma/selector-idioma.component';
+import { TextoPoliticaComponent } from '@shared/components/texto-politica/texto-politica.component';
 
 /**
  * Aceptación obligatoria de la política de datos (Ley 1581 de 2012).

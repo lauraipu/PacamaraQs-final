@@ -7,7 +7,7 @@ import { addIcons } from 'ionicons';
 import { mailOutline } from 'ionicons/icons';
 import { AuthService } from '@core/auth/auth.service';
 import { codigoDeError, esSinConexion, estadoHttp } from '@core/errores/errores';
-import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
+import { SelectorIdiomaComponent } from '@shared/components/selector-idioma/selector-idioma.component';
 
 addIcons({ mailOutline });
 

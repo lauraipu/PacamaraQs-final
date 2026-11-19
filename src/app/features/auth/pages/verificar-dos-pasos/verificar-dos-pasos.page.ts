@@ -4,10 +4,10 @@ import { IonButton, IonContent, IonIcon, IonSpinner, ToastController } from '@io
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { shieldCheckmarkOutline, swapHorizontalOutline } from 'ionicons/icons';
-import { CierreSesionService } from '../../../core/auth/cierre-sesion.service';
+import { CierreSesionService } from '@core/auth/cierre-sesion.service';
 import { AuthService } from '@core/auth/auth.service';
 import { esSinConexion } from '@core/errores/errores';
-import { CodigoOtpComponent } from '../../../shared/components/codigo-otp/codigo-otp.component';
+import { CodigoOtpComponent } from '@shared/components/codigo-otp/codigo-otp.component';
 
 addIcons({ shieldCheckmarkOutline, swapHorizontalOutline });
 

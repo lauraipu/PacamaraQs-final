@@ -21,9 +21,9 @@ import {
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthService } from '@core/auth/auth.service';
 import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '@domain/contrasena/politica-contrasena';
-import { CampoContrasenaComponent } from '../../../shared/components/campo-contrasena/campo-contrasena.component';
-import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
-import { TextoPoliticaComponent } from '../../../shared/components/texto-politica/texto-politica.component';
+import { CampoContrasenaComponent } from '@shared/components/campo-contrasena/campo-contrasena.component';
+import { SelectorIdiomaComponent } from '@shared/components/selector-idioma/selector-idioma.component';
+import { TextoPoliticaComponent } from '@shared/components/texto-politica/texto-politica.component';
 
 @Component({
   selector: 'app-registro',
