@@ -5,8 +5,8 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { Subject } from 'rxjs';
 import { EstadoSesion } from '@domain/sesion/sesion.model';
 import { AuthService, UsuarioActual } from '@core/auth/auth.service';
-import { EventoSala, PresenciaUsuario, RealtimeService } from '../../../core/services/realtime';
-import { ProgresoPanel, SesionService } from '../../../core/services/sesion';
+import { EventoSala, PresenciaUsuario, RealtimeService } from '@core/realtime/sala-realtime.service';
+import { ProgresoPanel, SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { OrganizerDashboardPage } from './organizer-dashboard.page';
 
 const progresoBase = (cambios: Partial<ProgresoPanel> = {}): ProgresoPanel => ({
@@ -69,7 +69,7 @@ describe('OrganizerDashboardPage', () => {
         provideRouter([]),
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ id: 'session-id' }) } } },
         {
-          provide: SesionService,
+          provide: SesionesRepository,
           useValue: { obtenerSesionPorId, obtenerProgresoPanel, forzarCierreMuestra, finalizarSesionForzado }
         },
         { provide: AuthService, useValue: { usuario, asegurarInicializado: vi.fn().mockResolvedValue(undefined) } },

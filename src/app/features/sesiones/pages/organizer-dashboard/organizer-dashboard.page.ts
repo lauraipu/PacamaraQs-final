@@ -11,13 +11,13 @@ import {
 } from 'ionicons/icons';
 import { Subscription } from 'rxjs';
 import { AuthService } from '@core/auth/auth.service';
-import { EventoSala, GRACE_PERIOD_MS, RealtimeService, SalaRealtime } from '../../../core/services/realtime';
-import { ProgresoPanel, SesionService } from '../../../core/services/sesion';
+import { EventoSala, GRACE_PERIOD_MS, RealtimeService, SalaRealtime } from '@core/realtime/sala-realtime.service';
+import { ProgresoPanel, SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { mensajeDeError } from '@core/errores/errores';
-import { ProgressTrackerComponent } from '../../../shared/components/progress-tracker/progress-tracker.component';
+import { ProgressTrackerComponent } from '@shared/components/progress-tracker/progress-tracker.component';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TrPipe } from '../../../core/i18n/tr';
+import { TrPipe } from '@core/i18n/tr';
 const SONDEO_PROGRESO_MS = 30_000;
 const SONDEO_SIN_SOCKET_MS = 8_000;
 
@@ -57,7 +57,7 @@ export class OrganizerDashboardPage implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
-  private readonly sesionService = inject(SesionService);
+  private readonly sesionService = inject(SesionesRepository);
   private readonly realtimeService = inject(RealtimeService);
   private readonly alertCtrl = inject(AlertController);
   private readonly toastCtrl = inject(ToastController);

@@ -26,17 +26,16 @@ import {
 import { addIcons } from 'ionicons';
 import { keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline, settingsOutline } from 'ionicons/icons';
 import { AuthService } from '@core/auth/auth.service';
-import { CierreSesionService } from '../../../core/auth/cierre-sesion.service';
-import { SesionConRol, SesionService } from '../../../core/services/sesion';
-import { SupabaseService } from '@core/supabase/supabase.client';
+import { CierreSesionService } from '@core/auth/cierre-sesion.service';
+import { SesionConRol, SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { EstadoSesion, getFormatoById } from '@domain/sesion/sesion.model';
 import {
   ModoEscaneo, ResultadoEscaneo, ScannerModalComponent
-} from '../../../shared/components/scanner-modal/scanner-modal.component';
+} from '@shared/components/scanner-modal/scanner-modal.component';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TrPipe } from '../../../core/i18n/tr';
-import { BotonGuiaComponent } from '../../../shared/components/boton-guia/boton-guia.component';
+import { TrPipe } from '@core/i18n/tr';
+import { BotonGuiaComponent } from '@shared/components/boton-guia/boton-guia.component';
 interface SesionItemUi {
   id: string;
   titulo: string;
@@ -107,8 +106,7 @@ export class DashboardPage implements OnInit {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly cierreSesion = inject(CierreSesionService);
-  private readonly sesionService = inject(SesionService);
-  private readonly supabaseService = inject(SupabaseService);
+  private readonly sesionService = inject(SesionesRepository);
   private readonly toastController = inject(ToastController);
   private readonly alertController = inject(AlertController);
   private readonly modalController = inject(ModalController);
@@ -202,8 +200,7 @@ export class DashboardPage implements OnInit {
     if (this.inicializando) return;
     this.inicializando = true;
     try {
-      const { data: { user }, error } = await this.supabaseService.client.auth.getUser();
-      if (error) throw error;
+      const { user } = await this.authService.getUser();
       if (!user) throw new Error('Debes iniciar sesión para ver tus sesiones.');
 
       await this.cargarNombreUsuario(user);
@@ -392,14 +389,7 @@ export class DashboardPage implements OnInit {
     user_metadata?: Record<string, unknown>;
   }): Promise<void> {
     try {
-      const { data, error } = await this.supabaseService.client
-        .from('usuarios')
-        .select('nombre')
-        .eq('id', user.id)
-        .maybeSingle();
-      if (error) throw error;
-
-      const nombrePerfil = data?.['nombre'];
+      const nombrePerfil = await this.authService.leerNombrePerfil(user.id);
       const nombreMetadata = user.user_metadata?.['nombre'];
       this.nombreUsuario = typeof nombrePerfil === 'string' && nombrePerfil.trim()
         ? nombrePerfil.trim()

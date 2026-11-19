@@ -13,10 +13,9 @@ export const routes: Routes = [
     loadChildren: () => import('@features/auth/auth.routes').then(m => m.AUTH_ROUTES)
   },
   {
-    path: 'dashboard',
-    loadComponent: () => import('./pages/dashboard/dashboard/dashboard.page').then(m => m.DashboardPage),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ROLES_APP }
+    // Feature sesiones: inicio, crear, sala de espera, panel del organizador y fin de la cata.
+    path: '',
+    loadChildren: () => import('@features/sesiones/sesiones.routes').then(m => m.SESIONES_ROUTES)
   },
   {
     // Feature perfil: Configuración (/configuracion).
@@ -58,44 +57,10 @@ export const routes: Routes = [
     data: { roles: ROLES_APP }
   },
   {
-    path: 'session/create',
-    loadComponent: () => import('./pages/session/create-session/create-session.page').then(m => m.CreateSessionPage),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ROLES_APP }
-  },
-  {
-    path: 'create-session',
-    redirectTo: 'session/create',
-    pathMatch: 'full'
-  },
-  {
-    path: 'session/waiting/:sesionId',
-    loadComponent: () => import('./pages/session/waiting-room/waiting-room.page').then(m => m.WaitingRoomPage),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ROLES_APP }
-  },
-  {
-    path: 'session/:id/organizer-dashboard',
-    loadComponent: () => import('./pages/session/organizer-dashboard/organizer-dashboard.page').then(m => m.OrganizerDashboardPage),
-    canActivate: [authGuard, roleGuard, organizerGuard],
-    data: { roles: ROLES_APP }
-  },
-  {
-    path: 'session/:id/evaluation-complete',
-    loadComponent: () => import('./pages/session/evaluation-complete/evaluation-complete.page').then(m => m.EvaluationCompletePage),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ROLES_APP }
-  },
-  {
     path: 'session/:id/results',
     loadComponent: () => import('./pages/session/results/results.page').then(m => m.ResultsPage),
     canActivate: [authGuard, roleGuard, organizerGuard],
     data: { roles: ROLES_APP }
-  },
-  {
-    path: 'waiting-room',
-    redirectTo: 'dashboard',
-    pathMatch: 'full'
   },
   {
     path: '',

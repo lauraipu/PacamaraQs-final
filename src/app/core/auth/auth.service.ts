@@ -309,6 +309,17 @@ export class AuthService {
     return data;
   }
 
+  /** Nombre guardado en public.usuarios (normalizado por el trigger). null si no hay fila. */
+  async leerNombrePerfil(usuarioId: string): Promise<string | null> {
+    const { data, error } = await this.supabase.client
+      .from('usuarios')
+      .select('nombre')
+      .eq('id', usuarioId)
+      .maybeSingle();
+    if (error) throw error;
+    return typeof data?.nombre === 'string' ? data.nombre : null;
+  }
+
   /** Valida el token contra el servidor de Auth (petición de red). */
   async getUser() {
     const { data, error } = await this.supabase.client.auth.getUser();

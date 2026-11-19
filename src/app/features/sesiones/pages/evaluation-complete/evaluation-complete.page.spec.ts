@@ -3,7 +3,7 @@ import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angul
 import { NavController } from '@ionic/angular';
 import { EstadoSesion, Sesion } from '@domain/sesion/sesion.model';
 import { AuthService } from '@core/auth/auth.service';
-import { SesionService } from '../../../core/services/sesion';
+import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { EvaluationCompletePage } from './evaluation-complete.page';
 
 const sesionBase = (): Sesion => ({
@@ -41,7 +41,7 @@ describe('EvaluationCompletePage', () => {
       providers: [
         provideRouter([]),
         { provide: AuthService, useValue: { getSession } },
-        { provide: SesionService, useValue: { obtenerSesionPorId } },
+        { provide: SesionesRepository, useValue: { obtenerSesionPorId } },
         { provide: NavController, useValue: { navigateRoot } },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ id: 'session-id' }) } } }
       ]

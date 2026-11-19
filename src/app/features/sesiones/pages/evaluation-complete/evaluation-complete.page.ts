@@ -6,10 +6,10 @@ import { checkmarkCircleOutline, documentTextOutline, hourglassOutline, lockClos
 import { IonButton, IonContent, IonIcon, NavController } from '@ionic/angular';
 import { EstadoSesion, FormatoCva, getFormatoById } from '@domain/sesion/sesion.model';
 import { AuthService } from '@core/auth/auth.service';
-import { SesionService } from '../../../core/services/sesion';
+import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TrPipe } from '../../../core/i18n/tr';
+import { TrPipe } from '@core/i18n/tr';
 addIcons({ checkmarkCircleOutline, documentTextOutline, hourglassOutline, lockClosedOutline });
 
 /**
@@ -34,7 +34,7 @@ export class EvaluationCompletePage implements OnInit {
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
   private readonly authService = inject(AuthService);
-  private readonly sesionService = inject(SesionService);
+  private readonly sesionService = inject(SesionesRepository);
 
   readonly esOrganizador = signal(false);
   readonly nombreSesion = signal('');

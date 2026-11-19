@@ -24,9 +24,9 @@ import { addIcons } from 'ionicons';
 import { checkmarkCircle, informationCircleOutline } from 'ionicons/icons';
 import { EstadoSesion, FormatoCva, Sesion } from '@domain/sesion/sesion.model';
 import { AuthService } from '@core/auth/auth.service';
-import { SesionService } from '../../../core/services/sesion';
+import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { TrPipe } from '../../../core/i18n/tr';
+import { TrPipe } from '@core/i18n/tr';
 addIcons({ checkmarkCircle, informationCircleOutline });
 
 @Component({
@@ -95,7 +95,7 @@ export class CreateSessionPage {
     }
   ];
 
-  private readonly sesionService = inject(SesionService);
+  private readonly sesionService = inject(SesionesRepository);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly changeDetector = inject(ChangeDetectorRef);

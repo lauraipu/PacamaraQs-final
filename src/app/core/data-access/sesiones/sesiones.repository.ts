@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { participanteDtoToDomain, sesionDtoToDomain } from '../mappers/sesion.mapper';
+import { participanteDtoToDomain, sesionDtoToDomain } from './sesion.mapper';
 import { Participante, Sesion } from '@domain/sesion/sesion.model';
-import { ParticipanteDto, SesionDto } from '../models/sesion.dto';
-import { SupabaseService } from '../supabase/supabase.client';
+import { ParticipanteDto, SesionDto } from './sesion.dto';
+import { SupabaseService } from '../../supabase/supabase.client';
 
 export interface SesionConRol extends Sesion {
   esOrganizador: boolean;
@@ -56,7 +56,7 @@ interface CierreMuestraDto {
  * El tiempo real (Presence/Broadcast) vive en RealtimeService.
  */
 @Injectable({ providedIn: 'root' })
-export class SesionService {
+export class SesionesRepository {
   private readonly supabase = inject(SupabaseService);
 
   async crearSesion(sesion: Sesion): Promise<Sesion> {

@@ -2,7 +2,7 @@ import { effect, inject, Injectable, Signal, signal } from '@angular/core';
 import { RealtimeChannel, REALTIME_SUBSCRIBE_STATES, SupabaseClient } from '@supabase/supabase-js';
 import { Observable, Subject } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
-import { SesionService } from './sesion';
+import { SesionesRepository } from '../data-access/sesiones/sesiones.repository';
 import { SupabaseService } from '../supabase/supabase.client';
 
 /** Tiempo que se espera a que un catador desconectado vuelva antes de retirarlo. */
@@ -98,7 +98,7 @@ export class SalaRealtime {
 
   constructor(
     private readonly cliente: SupabaseClient,
-    private readonly sesionService: SesionService,
+    private readonly sesionService: SesionesRepository,
     readonly opciones: OpcionesSala
   ) {
     this.gracePeriodMs = opciones.gracePeriodMs ?? GRACE_PERIOD_MS;
@@ -366,7 +366,7 @@ interface RegistroSala {
 @Injectable({ providedIn: 'root' })
 export class RealtimeService {
   private readonly supabase = inject(SupabaseService);
-  private readonly sesionService = inject(SesionService);
+  private readonly sesionService = inject(SesionesRepository);
   private readonly authService = inject(AuthService);
   private readonly salas = new Map<string, RegistroSala>();
 

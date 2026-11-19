@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController, ToastController } from '@ionic/angular';
-import { SesionService } from '../../../core/services/sesion';
+import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { AffectiveFormPage } from './affective-form.page';
 
 describe('AffectiveFormPage', () => {
@@ -12,7 +12,7 @@ describe('AffectiveFormPage', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
-        { provide: SesionService, useValue: { obtenerSesionPorId: vi.fn() } },
+        { provide: SesionesRepository, useValue: { obtenerSesionPorId: vi.fn() } },
         { provide: AlertController, useValue: { create: vi.fn() } },
         { provide: ToastController, useValue: { create: vi.fn() } }
       ]

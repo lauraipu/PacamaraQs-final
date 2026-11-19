@@ -7,8 +7,8 @@ import { RUEDA_SABORES, TIPOS_DEFECTO } from '@domain/cva/cva';
 import { EstadoSesion } from '@domain/sesion/sesion.model';
 import { AuthService } from '@core/auth/auth.service';
 import { FichaEvaluacion, ItemCola, OfflineSyncService } from '../../../core/services/offline-sync';
-import { EventoSala, RealtimeService } from '../../../core/services/realtime';
-import { SesionService } from '../../../core/services/sesion';
+import { EventoSala, RealtimeService } from '@core/realtime/sala-realtime.service';
+import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { CombinedFormPage } from './combined-form.page';
 
 const ATRIBUTOS = ['fragancia', 'aroma', 'sabor', 'saborResidual', 'acidez', 'dulzor', 'sensacionEnBoca'] as const;
@@ -70,7 +70,7 @@ describe('CombinedFormPage', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => 'session-id' } } } },
-        { provide: SesionService, useValue: { obtenerSesionPorId, obtenerMuestrasCerradas, esOrganizadorDeSesion } },
+        { provide: SesionesRepository, useValue: { obtenerSesionPorId, obtenerMuestrasCerradas, esOrganizadorDeSesion } },
         {
           provide: AuthService,
           useValue: {

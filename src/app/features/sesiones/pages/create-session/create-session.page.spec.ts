@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { AuthService } from '@core/auth/auth.service';
-import { SesionService } from '../../../core/services/sesion';
+import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { CreateSessionPage } from './create-session.page';
 
 describe('CreateSessionPage', () => {
@@ -19,7 +19,7 @@ describe('CreateSessionPage', () => {
         provideRouter([]),
         { provide: ToastController, useValue: { create: vi.fn().mockResolvedValue({ present: vi.fn() }) } },
         { provide: AuthService, useValue: { getUser } },
-        { provide: SesionService, useValue: { crearSesion } }
+        { provide: SesionesRepository, useValue: { crearSesion } }
       ]
     });
     fixture = TestBed.createComponent(CreateSessionPage);

@@ -18,7 +18,8 @@ import {
 } from '@domain/escaneo/ficha-escaneada';
 import { AuthService } from '@core/auth/auth.service';
 import { ImagenPreparada, ScannerService } from '../../../core/services/scanner';
-import { SesionConRol, SesionService } from '../../../core/services/sesion';
+// eslint-disable-next-line no-restricted-imports -- temporal: este modal pasa a features/evaluacion en el paso 8.
+import { SesionConRol, SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { mensajeDeError } from '@core/errores/errores';
 
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -59,7 +60,7 @@ export class ScannerModalComponent implements OnInit {
   private readonly modalCtrl = inject(ModalController);
   private readonly toastCtrl = inject(ToastController);
   private readonly scanner = inject(ScannerService);
-  private readonly sesionService = inject(SesionService);
+  private readonly sesionService = inject(SesionesRepository);
   private readonly authService = inject(AuthService);
 
   /** Se recibe por componentProps desde el dashboard. */

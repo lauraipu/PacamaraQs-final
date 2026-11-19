@@ -5,8 +5,8 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { Subject } from 'rxjs';
 import { EstadoSesion, Participante, Sesion } from '@domain/sesion/sesion.model';
 import { AuthService, UsuarioActual } from '@core/auth/auth.service';
-import { EventoSala, PresenciaUsuario, RealtimeService } from '../../../core/services/realtime';
-import { SesionService } from '../../../core/services/sesion';
+import { EventoSala, PresenciaUsuario, RealtimeService } from '@core/realtime/sala-realtime.service';
+import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { WaitingRoomPage } from './waiting-room.page';
 
 const participante = (usuarioId: string, listo: boolean, esOrganizador = false): Participante => ({
@@ -84,7 +84,7 @@ describe('WaitingRoomPage', () => {
         provideRouter([]),
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => 'session-id' } } } },
         {
-          provide: SesionService,
+          provide: SesionesRepository,
           useValue: { obtenerSesionPorId, obtenerParticipantes, iniciarSesion, marcarComoListo, abandonarSesion }
         },
         { provide: AuthService, useValue: { usuario, asegurarInicializado: vi.fn().mockResolvedValue(undefined) } },

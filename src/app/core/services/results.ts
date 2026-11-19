@@ -8,7 +8,7 @@ import {
   ValorAtributo,
   VotoHedonico
 } from '../models/session-results.model';
-import { sesionDtoToDomain } from '../mappers/sesion.mapper';
+import { sesionDtoToDomain } from '../data-access/sesiones/sesion.mapper';
 import { construirFichasTecnicas, ExtrinsecaRegistradaDto, FichaExtrinsecaDto } from '../mappers/ficha-tecnica.mapper';
 
 /** Forma real (snake_case) que devuelve la RPC get_resumen_panel. */

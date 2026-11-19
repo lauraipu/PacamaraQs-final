@@ -1,28 +1,24 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { SupabaseService } from '../../supabase/supabase.client';
+import { SesionesRepository } from '../../data-access/sesiones/sesiones.repository';
+import { AuthService } from '../auth.service';
 
+/** Solo el organizador de la sesión pasa; los demás van a la pantalla de gracias. */
 export const organizerGuard: CanActivateFn = async (route) => {
-  const supabase = inject(SupabaseService).client;
+  const auth = inject(AuthService);
+  const sesiones = inject(SesionesRepository);
   const router = inject(Router);
 
   const sesionId = route.paramMap.get('id') || route.paramMap.get('sesionId');
   if (!sesionId) return router.createUrlTree(['/dashboard']);
 
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { user } = await auth.getUser();
     if (!user) return router.createUrlTree(['/login']);
 
-    // Consultamos quién es el organizador de esta sesión
-    const { data: sesion } = await supabase
-      .from('sesiones')
-      .select('organizador_id')
-      .eq('id', sesionId)
-      .single();
-
-    if (sesion && sesion.organizador_id === user.id) {
-      return true; // Es el organizador, puede pasar
-    }
+    // Un error de consulta cuenta como "no es el organizador", igual que antes.
+    const esOrganizador = await sesiones.esOrganizadorDeSesion(sesionId, user.id).catch(() => false);
+    if (esOrganizador) return true;
 
     // No es el organizador, lo mandamos a la pantalla de gracias
     return router.createUrlTree([`/session/${sesionId}/evaluation-complete`]);
