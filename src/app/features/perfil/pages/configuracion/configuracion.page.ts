@@ -9,18 +9,18 @@ import {
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { chevronDownOutline, chevronUpOutline, pencilOutline } from 'ionicons/icons';
-import { CierreSesionService } from '../../core/auth/cierre-sesion.service';
+import { CierreSesionService } from '@core/auth/cierre-sesion.service';
 import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '@domain/contrasena/politica-contrasena';
-import { Idioma, IDIOMAS, IdiomaService } from '../../core/i18n/idioma.service';
+import { Idioma, IDIOMAS, IdiomaService } from '@core/i18n/idioma.service';
 import { AuthService } from '@core/auth/auth.service';
-import { SupabaseService } from '@core/supabase/supabase.client';
-import { CampoContrasenaComponent } from '../../shared/components/campo-contrasena/campo-contrasena.component';
+import { DosPasosService } from '@core/auth/dos-pasos.service';
+import { PerfilRepository } from '../../data-access/perfil.repository';
+import { Perfil, Preferencias } from '../../models/perfil.model';
+import { CampoContrasenaComponent } from '@shared/components/campo-contrasena/campo-contrasena.component';
 
-import { BotonGuiaComponent } from '../../shared/components/boton-guia/boton-guia.component';
-import { CodigoOtpComponent } from '../../shared/components/codigo-otp/codigo-otp.component';
+import { BotonGuiaComponent } from '@shared/components/boton-guia/boton-guia.component';
+import { CodigoOtpComponent } from '@shared/components/codigo-otp/codigo-otp.component';
 addIcons({ chevronDownOutline, chevronUpOutline, pencilOutline });
-
-interface Preferencias { altoContraste?: boolean; tamanoTexto?: number; reducirAnimaciones?: boolean }
 
 @Component({
   selector: 'app-configuracion',
@@ -34,7 +34,8 @@ interface Preferencias { altoContraste?: boolean; tamanoTexto?: number; reducirA
 })
 export class ConfiguracionPage implements ViewWillEnter {
   private readonly auth = inject(AuthService);
-  private readonly supabase = inject(SupabaseService).client;
+  private readonly perfil = inject(PerfilRepository);
+  private readonly dosPasos = inject(DosPasosService);
   private readonly transloco = inject(TranslocoService);
   private readonly alertas = inject(AlertController);
   private readonly toasts = inject(ToastController);
@@ -83,17 +84,20 @@ export class ConfiguracionPage implements ViewWillEnter {
     this.cargado = false;
     const id = this.auth.usuario()?.id;
     if (!id) return;
-    const { data, error } = await this.supabase.from('usuarios')
-      .select('nombre, idioma, preferencias').eq('id', id).maybeSingle();
-    if (error) { await this.avisar('config.errores.cargar'); return; }
+    let data: Perfil | null;
+    try {
+      data = await this.perfil.obtener(id);
+    } catch {
+      await this.avisar('config.errores.cargar');
+      return;
+    }
     this.nombre.set(data?.nombre ?? this.auth.usuario()?.nombre ?? '');
-    const prefs = (data?.preferencias ?? {}) as Preferencias;
+    const prefs: Preferencias = data?.preferencias ?? {};
     this.altoContraste.set(!!prefs.altoContraste);
     this.tamanoTexto.set(prefs.tamanoTexto ?? 100);
     this.reducirAnimaciones.set(!!prefs.reducirAnimaciones);
     if (data?.idioma && data.idioma !== this.idioma.actual()) this.idioma.cambiar(data.idioma);
-    const { data: factores } = await this.supabase.auth.mfa.listFactors();
-    this.dosPasosActivo.set(!!factores?.totp?.some(f => f.status === 'verified'));
+    this.dosPasosActivo.set(await this.dosPasos.tieneFactorVerificado());
     // Un administrador sin verificación en dos pasos llega aquí desde roleGuard.
     if (this.route.snapshot.queryParamMap.get('dosPasos') === 'requerido' && !this.dosPasosActivo()) {
       this.dosPasosObligatorio.set(true);
@@ -118,11 +122,16 @@ export class ConfiguracionPage implements ViewWillEnter {
     if (!id || this.guardando()) return;
     if (this.nombre().trim().length < 2) { await this.avisar('config.errores.nombre'); return; }
     this.guardando.set(true);
-    const { data, error } = await this.supabase.from('usuarios')
-      .update({ nombre: this.nombre().trim() }).eq('id', id).select('nombre').single();
+    let guardado: string;
+    try {
+      guardado = await this.perfil.guardarNombre(id, this.nombre());
+    } catch {
+      this.guardando.set(false);
+      await this.avisar('config.errores.guardar');
+      return;
+    }
     this.guardando.set(false);
-    if (error) { await this.avisar('config.errores.guardar'); return; }
-    this.nombre.set(data.nombre); // ya normalizado por el trigger (mayúscula inicial)
+    this.nombre.set(guardado); // ya normalizado por el trigger (mayúscula inicial)
     this.editandoNombre.set(false);
     await this.avisar('config.guardado', 'success');
   }
@@ -131,8 +140,7 @@ export class ConfiguracionPage implements ViewWillEnter {
     this.idioma.cambiar(valor); // Transloco cambia al instante
     const id = this.auth.usuario()?.id;
     if (!id) return;
-    const { error } = await this.supabase.from('usuarios').update({ idioma: valor }).eq('id', id);
-    if (error) await this.avisar('config.errores.guardar');
+    await this.perfil.guardarIdioma(id, valor).catch(() => this.avisar('config.errores.guardar'));
   }
 
   async guardarContrasena(): Promise<void> {
@@ -159,18 +167,13 @@ export class ConfiguracionPage implements ViewWillEnter {
 
   /** Paso 1: crea el factor TOTP y muestra el QR para la app de autenticación. */
   async iniciarActivacion(): Promise<void> {
-    const mfa = this.supabase.auth.mfa;
-    const { data: lista } = await mfa.listFactors();
-    // Intentos anteriores sin terminar: se eliminan para poder empezar de nuevo.
-    for (const f of lista?.all ?? []) {
-      if (f.factor_type === 'totp' && f.status === 'unverified') await mfa.unenroll({ factorId: f.id });
-    }
-    const { data, error } = await mfa.enroll({ factorType: 'totp', friendlyName: `PacamaraQS ${Date.now()}` });
-    if (error || !data) { await this.avisar('dos_pasos.errores.activar'); return; }
-    this.factorPendiente = data.id;
+    // Borra intentos anteriores sin terminar y crea un factor nuevo.
+    const factor = await this.dosPasos.iniciarAlta();
+    if (!factor) { await this.avisar('dos_pasos.errores.activar'); return; }
+    this.factorPendiente = factor.factorId;
     // El QR es un SVG generado por Supabase (data URL); Angular lo bloquearía sin esto.
-    this.qrDosPasos.set(this.sanitizer.bypassSecurityTrustUrl(data.totp.qr_code));
-    this.secretoDosPasos.set(data.totp.secret);
+    this.qrDosPasos.set(this.sanitizer.bypassSecurityTrustUrl(factor.qr));
+    this.secretoDosPasos.set(factor.secreto);
     this.codigoDosPasos.set('');
     this.modalDosPasos.set(true);
   }
@@ -184,11 +187,9 @@ export class ConfiguracionPage implements ViewWillEnter {
     if (!this.factorPendiente || this.activandoDosPasos()) return;
     if (this.codigoDosPasos().length !== 6) { await this.avisar('dos_pasos.errores.formato'); return; }
     this.activandoDosPasos.set(true);
-    const { error } = await this.supabase.auth.mfa.challengeAndVerify({
-      factorId: this.factorPendiente, code: this.codigoDosPasos()
-    });
+    const valido = await this.dosPasos.confirmarAlta(this.factorPendiente, this.codigoDosPasos());
     this.activandoDosPasos.set(false);
-    if (error) { this.codigoDosPasos.set(''); await this.avisar('dos_pasos.errores.codigo'); return; }
+    if (!valido) { this.codigoDosPasos.set(''); await this.avisar('dos_pasos.errores.codigo'); return; }
     this.factorPendiente = null;
     this.dosPasosActivo.set(true);
     this.dosPasosObligatorio.set(false);
@@ -199,7 +200,7 @@ export class ConfiguracionPage implements ViewWillEnter {
   async cancelarActivacion(): Promise<void> {
     this.modalDosPasos.set(false);
     if (this.factorPendiente) {
-      await this.supabase.auth.mfa.unenroll({ factorId: this.factorPendiente }).catch(() => undefined);
+      await this.dosPasos.cancelarAlta(this.factorPendiente);
       this.factorPendiente = null;
     }
   }
@@ -225,8 +226,7 @@ export class ConfiguracionPage implements ViewWillEnter {
     const codigo = String(data?.values?.codigo ?? '').replace(/\D/g, '');
     try {
       await this.auth.verificarCodigoDosPasos(codigo);
-      const { data: lista } = await this.supabase.auth.mfa.listFactors();
-      for (const f of lista?.totp ?? []) await this.supabase.auth.mfa.unenroll({ factorId: f.id });
+      await this.dosPasos.quitarTodos();
       this.dosPasosActivo.set(false);
       await this.avisar('dos_pasos.desactivada', 'success');
     } catch {
@@ -246,8 +246,8 @@ export class ConfiguracionPage implements ViewWillEnter {
 
   private async guardarPreferencias(preferencias: Preferencias): Promise<void> {
     // Combina en el servidor: no borra otras claves (p. ej. las guías vistas).
-    const { error } = await this.supabase.rpc('guardar_preferencias', { p_preferencias: preferencias });
-    if (error) console.error('[Configuración] preferencias:', error);
+    await this.perfil.guardarPreferencias(preferencias)
+      .catch(error => console.error('[Configuración] preferencias:', error));
   }
 
   private async confirmar(titulo: string, mensaje: string): Promise<boolean> {

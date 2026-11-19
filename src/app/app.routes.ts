@@ -19,9 +19,9 @@ export const routes: Routes = [
     data: { roles: ROLES_APP }
   },
   {
-    path: 'configuracion',
-    loadComponent: () => import('./pages/configuracion/configuracion.page').then(m => m.ConfiguracionPage),
-    canActivate: [authGuard]
+    // Feature perfil: Configuración (/configuracion).
+    path: '',
+    loadChildren: () => import('@features/perfil/perfil.routes').then(m => m.PERFIL_ROUTES)
   },
   {
     path: 'admin-dashboard',

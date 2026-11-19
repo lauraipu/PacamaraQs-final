@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { AuthService } from '../auth/auth.service';
-import { SupabaseService } from '../supabase/supabase.client';
 import { CARGAR_MODAL_GUIA } from './cargar-modal-guia';
 import { IdGuia } from './guias';
+import { GuiasRepository } from './guias.repository';
 
 const CLAVE_LOCAL = 'pacamaraqs.guias';
 
@@ -16,7 +16,7 @@ const CLAVE_LOCAL = 'pacamaraqs.guias';
 export class GuiaService {
   private readonly modales = inject(ModalController);
   private readonly auth = inject(AuthService);
-  private readonly supabase = inject(SupabaseService);
+  private readonly repositorio = inject(GuiasRepository);
   /** Opcional: en pruebas unitarias no se provee y la guía simplemente no se abre. */
   private readonly cargarModal = inject(CARGAR_MODAL_GUIA, { optional: true });
   private vistas: Set<string> | null = null;
@@ -31,7 +31,7 @@ export class GuiaService {
       vistas.add(id); // antes de abrir: aunque falle, no se reintenta en bucle
       await this.abrir(id);
       this.guardarLocal(vistas);
-      void this.supabase.client.rpc('marcar_guia_vista', { p_guia: id }).then(() => undefined, () => undefined);
+      this.repositorio.marcarVista(id);
     } catch (error) {
       console.warn('[Guías]', error);
     }
@@ -61,9 +61,7 @@ export class GuiaService {
     const locales = this.leerLocal();
     const id = typeof this.auth.usuario === 'function' ? this.auth.usuario()?.id : undefined;
     if (id) {
-      const { data } = await this.supabase.client.from('usuarios').select('preferencias').eq('id', id).maybeSingle();
-      const remotas = (data?.preferencias as { guias?: unknown } | null)?.guias;
-      if (Array.isArray(remotas)) remotas.forEach(g => typeof g === 'string' && locales.add(g));
+      (await this.repositorio.vistasEnLaCuenta(id)).forEach(g => locales.add(g));
     }
     this.vistas = locales;
     return locales;
