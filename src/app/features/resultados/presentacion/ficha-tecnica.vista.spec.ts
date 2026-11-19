@@ -1,5 +1,5 @@
 import { aFuentesFicha } from '../data-access/resultados.mapper';
-import { ExtrinsecaRegistradaDto, FichaExtrinsecaDto } from '../data-access/resultados.dto';
+import { ExtrinsecaRegistradaDto, FichaExtrinsecaDto } from '@core/dto/resultados.dto';
 import { armarFichasTecnicas, textoDeCampo } from './ficha-tecnica.vista';
 
 /** La misma cadena que usa la app: DTO → fuentes (mapper) → ficha (dominio + presentación). */

@@ -1,6 +1,6 @@
 import {
   AdminEventoDto, AdminResumenDto, AdminSesionDto, AdminUsuarioDto, PaginaDto
-} from './admin.dto';
+} from '@core/dto/admin.dto';
 import {
   AdminEvento, AdminResumen, AdminSesion, AdminUsuario, ESTADOS_SESION, EstadoSesionAdmin,
   FORMATOS_SESION, FormatoSesionAdmin, Pagina

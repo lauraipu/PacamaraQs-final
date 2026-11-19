@@ -18,10 +18,11 @@ src/app/
   app.routes.ts      solo compone features con loadChildren (las URL NO cambian)
   core/              singletons: supabase/, auth/ (+guards/, roles.ts, dos-pasos), errores/, i18n/, guias/,
                      plataforma/, realtime/ (sala en vivo), data-access/ (sesiones, cola offline de evaluaciones)
+                     dto/ (TODOS los DTO de la app: sesion, admin, perfil, resultados; ver su README)
   domain/            TypeScript puro (reglas CVA/SCA, catálogos, ficha técnica). Sin Angular ni Supabase.
   shared/            UI pura (components/), pipes/ (respaldo), utils/ (formato, lista-paginada, pagina)
   features/<x>/      auth, perfil, sesiones (+escaner/), evaluacion, resultados, admin
-                     cada una: <x>.routes.ts, pages/, y si aplica data-access/ (dto, mapper, repository), models/, ui/
+                     cada una: <x>.routes.ts, pages/, y si aplica data-access/ (mapper, repository), models/, ui/
 ```
 Fronteras (las hace cumplir ESLint `no-restricted-imports` en `eslint.config.js`):
 - `domain/` no importa nada externo ni otra capa.
@@ -30,6 +31,7 @@ Fronteras (las hace cumplir ESLint `no-restricted-imports` en `eslint.config.js`
 - Una feature no importa archivos internos de otra (lo compartido entre features va a `core/data-access/` o `domain/`).
 - Alias: `@core/*`, `@domain/*`, `@shared/*`, `@features/*`.
 - Mappers = traductores puros DTO → modelo (sin reglas de negocio, sin textos de pantalla).
+- DTO: todos en `core/dto/`; solo los importan los data-access/ (ESLint lo exige).
 - Componentes nunca llaman a Supabase: siempre vía repositorio.
 
 ## Estado del refactor de 12 pasos (documento: https://claude.ai/artifact/H7RavfZ2phL2GU2QyURBuR)

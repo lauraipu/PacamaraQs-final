@@ -3,7 +3,7 @@ import { FuenteFicha, Registro } from '@domain/ficha-tecnica/ficha-tecnica';
 import {
   CupperResultSummary, PromedioAtributo, SampleConsolidatedResult, SessionResults, ValorAtributo, VotoHedonico
 } from '../models/resultados.model';
-import { ExtrinsecaRegistradaDto, FichaExtrinsecaDto, ResumenPanelDto } from './resultados.dto';
+import { ExtrinsecaRegistradaDto, FichaExtrinsecaDto, ResumenPanelDto } from '@core/dto/resultados.dto';
 
 /** Traductores puros DTO → modelo. Sin reglas de negocio, sin formateo visual. */
 

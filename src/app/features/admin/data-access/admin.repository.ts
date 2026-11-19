@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { SupabaseService } from '@core/supabase/supabase.client';
 import {
   AdminEventoDto, AdminResumenDto, AdminSesionDto, AdminUsuarioDto, PaginaDto, ResultadoEliminarUsuarioDto
-} from './admin.dto';
+} from '@core/dto/admin.dto';
 import { aEvento, aPagina, aResumen, aSesion, aUsuario } from './admin.mapper';
 import {
   AdminEvento, AdminResumen, AdminSesion, AdminUsuario, FiltroAuditoria, FiltroSesiones,

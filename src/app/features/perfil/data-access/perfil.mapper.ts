@@ -1,5 +1,5 @@
 import { Perfil, Preferencias } from '../models/perfil.model';
-import { PerfilDto } from './perfil.dto';
+import { PerfilDto } from '@core/dto/perfil.dto';
 
 /** Traductor puro DTO → modelo. */
 export function aPerfil(dto: PerfilDto): Perfil {

@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { sesionDtoToDomain } from '@core/data-access/sesiones/sesion.mapper';
 import { SupabaseService } from '@core/supabase/supabase.client';
 import { SessionResults } from '../models/resultados.model';
-import { ResumenPanelDto } from './resultados.dto';
+import { ResumenPanelDto } from '@core/dto/resultados.dto';
 import { aResultadosSesion } from './resultados.mapper';
 
 /** Único acceso de la feature resultados a Supabase: consulta y traduce, sin reglas de negocio. */

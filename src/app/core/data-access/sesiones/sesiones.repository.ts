@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { participanteDtoToDomain, sesionDtoToDomain } from './sesion.mapper';
 import { Participante, Sesion } from '@domain/sesion/sesion.model';
-import { ParticipanteDto, SesionDto } from './sesion.dto';
+import { ParticipanteDto, SesionDto } from '../../dto/sesion.dto';
 import { SupabaseService } from '../../supabase/supabase.client';
 
 export interface SesionConRol extends Sesion {

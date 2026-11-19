@@ -1,5 +1,5 @@
 import { EstadoSesion, Participante, Sesion } from '@domain/sesion/sesion.model';
-import { ParticipanteDto, SesionDto } from './sesion.dto';
+import { ParticipanteDto, SesionDto } from '../../dto/sesion.dto';
 
 export function sesionDtoToDomain(dto: SesionDto): Sesion {
   let estado: EstadoSesion;

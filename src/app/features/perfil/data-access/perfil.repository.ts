@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { SupabaseService } from '@core/supabase/supabase.client';
 import { Perfil, Preferencias } from '../models/perfil.model';
-import { PerfilDto } from './perfil.dto';
+import { PerfilDto } from '@core/dto/perfil.dto';
 import { aPerfil } from './perfil.mapper';
 
 /**
