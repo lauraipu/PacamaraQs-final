@@ -7,7 +7,7 @@ import { cloudOfflineOutline, refreshOutline } from 'ionicons/icons';
 import { AdminRepository } from '../data-access/admin.repository';
 import {
   AdminResumen, ESTADOS_SESION, FORMATOS_SESION, LIMITE_BD_BYTES
-} from '../data-access/admin.models';
+} from '../models/admin.models';
 import { formatearDiaCorto, megabytes } from '@shared/utils/formato';
 
 addIcons({ refreshOutline, cloudOfflineOutline });

@@ -5,6 +5,7 @@ import {
   IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar
 } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { RespaldoPipe } from '@shared/pipes/respaldo.pipe';
 import { addIcons } from 'ionicons';
 import {
   banOutline, closeOutline, cloudOfflineOutline, createOutline, refreshOutline, searchOutline,
@@ -13,7 +14,7 @@ import {
 import { AvisosService } from '@core/errores/avisos.service';
 import { AuthService } from '@core/auth/auth.service';
 import { AdminRepository } from '../data-access/admin.repository';
-import { AdminUsuario, FiltroUsuarios, RolAdminVista } from '../data-access/admin.models';
+import { AdminUsuario, FiltroUsuarios, RolAdminVista, nombreVisible } from '../models/admin.models';
 import { formatearFecha, iniciales } from '@shared/utils/formato';
 import { ListaPaginada } from '@shared/utils/lista-paginada';
 
@@ -30,7 +31,7 @@ type FiltroRol = 'todos' | RolAdminVista;
   standalone: true,
   imports: [
     IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonModal, IonSearchbar,
-    IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar, TranslocoPipe
+    IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar, TranslocoPipe, RespaldoPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./admin-comun.scss', './admin-usuarios.component.scss'],
@@ -67,9 +68,9 @@ type FiltroRol = 'todos' | RolAdminVista;
         @for (u of lista.filas(); track u.id) {
           <li class="ad-fila us-fila" [class.us-fila--inactiva]="!u.activo">
             <div class="us-cabeza">
-              <span class="us-avatar" aria-hidden="true">{{ inicialesDe(u.nombre) }}</span>
+              <span class="us-avatar" aria-hidden="true">{{ inicialesDe(u.nombre | respaldo: u.email) }}</span>
               <div class="us-ident">
-                <p class="ad-fila__titulo">{{ u.nombre }}</p>
+                <p class="ad-fila__titulo">{{ u.nombre | respaldo: u.email }}</p>
                 <p class="ad-fila__sub">{{ u.email }}</p>
               </div>
               <div class="ad-chips">
@@ -111,12 +112,12 @@ type FiltroRol = 'todos' | RolAdminVista;
                   </ion-button>
                 }
                 <ion-button size="small" fill="clear" class="us-icono" [disabled]="ocupado() === u.id"
-                  (click)="abrirEdicion(u)" [attr.aria-label]="'admin.usuarios.editar_aria' | transloco: { nombre: u.nombre }">
+                  (click)="abrirEdicion(u)" [attr.aria-label]="'admin.usuarios.editar_aria' | transloco: { nombre: (u.nombre | respaldo: u.email) }">
                   <ion-icon slot="icon-only" name="create-outline" aria-hidden="true"></ion-icon>
                 </ion-button>
                 @if (u.id !== miId()) {
                   <ion-button size="small" fill="clear" class="us-icono us-icono--peligro" [disabled]="ocupado() === u.id"
-                    (click)="eliminar(u)" [attr.aria-label]="'admin.usuarios.eliminar_aria' | transloco: { nombre: u.nombre }">
+                    (click)="eliminar(u)" [attr.aria-label]="'admin.usuarios.eliminar_aria' | transloco: { nombre: (u.nombre | respaldo: u.email) }">
                     <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true"></ion-icon>
                   </ion-button>
                 }
@@ -230,7 +231,7 @@ export class AdminUsuariosComponent implements OnInit {
       mensaje: promover ? 'admin.usuarios.confirmar_admin_texto' : 'admin.usuarios.confirmar_quitar_texto',
       confirmar: 'admin.usuarios.confirmar',
       peligro: true,
-      params: { nombre: usuario.nombre }
+      params: { nombre: nombreVisible(usuario) }
     });
     if (!ok) return;
 
@@ -243,7 +244,7 @@ export class AdminUsuariosComponent implements OnInit {
         this.lista.actualizar(f => f.id === usuario.id, f => ({ ...f, rol: nuevo }));
       }
       await this.avisos.exito('admin.usuarios.rol_actualizado', {
-        nombre: usuario.nombre,
+        nombre: nombreVisible(usuario),
         rol: this.transloco.translate(`admin.roles.${nuevo}`)
       });
     } catch (error) {
@@ -254,7 +255,7 @@ export class AdminUsuariosComponent implements OnInit {
   }
 
   abrirEdicion(usuario: AdminUsuario): void {
-    this.nombreEdicion.set(usuario.nombre === usuario.email ? '' : usuario.nombre);
+    this.nombreEdicion.set(usuario.nombre ?? '');
     this.rolEdicion.set(usuario.rol);
     this.edicion.set(usuario);
   }
@@ -286,7 +287,7 @@ export class AdminUsuariosComponent implements OnInit {
       mensaje: 'admin.eliminar.usuario_texto',
       confirmar: 'admin.eliminar.confirmar',
       peligro: true,
-      params: { nombre: usuario.nombre }
+      params: { nombre: nombreVisible(usuario) }
     });
     if (!ok) return;
 
@@ -295,7 +296,7 @@ export class AdminUsuariosComponent implements OnInit {
       const resultado = await this.repo.eliminarUsuario(usuario.id);
       await this.recargar();
       await this.avisos.exito(resultado === 'eliminado' ? 'admin.eliminar.usuario_eliminado' : 'admin.eliminar.usuario_desactivado',
-        { nombre: usuario.nombre });
+        { nombre: nombreVisible(usuario) });
     } catch (error) {
       await this.avisos.error(error);
     } finally {
@@ -308,7 +309,7 @@ export class AdminUsuariosComponent implements OnInit {
     try {
       await this.repo.reactivarUsuario(usuario.id);
       this.lista.actualizar(f => f.id === usuario.id, f => ({ ...f, activo: true, desactivadoEn: null }));
-      await this.avisos.exito('admin.usuarios.reactivado', { nombre: usuario.nombre });
+      await this.avisos.exito('admin.usuarios.reactivado', { nombre: nombreVisible(usuario) });
     } catch (error) {
       await this.avisos.error(error);
     } finally {

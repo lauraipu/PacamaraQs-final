@@ -50,7 +50,8 @@ export interface AdminResumen {
 export interface AdminUsuario {
   id: string;
   email: string;
-  nombre: string;
+  /** null si el usuario no tiene nombre: la vista muestra el correo (pipe respaldo). */
+  nombre: string | null;
   rol: RolAdminVista;
   activo: boolean;
   desactivadoEn: Date | null;
@@ -60,6 +61,9 @@ export interface AdminUsuario {
   sesionesOrganizadas: number;
   evaluaciones: number;
 }
+
+/** Nombre para mostrar en textos (avisos, confirmaciones): el nombre o, si falta, el correo. */
+export const nombreVisible = (u: Pick<AdminUsuario, 'nombre' | 'email'>): string => u.nombre ?? u.email;
 
 export interface AdminSesion {
   id: string;
@@ -71,7 +75,8 @@ export interface AdminSesion {
   numeroMuestras: number;
   catadoresObjetivo: number;
   creadoEn: Date;
-  organizador: string;
+  /** Nombre o correo del organizador; null si no se conoce (la vista muestra '—'). */
+  organizador: string | null;
   catadores: number;
   listos: number;
   evaluaciones: number;
@@ -84,7 +89,8 @@ export interface AdminEvento {
   registroId: string | null;
   sesionId: string | null;
   sesionNombre: string | null;
-  actor: string;
+  /** Nombre o correo de quien hizo el cambio; null = acción del sistema. */
+  actor: string | null;
   datos: Record<string, unknown>;
   creadoEn: Date;
 }

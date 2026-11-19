@@ -13,12 +13,12 @@ describe('admin.mapper', () => {
     expect(r.actividad14d[0].dia.getDate()).toBe(19);
   });
 
-  it('usa el correo cuando el usuario no tiene nombre y normaliza el rol', () => {
+  it('deja el nombre en null cuando falta (la vista decide el respaldo) y normaliza el rol', () => {
     const u = aUsuario({
       id: '1', email: 'a@b.co', nombre: null, rol_global: 'otro', creado_en: '2026-11-01T00:00:00Z',
       idioma: 'es', activo: true, desactivado_en: null, ultimo_acceso: null, tiene_dos_pasos: true, sesiones_organizadas: 2, evaluaciones: 3
     });
-    expect(u.nombre).toBe('a@b.co');
+    expect(u.nombre).toBeNull();
     expect(u.rol).toBe('catador');
     expect(u.ultimoAcceso).toBeNull();
   });
@@ -27,12 +27,12 @@ describe('admin.mapper', () => {
     expect(aPagina(null, aSesion)).toEqual({ total: 0, filas: [] });
   });
 
-  it('muestra un guion cuando el evento no tiene actor', () => {
+  it('deja el actor en null cuando el evento no tiene actor', () => {
     const e = aEvento({
       id: 1, tabla: 'sesiones', operacion: 'DELETE', registro_id: 'x', sesion_id: null,
       sesion_nombre: null, actor_nombre: null, actor_email: null, datos: null, creado_en: '2026-11-01T00:00:00Z'
     });
-    expect(e.actor).toBe('—');
+    expect(e.actor).toBeNull();
     expect(e.datos).toEqual({});
   });
 });

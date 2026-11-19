@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IonButton, IonIcon, IonSelect, IonSelectOption, IonSpinner } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { RespaldoPipe } from '@shared/pipes/respaldo.pipe';
 import { addIcons } from 'ionicons';
 import { cloudOfflineOutline, lockClosedOutline, refreshOutline, searchOutline } from 'ionicons/icons';
 import { AdminRepository } from '../data-access/admin.repository';
 import {
   AdminEvento, FiltroAuditoria, OPERACIONES_AUDITORIA, OperacionAuditoria, TABLAS_AUDITORIA, TablaAuditoria
-} from '../data-access/admin.models';
+} from '../models/admin.models';
 import { formatearFecha } from '@shared/utils/formato';
 import { ListaPaginada } from '@shared/utils/lista-paginada';
 
@@ -20,7 +21,7 @@ addIcons({ refreshOutline, cloudOfflineOutline, searchOutline, lockClosedOutline
 @Component({
   selector: 'app-admin-auditoria',
   standalone: true,
-  imports: [IonButton, IonIcon, IonSelect, IonSelectOption, IonSpinner, TranslocoPipe],
+  imports: [IonButton, IonIcon, IonSelect, IonSelectOption, IonSpinner, TranslocoPipe, RespaldoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./admin-comun.scss'],
   styles: [`
@@ -81,7 +82,7 @@ addIcons({ refreshOutline, cloudOfflineOutline, searchOutline, lockClosedOutline
                 @if (e.sesionNombre) { <span class="ad-fila__sub">· {{ e.sesionNombre }}</span> }
               </div>
               <p class="ad-fila__sub">
-                {{ e.actor === '—' ? ('admin.auditoria.sistema' | transloco) : e.actor }}
+                {{ e.actor | respaldo: ('admin.auditoria.sistema' | transloco) }}
                 @if (detalle(e); as d) { · {{ d }} }
               </p>
             </div>

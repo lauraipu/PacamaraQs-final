@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IonButton, IonIcon, IonSearchbar, IonSelect, IonSelectOption, IonSpinner } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { RespaldoPipe } from '@shared/pipes/respaldo.pipe';
 import { addIcons } from 'ionicons';
 import { cloudOfflineOutline, refreshOutline, searchOutline, trashOutline } from 'ionicons/icons';
 import { AvisosService } from '@core/errores/avisos.service';
 import { AdminRepository } from '../data-access/admin.repository';
 import {
   AdminSesion, ESTADOS_ELIMINABLES, ESTADOS_SESION, EstadoSesionAdmin, FiltroSesiones
-} from '../data-access/admin.models';
+} from '../models/admin.models';
 import { formatearFecha } from '@shared/utils/formato';
 import { ListaPaginada } from '@shared/utils/lista-paginada';
 
@@ -21,7 +22,7 @@ addIcons({ refreshOutline, cloudOfflineOutline, searchOutline, trashOutline });
 @Component({
   selector: 'app-admin-sesiones',
   standalone: true,
-  imports: [IonButton, IonIcon, IonSearchbar, IonSelect, IonSelectOption, IonSpinner, TranslocoPipe],
+  imports: [IonButton, IonIcon, IonSearchbar, IonSelect, IonSelectOption, IonSpinner, TranslocoPipe, RespaldoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./admin-comun.scss'],
   styles: [`
@@ -71,7 +72,7 @@ addIcons({ refreshOutline, cloudOfflineOutline, searchOutline, trashOutline });
             <div class="se-cabeza">
               <div class="se-ident">
                 <p class="ad-fila__titulo">{{ s.nombre }}</p>
-                <p class="ad-fila__sub">{{ 'admin.sesiones.organizador' | transloco }}: {{ s.organizador }}</p>
+                <p class="ad-fila__sub">{{ 'admin.sesiones.organizador' | transloco }}: {{ s.organizador | respaldo }}</p>
               </div>
               <div class="se-lado">
                 <div class="ad-chips">

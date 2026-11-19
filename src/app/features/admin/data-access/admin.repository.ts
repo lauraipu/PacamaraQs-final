@@ -7,7 +7,7 @@ import { aEvento, aPagina, aResumen, aSesion, aUsuario } from './admin.mapper';
 import {
   AdminEvento, AdminResumen, AdminSesion, AdminUsuario, FiltroAuditoria, FiltroSesiones,
   FiltroUsuarios, Pagina, ResultadoEliminarUsuario, RolAdminVista
-} from './admin.models';
+} from '../models/admin.models';
 
 /**
  * Único punto de acceso del panel de administrador a Supabase.

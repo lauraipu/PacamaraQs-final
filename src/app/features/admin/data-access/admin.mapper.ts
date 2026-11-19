@@ -4,7 +4,7 @@ import {
 import {
   AdminEvento, AdminResumen, AdminSesion, AdminUsuario, ESTADOS_SESION, EstadoSesionAdmin,
   FORMATOS_SESION, FormatoSesionAdmin, Pagina
-} from './admin.models';
+} from '../models/admin.models';
 
 /** Convierte las respuestas de las RPC (DTO) en modelos de dominio. */
 
@@ -64,7 +64,7 @@ export function aUsuario(dto: AdminUsuarioDto): AdminUsuario {
   return {
     id: dto.id,
     email: dto.email,
-    nombre: dto.nombre?.trim() || dto.email,
+    nombre: dto.nombre?.trim() || null,
     rol: dto.rol_global === 'administrador' ? 'administrador' : 'catador',
     activo: dto.activo !== false,
     desactivadoEn: fecha(dto.desactivado_en),
@@ -87,7 +87,7 @@ export function aSesion(dto: AdminSesionDto): AdminSesion {
     numeroMuestras: numero(dto.numero_muestras),
     catadoresObjetivo: numero(dto.catadores_objetivo),
     creadoEn: fecha(dto.creado_en) ?? new Date(0),
-    organizador: dto.organizador_nombre?.trim() || dto.organizador_email || '—',
+    organizador: dto.organizador_nombre?.trim() || dto.organizador_email || null,
     catadores: numero(dto.catadores),
     listos: numero(dto.listos),
     evaluaciones: numero(dto.evaluaciones)
@@ -102,7 +102,7 @@ export function aEvento(dto: AdminEventoDto): AdminEvento {
     registroId: dto.registro_id,
     sesionId: dto.sesion_id,
     sesionNombre: dto.sesion_nombre,
-    actor: dto.actor_nombre?.trim() || dto.actor_email || '—',
+    actor: dto.actor_nombre?.trim() || dto.actor_email || null,
     datos: dto.datos ?? {},
     creadoEn: fecha(dto.creado_en) ?? new Date(0)
   };
