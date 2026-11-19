@@ -33,15 +33,12 @@ Fronteras (las hace cumplir ESLint `no-restricted-imports` en `eslint.config.js`
 - Componentes nunca llaman a Supabase: siempre vía repositorio.
 
 ## Estado del refactor de 12 pasos (documento: https://claude.ai/artifact/H7RavfZ2phL2GU2QyURBuR)
-- Pasos 1–10: hechos y con commit en master.
-- Paso 11: aplicado y **preparado (staged) sin commit**: `app.routes.ts` solo compone features,
-  `features/admin/admin.routes.ts` nuevo, borrado `pages/admin-dashboard/`, limpieza de carpetas vacías.
-  Falta: `npm run build`, `npm test`, prueba rápida en `ionic serve` y
-  `git commit -m "refactor(fase2): paso 11 – app.routes solo compone features; limpieza de pages/ y core/"`.
-- Paso 12 (pendiente): verificación final — sin imports rotos ni código muerto (p. ej. revisar si
-  `shared/components/progress-tracker` se usa), build, tests, ESLint, prueba manual completa
-  (recuperar contraseña, Google, 2FA, cata con 3 catadores, resultados, exportar, APK), y actualizar
-  el documento de auditoría con lo hecho.
+- Fase 2 terminada (19-nov-2026): los 12 pasos con commit en master; build, 145 tests y ESLint en verde;
+  prueba manual completa hecha. Detalle por paso y hallazgos en la sección "Estado de ejecución" del documento.
+- Paso 12 corrigió: ruta de `combined-form` en `src/global.scss` (build roto desde el paso 8) y doble
+  global de `ModalController` en `src/test-setup.ts` (52 tests que fallaban desde antes de la Fase 2);
+  borró los pipes sin uso `fecha`, `precio`, `siNo`, `megabytes` y las claves `comun.si`/`comun.no`.
+- Pendiente fuera de la fase: presupuesto de `results.page.scss` (15,9 kB de 8 kB) y los pendientes de seguridad.
 
 Desvíos del plan ya decididos (no revertir):
 - Repositorio de sesiones, tiempo real y cola offline van en `core/` (los usan varias features).
