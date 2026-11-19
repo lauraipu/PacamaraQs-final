@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { TranslocoTestingModule } from '@jsverse/transloco';
+import { ModalController } from '@ionic/angular';
 import es from './assets/i18n/es.json';
 
 // Polyfills for running unit tests under jsdom (the default Vitest environment).
@@ -31,6 +32,9 @@ beforeEach(() => {
           fallbackLang: 'es'
         }
       })
-    ]
+    ],
+    // GuiaService (providedIn: 'root') inyecta ModalController, que en la app
+    // provee Ionic en main.ts. En jsdom la guía no se abre, basta un doble.
+    providers: [{ provide: ModalController, useValue: { create: vi.fn() } }]
   });
 });
