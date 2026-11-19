@@ -4,7 +4,9 @@
     "es": "Español",
     "en": "English",
     "it": "Italiano",
-    "zh": "中文"
+    "zh": "中文",
+    "elegir": "Scegli la lingua",
+    "cancelar": "Annulla"
   },
   "comun": {
     "o": "oppure",
@@ -94,7 +96,8 @@
     "errores": {
       "correo_invalido": "Inserisci un’email valida.",
       "limite": "Hai già richiesto diversi link. Attendi qualche minuto e riprova.",
-      "red": "Nessuna connessione. Controlla la rete e riprova."
+      "red": "Nessuna connessione. Controlla la rete e riprova.",
+      "envio": "Non è stato possibile inviare l’email in questo momento. Riprova tra qualche minuto."
     }
   },
   "contrasena": {

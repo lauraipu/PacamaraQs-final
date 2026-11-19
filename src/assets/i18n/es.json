@@ -4,7 +4,9 @@
     "es": "Español",
     "en": "English",
     "it": "Italiano",
-    "zh": "中文"
+    "zh": "中文",
+    "elegir": "Elegir idioma",
+    "cancelar": "Cancelar"
   },
   "comun": {
     "o": "o",
@@ -94,7 +96,8 @@
     "errores": {
       "correo_invalido": "Escribe un correo válido.",
       "limite": "Ya pediste varios enlaces. Espera unos minutos e intenta de nuevo.",
-      "red": "Sin conexión. Revisa tu red e intenta de nuevo."
+      "red": "Sin conexión. Revisa tu red e intenta de nuevo.",
+      "envio": "No pudimos enviar el correo en este momento. Intenta de nuevo en unos minutos."
     }
   },
   "contrasena": {

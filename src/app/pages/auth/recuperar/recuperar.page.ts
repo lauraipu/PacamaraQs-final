@@ -3,9 +3,13 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonInput, IonSpinner, ToastController } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { addIcons } from 'ionicons';
+import { mailOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
-import { codigoDeError, esErrorDeRed } from '../../../core/utils/errores';
+import { codigoDeError, esSinConexion, estadoHttp } from '../../../core/utils/errores';
 import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
+
+addIcons({ mailOutline });
 
 const ESPERA_REENVIO_S = 60;
 const CORREO_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -48,10 +52,15 @@ export class RecuperarPage implements OnDestroy {
       this.iniciarEspera(ESPERA_REENVIO_S);
     } catch (error) {
       const codigo = codigoDeError(error);
-      if (codigo === 'over_email_send_rate_limit' || codigo === '429') {
+      const estado = estadoHttp(error);
+      if (codigo === 'over_email_send_rate_limit' || estado === 429) {
         await this.avisar('recuperar.errores.limite');
-      } else if (esErrorDeRed(error)) {
+      } else if (esSinConexion(error)) {
         await this.avisar('recuperar.errores.red');
+      } else if (estado >= 500) {
+        // El servidor respondió pero no pudo enviar el correo (p. ej. SMTP mal configurado).
+        console.error('[Recuperar] El servidor no pudo enviar el correo:', error);
+        await this.avisar('recuperar.errores.envio');
       } else {
         // Cualquier otra respuesta se trata como enviada: no se revela si la cuenta existe.
         console.error('[Recuperar]', error);

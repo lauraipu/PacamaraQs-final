@@ -3,11 +3,15 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonInput, IonSpinner, ToastController } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { addIcons } from 'ionicons';
+import { alertCircleOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { contrasenaEsSegura } from '../../../core/auth/politica-contrasena';
 import { AuthService } from '../../../core/services/auth';
-import { codigoDeError, esErrorDeRed } from '../../../core/utils/errores';
+import { codigoDeError, esSinConexion } from '../../../core/utils/errores';
 import { RequisitosContrasenaComponent } from '../../../shared/components/requisitos-contrasena/requisitos-contrasena.component';
 import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
+
+addIcons({ alertCircleOutline, checkmarkCircleOutline });
 
 type Estado = 'verificando' | 'formulario' | 'invalido' | 'listo';
 
@@ -90,7 +94,7 @@ export class NuevaContrasenaPage implements OnInit {
       if (codigo === 'same_password') await this.avisar('contrasena.errores.igual');
       else if (codigo === 'weak_password') await this.avisar('contrasena.errores.insegura');
       else if (codigo === 'session_not_found' || codigo === 'bad_jwt' || codigo === '401') this.estado.set('invalido');
-      else if (esErrorDeRed(error)) await this.avisar('recuperar.errores.red');
+      else if (esSinConexion(error)) await this.avisar('recuperar.errores.red');
       else {
         console.error('[NuevaContrasena]', error);
         await this.avisar('contrasena.errores.generico');

@@ -49,25 +49,8 @@ ion-item {
 }
 
 body {
-  margin: 0;
-  background: var(--app-bg-screen);
   color: var(--app-text-main);
   font-family: var(--ion-font-family);
-}
-
-ion-toolbar {
-  --background: var(--app-bg-card);
-  --border-color: var(--app-border);
-  border-bottom: 1px solid var(--app-border);
-  box-shadow: 0 2px 12px rgb(25 47 38 / 4%);
-}
-
-ion-card,
-.cupping-card {
-  border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-card);
-  background: var(--app-bg-card);
-  box-shadow: var(--app-shadow-card);
 }
 
 .custom-input {
@@ -78,17 +61,31 @@ ion-card,
   --border-width: 1px;
   --border-color: var(--app-border-input);
   --border-style: solid;
-  --border-radius: var(--app-radius-control);
+  --border-radius: 8px;
   --highlight-color-focused: var(--app-primary-dark);
   --highlight-color-valid: var(--app-primary-dark);
   --highlight-color-invalid: var(--app-error);
 
-  padding: 10px 12px !important;
+  /* Relleno con las variables de Ionic (no en el host): así el fondo del
+     campo, incluido el autocompletado del navegador, ocupa todo el ancho. */
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
   font-size: 0.875rem;
+
+  /* Autocompletado de Chrome/Android: sin la franja azul recortada. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--app-bg-card) inset;
+    -webkit-text-fill-color: var(--app-text-main);
+    caret-color: var(--app-text-main);
+    transition: background-color 9999s ease-out 0s;
+  }
 
   &.ion-focused {
     --border-width: 2px;
-    box-shadow: 0 0 0 3px rgb(47 62 70 / 10%);
   }
 }
 
@@ -106,9 +103,8 @@ ion-card,
   margin-bottom: 16px;
   padding: 16px;
   border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-card);
+  border-radius: 12px;
   background: var(--app-bg-card);
-  box-shadow: var(--app-shadow-card);
 }
 
 .formato-item {
@@ -117,7 +113,7 @@ ion-card,
   margin-bottom: 12px;
   padding: 16px;
   border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-control);
+  border-radius: 8px;
   background: var(--app-bg-card);
   color: var(--app-text-main);
   cursor: pointer;
@@ -127,8 +123,7 @@ ion-card,
 
   &.selected {
     border-color: var(--app-primary-dark);
-    background: var(--app-primary-soft);
-    box-shadow: 0 0 0 3px rgb(47 62 70 / 8%);
+    background: #f8fafc;
   }
 }
 
@@ -137,25 +132,20 @@ ion-card,
   --background-hover: var(--app-primary-hover);
   --color: #ffffff;
   --border-radius: 8px;
-  --box-shadow: 0 8px 18px rgb(25 47 38 / 16%);
+  --box-shadow: none;
 
   min-height: 48px;
   margin: 0;
   font-weight: 600;
   font-size: 0.875rem;
   text-transform: none;
-  transition: transform 160ms ease, box-shadow 160ms ease;
-
-  &:hover { --box-shadow: 0 10px 22px rgb(25 47 38 / 22%); }
-  &:active { transform: translateY(1px); }
 }
 
 .btn-login {
   --background: var(--app-primary-dark);
   --background-hover: var(--app-primary-hover);
   --color: #ffffff;
-  --border-radius: var(--app-radius-control);
-  --box-shadow: 0 8px 18px rgb(25 47 38 / 16%);
+  --border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
   text-transform: none;
@@ -271,7 +261,7 @@ ion-item { --min-height: 48px; }
 .oauth-divider::before, .oauth-divider::after { content: ''; flex: 1; border-top: 1px solid var(--app-border); }
 .btn-google {
   --border-color: var(--app-border); --color: var(--app-text-main); --background: #ffffff;
-  --border-radius: var(--app-radius-control); --box-shadow: var(--app-shadow-card); min-height: 48px; margin: 0; font-weight: 600; text-transform: none;
+  --border-radius: 8px; --box-shadow: none; min-height: 48px; margin: 0; font-weight: 600; text-transform: none;
 }
 .btn-google__logo { width: 20px; height: 20px; flex: 0 0 auto; margin-right: 10px; }
 .btn-google__text { white-space: normal; }

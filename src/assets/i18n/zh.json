@@ -4,7 +4,9 @@
     "es": "Español",
     "en": "English",
     "it": "Italiano",
-    "zh": "中文"
+    "zh": "中文",
+    "elegir": "选择语言",
+    "cancelar": "取消"
   },
   "comun": {
     "o": "或",
@@ -94,7 +96,8 @@
     "errores": {
       "correo_invalido": "请输入有效的邮箱。",
       "limite": "您已多次申请链接，请稍等几分钟后再试。",
-      "red": "无网络连接。请检查网络后重试。"
+      "red": "无网络连接。请检查网络后重试。",
+      "envio": "暂时无法发送邮件。请几分钟后重试。"
     }
   },
   "contrasena": {

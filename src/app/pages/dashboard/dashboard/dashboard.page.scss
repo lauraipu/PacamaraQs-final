@@ -24,7 +24,7 @@ ion-toolbar {
 .dashboard-container {
   width: min(100%, 900px);
   margin: 0 auto;
-  padding: 8px 0 80px; /* Espacio extra para no tapar contenido con el FAB */
+  padding-bottom: 80px; /* Espacio extra para no tapar contenido con el FAB */
 }
 
 .filter-container {
@@ -84,9 +84,8 @@ ion-toolbar {
 /* ESCANEO RÁPIDO */
 .scan-card {
   margin: 8px 0 20px;
-  padding: 20px;
-  border-radius: var(--app-radius-card);
-  background: linear-gradient(135deg, var(--app-bg-card), var(--app-primary-soft));
+  padding: 18px;
+  border-radius: 14px;
 }
 
 .scan-card__head {
@@ -207,11 +206,6 @@ ion-toolbar {
   border-radius: 12px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-
-  &:hover {
-    box-shadow: var(--app-shadow-float);
-    transform: translateY(-2px);
-  }
 
   &:active {
     transform: scale(0.99);

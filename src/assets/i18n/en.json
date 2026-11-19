@@ -4,7 +4,9 @@
     "es": "Español",
     "en": "English",
     "it": "Italiano",
-    "zh": "中文"
+    "zh": "中文",
+    "elegir": "Choose language",
+    "cancelar": "Cancel"
   },
   "comun": {
     "o": "or",
@@ -94,7 +96,8 @@
     "errores": {
       "correo_invalido": "Enter a valid email.",
       "limite": "You already requested several links. Wait a few minutes and try again.",
-      "red": "No connection. Check your network and try again."
+      "red": "No connection. Check your network and try again.",
+      "envio": "We could not send the email right now. Try again in a few minutes."
     }
   },
   "contrasena": {

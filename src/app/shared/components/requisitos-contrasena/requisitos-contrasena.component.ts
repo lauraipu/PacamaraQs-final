@@ -1,7 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { IonIcon } from '@ionic/angular';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { addIcons } from 'ionicons';
+import { checkmarkCircle, ellipseOutline } from 'ionicons/icons';
 import { evaluarContrasena, LONGITUD_MINIMA_CONTRASENA, nivelContrasena } from '../../../core/auth/politica-contrasena';
+
+addIcons({ checkmarkCircle, ellipseOutline });
 
 /**
  * Medidor de fortaleza + lista de requisitos que se marcan al cumplirse.

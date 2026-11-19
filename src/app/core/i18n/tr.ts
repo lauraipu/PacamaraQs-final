@@ -56,8 +56,23 @@ export function tr(texto: string | null | undefined, params?: Record<string, unk
 function traducirClave(texto: string, params?: Record<string, unknown>): string | null {
   if (!transloco) return null;
   const clave = claveTexto(texto);
+  if (!existeClave(clave)) return null;
   const traducido = transloco.translate(clave, params);
   return traducido && traducido !== clave ? traducido : null;
+}
+
+/**
+ * tr() prueba claves derivadas del texto; muchas no existen a propósito
+ * (nombres, notas, mensajes ya traducidos). Se consulta el catálogo cargado
+ * para no llenar la consola de avisos "Missing translation".
+ */
+function existeClave(clave: string): boolean {
+  if (!transloco) return false;
+  const idiomas = [transloco.getActiveLang(), transloco.getDefaultLang()];
+  return idiomas.some(idioma => {
+    const catalogo = transloco!.getTranslation(idioma) as Record<string, unknown> | undefined;
+    return !!catalogo && Object.prototype.hasOwnProperty.call(catalogo, clave);
+  });
 }
 
 function interpolar(texto: string, params: Record<string, unknown>): string {

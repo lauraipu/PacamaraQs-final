@@ -4,8 +4,6 @@
     <div class="logo-box">
       <img src="assets/icon/logopacamara.png" [alt]="'login.logo_alt' | transloco">
     </div>
-    <a class="back-link" routerLink="/login" replaceUrl>{{ 'recuperar.volver' | transloco }}</a>
-
     @if (!enviado()) {
       <h1 class="title">{{ 'recuperar.titulo' | transloco }}</h1>
       <p class="subtitle">{{ 'recuperar.subtitulo' | transloco }}</p>
@@ -54,5 +52,7 @@
         </ion-button>
       </section>
     }
+
+    <a class="back-link" routerLink="/login" replaceUrl>{{ 'recuperar.volver' | transloco }}</a>
   </main>
 </ion-content>

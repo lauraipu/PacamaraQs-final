@@ -65,6 +65,27 @@ export function esErrorDeRed(error: unknown): boolean {
   return PATRONES_RED.some(patron => texto.includes(patron));
 }
 
+/**
+ * true solo si de verdad no hay conexión: el navegador está sin red o la
+ * petición ni siquiera obtuvo respuesta (sin código HTTP). Un 500 del
+ * servidor NO es "sin conexión": el servidor sí respondió, pero falló.
+ * Para decidir reintentos usar esErrorDeRed; para mensajes al usuario, esta.
+ */
+export function esSinConexion(error: unknown): boolean {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return true;
+  const registro = comoRegistro(error);
+  const status = typeof registro.status === 'number' ? registro.status : 0;
+  if (status > 0) return false;
+  const texto = mensajeDeError(error, '').toLowerCase();
+  return PATRONES_RED.some(patron => texto.includes(patron));
+}
+
+/** Código HTTP de la respuesta, o 0 si no hubo respuesta. */
+export function estadoHttp(error: unknown): number {
+  const status = comoRegistro(error).status;
+  return typeof status === 'number' ? status : 0;
+}
+
 /** true si reintentar no cambiará el resultado (permisos, validación). */
 export function esErrorPermanente(error: unknown): boolean {
   if (esErrorDeRed(error)) return false;
