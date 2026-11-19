@@ -1,0 +1,80 @@
+/* Pestaña "Uso y límites" (mismo tema del panel). */
+.lm-aviso {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--app-score-border);
+  border-radius: var(--app-radius-card);
+  background: var(--app-score-bg);
+  color: var(--app-score);
+  font-size: 0.875rem;
+  font-weight: 600;
+
+  ion-icon { flex: none; font-size: 1.25rem; }
+}
+
+.lm-aviso--pausa {
+  border-color: var(--app-error-text);
+  background: var(--app-error-bg);
+  color: var(--app-error-text);
+}
+
+.lm-medidores {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 768px) { .lm-medidores { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.lm-medidor { display: grid; gap: 2px; align-content: start; }
+.lm-medidor__label { color: var(--app-text-faint); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.lm-medidor__valor { color: var(--app-text-main); font-size: 1.375rem; font-weight: 700; }
+.lm-medidor__sub { color: var(--app-text-muted); font-size: 0.75rem; }
+
+.lm-barra {
+  height: 6px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--app-bg-subtle);
+
+  span { display: block; height: 100%; border-radius: inherit; background: var(--app-primary-dark); }
+  .lm-barra--alto { background: var(--app-score); }
+}
+
+.lm-form { display: grid; gap: 12px; }
+
+@media (min-width: 992px) {
+  .lm-form { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .lm-form > .lm-seccion:first-child { grid-row: span 2; }
+  .lm-pie { grid-column: 1 / -1; }
+}
+
+.lm-seccion { display: grid; gap: 10px; }
+
+.lm-toggle {
+  min-height: 44px;
+  color: var(--app-text-main);
+  font-size: 0.9375rem;
+  --track-background-checked: var(--app-primary-dark);
+}
+
+.lm-ayuda { margin: -4px 0 0; color: var(--app-text-muted); font-size: 0.8125rem; overflow-wrap: anywhere; }
+
+.lm-acciones-fecha { display: flex; flex-wrap: wrap; gap: 8px; margin-top: -4px; }
+
+.lm-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  .lm-ayuda { margin: 0; }
+}
+
+.lm-pie__botones { display: flex; gap: 8px; margin-left: auto; }

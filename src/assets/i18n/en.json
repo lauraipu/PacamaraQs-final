@@ -73,7 +73,8 @@
       "corta": "The password must be at least 6 characters long.",
       "no_coinciden": "Passwords do not match.",
       "politica": "You must accept the data processing policy to continue.",
-      "generico": "Registration could not be completed."
+      "generico": "Registration could not be completed.",
+      "cerrado": "New sign-ups are closed for now. Write to PacamaraQS@gmail.com if you need an account."
     }
   },
   "recuperar": {
@@ -180,7 +181,9 @@
     "ej_abc_123": "E.g. ABC-123",
     "unirme": "Join",
     "resultado": "result",
-    "resultados": "results"
+    "resultados": "results",
+    "pausa_titulo": "Platform paused",
+    "pausa_programada": "The platform will pause on {{fecha}}."
   },
   "sala": {
     "sala_de_espera": "Waiting room",
@@ -698,7 +701,8 @@
       "resumen": "Overview",
       "usuarios": "Users",
       "sesiones": "Sessions",
-      "auditoria": "Audit"
+      "auditoria": "Audit",
+      "limites": "Usage and limits"
     },
     "actualizar": "Refresh",
     "reintentar": "Retry",
@@ -799,7 +803,8 @@
         "participantes": "Participant",
         "evaluaciones": "Evaluation",
         "cierres_muestra": "Sample closed",
-        "usuarios": "User"
+        "usuarios": "User",
+        "configuracion_app": "Settings"
       },
       "operaciones": {
         "INSERT": "Created",
@@ -809,7 +814,8 @@
         "EDICION": "Edit",
         "DESACTIVACION": "Deactivation",
         "REACTIVACION": "Reactivation",
-        "ELIMINACION": "Deletion"
+        "ELIMINACION": "Deletion",
+        "CONFIGURACION": "Settings change"
       },
       "sistema": "System",
       "nota_privacidad": "For privacy, cuppers' scores and answers are not shown.",
@@ -825,6 +831,62 @@
       "usuario_eliminado": "{{nombre}} was deleted.",
       "usuario_desactivado": "{{nombre}} had history: the account was deactivated and can no longer sign in.",
       "sesion_eliminada": "The session \"{{nombre}}\" was deleted."
+    },
+    "limites": {
+      "titulo": "Free plan usage and lab limits",
+      "uso": "Current usage",
+      "estado_en_pausa": "The platform is paused: users cannot create sessions, join or scan.",
+      "estado_programada": "The scheduled pause starts on {{fecha}}.",
+      "base_datos": "Database",
+      "de_limite": "of {{limite}} allowed",
+      "sesiones_abiertas": "Open sessions",
+      "por_organizador": "Max. {{n}} per organizer",
+      "escaneos_24h": "Scans (24 h)",
+      "escaner_apagado": "Scanner off",
+      "por_usuario_hora": "Max. {{n}} per user per hour",
+      "usuarios_activos": "Active users",
+      "evaluaciones_total": "{{n}} saved evaluations",
+      "pausa": "Platform pause",
+      "pausar_ahora": "Pause now",
+      "pausar_ahora_ayuda": "While paused, nobody (except administrators) can create sessions, join or use the scanner. Saved data can still be viewed.",
+      "pausar_desde": "Scheduled pause",
+      "en_dias": "In {{n}} days",
+      "quitar_fecha": "Clear date",
+      "pausar_desde_ayuda": "From that date the platform pauses on its own. Useful to limit the trial to one week.",
+      "mensaje": "Message for users",
+      "mensaje_invalido": "Write between {{min}} and {{max}} characters.",
+      "mensaje_vista_previa": "Preview:",
+      "acceso": "Access",
+      "registros_abiertos": "Allow new sign-ups",
+      "registros_ayuda": "If turned off, nobody can create a new account (by email or Google). Existing accounts keep working.",
+      "maximos": "Limits",
+      "campos": {
+        "maxSesionesAbiertas": "Open sessions per organizer",
+        "maxEscaneosHora": "Scans per user per hour",
+        "limiteBdMb": "Database limit (MB)"
+      },
+      "ayuda": {
+        "maxSesionesAbiertas": "Between {{min}} and {{max}}. Counts each organizer’s waiting or in-progress sessions.",
+        "maxEscaneosHora": "Between {{min}} and {{max}}. 0 turns the scanner off.",
+        "limiteBdMb": "Between {{min}} and {{max}}. Once reached, no new sessions can be created (the free plan allows 500 MB)."
+      },
+      "fuera_de_rango": "Must be a whole number between {{min}} and {{max}}.",
+      "campos_bd": {
+        "pausada": "Pause",
+        "pausar_desde": "Scheduled pause",
+        "mensaje_pausa": "Pause message",
+        "registros_abiertos": "Sign-ups",
+        "max_sesiones_abiertas": "Open sessions",
+        "max_escaneos_hora": "Scans per hour",
+        "limite_bd_mb": "Database limit"
+      },
+      "actualizado": "Last change: {{fecha}}",
+      "descartar": "Discard",
+      "guardar": "Save changes",
+      "confirmar_titulo": "Save settings",
+      "confirmar_texto": "Changes apply immediately to all users.",
+      "confirmar_pausa": "You are about to pause the platform now. Nobody will be able to create sessions, join or scan until you resume it.",
+      "guardado": "Settings saved."
     }
   },
   "estado": {
@@ -1305,7 +1367,12 @@
     "combinado_descriptivo_afectivo_tgsuum": "Combined (Descriptive + Affective)",
     "reporte_sca_2o9493": "SCA report",
     "reporte_pacamaraqs_1wbxvwa": "PacamaraQs report",
-    "tu_sesion_expiro_inicia_sesion_d_a2rr34": "Your session expired. Sign in again; your answers were saved on this device."
+    "tu_sesion_expiro_inicia_sesion_d_a2rr34": "Your session expired. Sign in again; your answers were saved on this device.",
+    "la_plataforma_esta_en_pausa_escr_1nnm1ah": "The platform is paused. Write to PacamaraQS@gmail.com if you need access.",
+    "alcanzaste_el_maximo_de_sesiones_13x1y1p": "You reached the maximum of open sessions. Finish or delete one before creating another.",
+    "la_base_de_datos_llego_al_limite_13yuqo4": "The database reached its configured limit. New sessions cannot be created.",
+    "el_escaner_esta_desactivado_por_11mzrpg": "The scanner was turned off by the administrator.",
+    "los_registros_estan_cerrados_por_17rzf5k": "Sign-ups were closed by the administrator."
   },
   "config": {
     "titulo": "Settings",
@@ -1380,7 +1447,12 @@
     "servidor": "The server had a problem. Try again in a moment.",
     "inesperado": "An unexpected error occurred. If it happens again, reload the app.",
     "banner_sin_conexion": "No connection. Your changes are saved on this device and will be sent when you reconnect.",
-    "conexion_restablecida": "Connection restored."
+    "conexion_restablecida": "Connection restored.",
+    "app_en_pausa": "The platform is paused for now.",
+    "max_sesiones": "You reached the maximum of open sessions. Finish or delete one before creating another.",
+    "limite_bd": "The storage limit was reached. New sessions cannot be created.",
+    "registros_cerrados": "New sign-ups are closed for now.",
+    "dato_invalido": "Check the data: a value is not allowed."
   },
   "formulario": {
     "enviar_titulo": "Submit forms",

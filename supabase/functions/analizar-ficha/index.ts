@@ -11,7 +11,8 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const MODELO = Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.6-flash';
 const MAX_BASE64 = 8 * 1024 * 1024; // ~6 MB de imagen
 // Límite de escaneos por usuario, persistente en la base de datos
-// (public.consumir_cuota_escaner). Ajustable con el secreto SCANNER_RATE_LIMIT.
+// (public.consumir_cuota_escaner). Lo decide el administrador en el panel
+// ("Uso y límites", tabla configuracion_app); SCANNER_RATE_LIMIT solo es respaldo.
 const RATE_WINDOW_MIN = 60;
 const RATE_LIMIT_CONFIG = Number.parseInt(Deno.env.get('SCANNER_RATE_LIMIT') ?? '10', 10);
 const RATE_LIMIT = Number.isFinite(RATE_LIMIT_CONFIG) && RATE_LIMIT_CONFIG > 0 ? RATE_LIMIT_CONFIG : 10;
@@ -151,8 +152,11 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'No se pudo verificar el límite de escaneos. Intenta de nuevo.' }, 503);
   }
   if (!cuota?.permitido) {
+    // Plataforma en pausa o escáner apagado por el administrador: no es temporal.
+    if (cuota?.motivo === 'pausa') return json({ error: cuota.mensaje ?? 'La plataforma está en pausa.' }, 403);
+    if (cuota?.motivo === 'apagado') return json({ error: 'El escáner está desactivado por el administrador.' }, 403);
     return new Response(JSON.stringify({
-      error: `Alcanzaste el límite de ${RATE_LIMIT} escaneos por hora. Intenta de nuevo más tarde.`
+      error: `Alcanzaste el límite de ${cuota?.limite ?? RATE_LIMIT} escaneos por hora. Intenta de nuevo más tarde.`
     }), {
       status: 429,
       headers: { ...CORS, 'Content-Type': 'application/json', 'Retry-After': String(cuota?.reintentar_en_s ?? RATE_WINDOW_MIN * 60) }

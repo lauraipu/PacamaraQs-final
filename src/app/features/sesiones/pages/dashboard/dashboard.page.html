@@ -15,7 +15,21 @@
 
 <ion-content class="ion-padding dashboard-content">
   <main class="dashboard-container">
-    
+    @if (estadoApp?.enPausa) {
+      <div class="app-pausa app-pausa--activa" role="status">
+        <ion-icon name="pause-circle-outline" aria-hidden="true"></ion-icon>
+        <div>
+          <strong>{{ 'dashboard.pausa_titulo' | transloco }}</strong>
+          <p>{{ estadoApp!.mensaje | tr }}</p>
+        </div>
+      </div>
+    } @else if (estadoApp?.pausaProgramada; as fecha) {
+      <div class="app-pausa" role="status">
+        <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+        <p>{{ 'dashboard.pausa_programada' | transloco: { fecha: fechaPausa(fecha) } }}</p>
+      </div>
+    }
+
     <!-- ESCANEO RÁPIDO (placeholder hasta implementar las pantallas de escaneo) -->
     <section class="cupping-card scan-card" aria-labelledby="scan-title">
       <div class="scan-card__head">

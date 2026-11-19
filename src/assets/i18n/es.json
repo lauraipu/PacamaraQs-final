@@ -73,7 +73,8 @@
       "corta": "La contraseña debe tener al menos 6 caracteres.",
       "no_coinciden": "Las contraseñas no coinciden.",
       "politica": "Debes aceptar la política de tratamiento de datos para continuar.",
-      "generico": "No se pudo completar el registro."
+      "generico": "No se pudo completar el registro.",
+      "cerrado": "Los registros nuevos están cerrados por ahora. Escribe a PacamaraQS@gmail.com si necesitas una cuenta."
     }
   },
   "recuperar": {
@@ -180,7 +181,9 @@
     "ej_abc_123": "Ej: ABC-123",
     "unirme": "Unirme",
     "resultado": "resultado",
-    "resultados": "resultados"
+    "resultados": "resultados",
+    "pausa_titulo": "Plataforma en pausa",
+    "pausa_programada": "La plataforma entrará en pausa el {{fecha}}."
   },
   "sala": {
     "sala_de_espera": "Sala de espera",
@@ -698,7 +701,8 @@
       "resumen": "Resumen",
       "usuarios": "Usuarios",
       "sesiones": "Sesiones",
-      "auditoria": "Auditoría"
+      "auditoria": "Auditoría",
+      "limites": "Uso y límites"
     },
     "actualizar": "Actualizar",
     "reintentar": "Reintentar",
@@ -799,7 +803,8 @@
         "participantes": "Participante",
         "evaluaciones": "Evaluación",
         "cierres_muestra": "Cierre de muestra",
-        "usuarios": "Usuario"
+        "usuarios": "Usuario",
+        "configuracion_app": "Configuración"
       },
       "operaciones": {
         "INSERT": "Creó",
@@ -809,7 +814,8 @@
         "EDICION": "Edición",
         "DESACTIVACION": "Desactivación",
         "REACTIVACION": "Reactivación",
-        "ELIMINACION": "Eliminación"
+        "ELIMINACION": "Eliminación",
+        "CONFIGURACION": "Cambio de configuración"
       },
       "sistema": "Sistema",
       "nota_privacidad": "Por privacidad no se muestran puntajes ni respuestas de los catadores.",
@@ -825,6 +831,62 @@
       "usuario_eliminado": "{{nombre}} fue eliminado.",
       "usuario_desactivado": "{{nombre}} tenía historial: su cuenta quedó desactivada y ya no puede entrar.",
       "sesion_eliminada": "La sesión \"{{nombre}}\" fue eliminada."
+    },
+    "limites": {
+      "titulo": "Uso del plan gratuito y límites del laboratorio",
+      "uso": "Uso actual",
+      "estado_en_pausa": "La plataforma está en pausa: los usuarios no pueden crear sesiones, unirse ni escanear.",
+      "estado_programada": "La pausa programada empieza el {{fecha}}.",
+      "base_datos": "Base de datos",
+      "de_limite": "de {{limite}} permitidos",
+      "sesiones_abiertas": "Sesiones abiertas",
+      "por_organizador": "Máx. {{n}} por organizador",
+      "escaneos_24h": "Escaneos (24 h)",
+      "escaner_apagado": "Escáner apagado",
+      "por_usuario_hora": "Máx. {{n}} por usuario cada hora",
+      "usuarios_activos": "Usuarios activos",
+      "evaluaciones_total": "{{n}} evaluaciones guardadas",
+      "pausa": "Pausa de la plataforma",
+      "pausar_ahora": "Pausar ahora",
+      "pausar_ahora_ayuda": "En pausa, nadie (excepto los administradores) puede crear sesiones, unirse ni usar el escáner. Lo ya guardado se puede consultar.",
+      "pausar_desde": "Pausa programada",
+      "en_dias": "En {{n}} días",
+      "quitar_fecha": "Quitar fecha",
+      "pausar_desde_ayuda": "Desde esa fecha la plataforma queda en pausa sola. Sirve para limitar la prueba a una semana.",
+      "mensaje": "Mensaje para los usuarios",
+      "mensaje_invalido": "Escribe entre {{min}} y {{max}} caracteres.",
+      "mensaje_vista_previa": "Vista previa:",
+      "acceso": "Acceso",
+      "registros_abiertos": "Permitir registros nuevos",
+      "registros_ayuda": "Si lo desactivas, nadie puede crear una cuenta nueva (ni con correo ni con Google). Las cuentas existentes siguen funcionando.",
+      "maximos": "Máximos",
+      "campos": {
+        "maxSesionesAbiertas": "Sesiones abiertas por organizador",
+        "maxEscaneosHora": "Escaneos por usuario cada hora",
+        "limiteBdMb": "Límite de la base de datos (MB)"
+      },
+      "ayuda": {
+        "maxSesionesAbiertas": "Entre {{min}} y {{max}}. Cuenta las sesiones en espera o en curso de cada organizador.",
+        "maxEscaneosHora": "Entre {{min}} y {{max}}. Con 0 el escáner queda apagado.",
+        "limiteBdMb": "Entre {{min}} y {{max}}. Al llegar, no se crean sesiones nuevas (el plan gratuito permite 500 MB)."
+      },
+      "fuera_de_rango": "Debe ser un número entero entre {{min}} y {{max}}.",
+      "campos_bd": {
+        "pausada": "Pausa",
+        "pausar_desde": "Pausa programada",
+        "mensaje_pausa": "Mensaje de pausa",
+        "registros_abiertos": "Registros",
+        "max_sesiones_abiertas": "Sesiones abiertas",
+        "max_escaneos_hora": "Escaneos por hora",
+        "limite_bd_mb": "Límite de base de datos"
+      },
+      "actualizado": "Último cambio: {{fecha}}",
+      "descartar": "Descartar",
+      "guardar": "Guardar cambios",
+      "confirmar_titulo": "Guardar configuración",
+      "confirmar_texto": "Los cambios se aplican de inmediato a todos los usuarios.",
+      "confirmar_pausa": "Vas a pausar la plataforma ahora. Nadie podrá crear sesiones, unirse ni escanear hasta que la reactives.",
+      "guardado": "Configuración guardada."
     }
   },
   "estado": {
@@ -1305,7 +1367,12 @@
     "combinado_descriptivo_afectivo_tgsuum": "Combinado (Descriptivo + Afectivo)",
     "reporte_sca_2o9493": "Reporte SCA",
     "reporte_pacamaraqs_1wbxvwa": "Reporte PacamaraQs",
-    "tu_sesion_expiro_inicia_sesion_d_a2rr34": "Tu sesión expiró. Inicia sesión de nuevo; tus respuestas quedaron guardadas en este dispositivo."
+    "tu_sesion_expiro_inicia_sesion_d_a2rr34": "Tu sesión expiró. Inicia sesión de nuevo; tus respuestas quedaron guardadas en este dispositivo.",
+    "la_plataforma_esta_en_pausa_escr_1nnm1ah": "La plataforma está en pausa. Escribe a PacamaraQS@gmail.com si necesitas acceso.",
+    "alcanzaste_el_maximo_de_sesiones_13x1y1p": "Alcanzaste el máximo de sesiones abiertas. Termina o elimina una antes de crear otra.",
+    "la_base_de_datos_llego_al_limite_13yuqo4": "La base de datos llegó al límite configurado. No se pueden crear sesiones nuevas.",
+    "el_escaner_esta_desactivado_por_11mzrpg": "El escáner está desactivado por el administrador.",
+    "los_registros_estan_cerrados_por_17rzf5k": "Los registros están cerrados por el administrador."
   },
   "config": {
     "titulo": "Configuración",
@@ -1380,7 +1447,12 @@
     "servidor": "El servidor tuvo un problema. Intenta de nuevo en un momento.",
     "inesperado": "Ocurrió un error inesperado. Si se repite, recarga la app.",
     "banner_sin_conexion": "Sin conexión. Tus cambios se guardan en este dispositivo y se enviarán al reconectar.",
-    "conexion_restablecida": "Conexión restablecida."
+    "conexion_restablecida": "Conexión restablecida.",
+    "app_en_pausa": "La plataforma está en pausa por ahora.",
+    "max_sesiones": "Alcanzaste el máximo de sesiones abiertas. Termina o elimina una antes de crear otra.",
+    "limite_bd": "Se alcanzó el límite de almacenamiento. No se pueden crear sesiones nuevas.",
+    "registros_cerrados": "Los registros nuevos están cerrados por ahora.",
+    "dato_invalido": "Revisa los datos: hay un valor no permitido."
   },
   "formulario": {
     "enviar_titulo": "Enviar fichas",

@@ -24,16 +24,22 @@ import {
   ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline, settingsOutline } from 'ionicons/icons';
+import {
+  keyOutline, addOutline, arrowForwardOutline, barcodeOutline, pauseCircleOutline, qrCodeOutline, searchOutline,
+  settingsOutline, timeOutline
+} from 'ionicons/icons';
 import { AuthService } from '@core/auth/auth.service';
 import { CierreSesionService } from '@core/auth/cierre-sesion.service';
 import { SesionConRol, SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
+import { EstadoAppRepository } from '@core/data-access/estado-app/estado-app.repository';
+import { EstadoApp } from '@core/data-access/estado-app/estado-app.model';
+import { formatearFecha } from '@shared/utils/formato';
 import { EstadoSesion, getFormatoById } from '@domain/sesion/sesion.model';
 import {
   ModoEscaneo, ResultadoEscaneo, ScannerModalComponent
 } from '../../escaner/scanner-modal/scanner-modal.component';
 
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { TrPipe } from '@core/i18n/tr';
 import { BotonGuiaComponent } from '@shared/components/boton-guia/boton-guia.component';
 interface SesionItemUi {
@@ -102,11 +108,15 @@ export class DashboardPage implements OnInit {
   cargando = true;
   menuSesionAbiertoId: string | null = null;
   sesionEliminandoId: string | null = null;
+  /** Pausa activa o programada del laboratorio (null si no hay o no se pudo leer). */
+  estadoApp: EstadoApp | null = null;
 
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly cierreSesion = inject(CierreSesionService);
   private readonly sesionService = inject(SesionesRepository);
+  private readonly estadoAppRepo = inject(EstadoAppRepository);
+  private readonly transloco = inject(TranslocoService);
   private readonly toastController = inject(ToastController);
   private readonly alertController = inject(AlertController);
   private readonly modalController = inject(ModalController);
@@ -116,7 +126,10 @@ export class DashboardPage implements OnInit {
 
   constructor() {
     // arrow-forward-outline se usa en el modal "Unirme" y no estaba registrado.
-    addIcons({ keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline, settingsOutline });
+    addIcons({
+      keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline, settingsOutline,
+      pauseCircleOutline, timeOutline
+    });
   }
 
   ngOnInit(): void {
@@ -203,6 +216,8 @@ export class DashboardPage implements OnInit {
       const { user } = await this.authService.getUser();
       if (!user) throw new Error('Debes iniciar sesión para ver tus sesiones.');
 
+      void this.cargarEstadoApp();
+
       await this.cargarNombreUsuario(user);
       this.cargandoPerfil = false;
       await this.cargarSesionesReales(user);
@@ -216,6 +231,16 @@ export class DashboardPage implements OnInit {
       this.inicializando = false;
       this.changeDetector.markForCheck();
     }
+  }
+
+  /** Aviso de pausa: no bloquea la carga; el servidor ya impide las acciones en pausa. */
+  private async cargarEstadoApp(): Promise<void> {
+    this.estadoApp = await this.estadoAppRepo.obtener();
+    this.changeDetector.markForCheck();
+  }
+
+  fechaPausa(fecha: Date): string {
+    return formatearFecha(fecha, this.transloco.getActiveLang(), true);
   }
 
   private async cargarSesionesReales(user: { id: string }): Promise<void> {

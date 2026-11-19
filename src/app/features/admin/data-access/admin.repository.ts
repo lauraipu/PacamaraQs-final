@@ -3,10 +3,11 @@ import { SupabaseService } from '@core/supabase/supabase.client';
 import {
   AdminEventoDto, AdminResumenDto, AdminSesionDto, AdminUsuarioDto, PaginaDto, ResultadoEliminarUsuarioDto
 } from '@core/dto/admin.dto';
-import { aEvento, aPagina, aResumen, aSesion, aUsuario } from './admin.mapper';
+import { AdminConfiguracionDto } from '@core/dto/configuracion.dto';
+import { aConfiguracion, aEvento, aPagina, aResumen, aSesion, aUsuario } from './admin.mapper';
 import {
-  AdminEvento, AdminResumen, AdminSesion, AdminUsuario, FiltroAuditoria, FiltroSesiones,
-  FiltroUsuarios, Pagina, ResultadoEliminarUsuario, RolAdminVista
+  AdminConfiguracion, AdminEvento, AdminResumen, AdminSesion, AdminUsuario, ConfiguracionApp, FiltroAuditoria,
+  FiltroSesiones, FiltroUsuarios, Pagina, ResultadoEliminarUsuario, RolAdminVista
 } from '../models/admin.models';
 
 /**
@@ -73,6 +74,24 @@ export class AdminRepository {
       p_desde: desde
     });
     return aPagina(dto, aEvento);
+  }
+
+  /** Configuración del laboratorio y medidores de uso actuales. */
+  async obtenerConfiguracion(): Promise<AdminConfiguracion> {
+    return aConfiguracion(await this.rpc<AdminConfiguracionDto>('admin_obtener_configuracion'));
+  }
+
+  /** Guarda la configuración; el servidor valida los rangos y deja registro en auditoría. */
+  async guardarConfiguracion(c: ConfiguracionApp): Promise<void> {
+    await this.rpc<null>('admin_guardar_configuracion', {
+      p_pausada: c.pausada,
+      p_pausar_desde: c.pausarDesde ? c.pausarDesde.toISOString() : null,
+      p_mensaje_pausa: c.mensajePausa.trim(),
+      p_registros_abiertos: c.registrosAbiertos,
+      p_max_sesiones_abiertas: c.maxSesionesAbiertas,
+      p_max_escaneos_hora: c.maxEscaneosHora,
+      p_limite_bd_mb: c.limiteBdMb
+    });
   }
 
   private async rpc<T>(funcion: string, params?: Record<string, unknown>): Promise<T> {

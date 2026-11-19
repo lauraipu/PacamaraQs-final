@@ -9,14 +9,15 @@ import { addIcons } from 'ionicons';
 import { settingsOutline } from 'ionicons/icons';
 import { AuthService } from '@core/auth/auth.service';
 import { AdminAuditoriaComponent } from '../ui/admin-auditoria.component';
+import { AdminLimitesComponent } from '../ui/admin-limites.component';
 import { AdminResumenComponent } from '../ui/admin-resumen.component';
 import { AdminSesionesComponent } from '../ui/admin-sesiones.component';
 import { AdminUsuariosComponent } from '../ui/admin-usuarios.component';
 
 addIcons({ settingsOutline });
 
-type Pestana = 'resumen' | 'usuarios' | 'sesiones' | 'auditoria';
-const PESTANAS: readonly Pestana[] = ['resumen', 'usuarios', 'sesiones', 'auditoria'];
+type Pestana = 'resumen' | 'usuarios' | 'sesiones' | 'auditoria' | 'limites';
+const PESTANAS: readonly Pestana[] = ['resumen', 'usuarios', 'sesiones', 'auditoria', 'limites'];
 const CLAVE_PESTANA = 'pacamaraqs.admin.pestana';
 
 /**
@@ -30,7 +31,8 @@ const CLAVE_PESTANA = 'pacamaraqs.admin.pestana';
   imports: [
     IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonSegment,
     IonSegmentButton, IonLabel, TranslocoPipe,
-    AdminResumenComponent, AdminUsuariosComponent, AdminSesionesComponent, AdminAuditoriaComponent
+    AdminResumenComponent, AdminUsuariosComponent, AdminSesionesComponent, AdminAuditoriaComponent,
+    AdminLimitesComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./admin-panel.page.scss'],
@@ -62,6 +64,7 @@ const CLAVE_PESTANA = 'pacamaraqs.admin.pestana';
           @case ('usuarios') { <app-admin-usuarios></app-admin-usuarios> }
           @case ('sesiones') { <app-admin-sesiones></app-admin-sesiones> }
           @case ('auditoria') { <app-admin-auditoria></app-admin-auditoria> }
+          @case ('limites') { <app-admin-limites></app-admin-limites> }
           @default { <app-admin-resumen></app-admin-resumen> }
         }
       </main>

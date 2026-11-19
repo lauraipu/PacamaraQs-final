@@ -7,14 +7,17 @@ export type RolAdminVista = 'catador' | 'administrador';
 export type EstadoSesionAdmin = 'esperando' | 'en_progreso' | 'completada' | 'cancelada';
 export type FormatoSesionAdmin = 'combinado' | 'afectivo' | 'descriptivo' | 'extrinseca';
 export type OperacionAuditoria =
-  | 'INSERT' | 'UPDATE' | 'DELETE' | 'CAMBIO_ROL' | 'EDICION' | 'DESACTIVACION' | 'REACTIVACION' | 'ELIMINACION';
-export type TablaAuditoria = 'sesiones' | 'participantes' | 'evaluaciones' | 'cierres_muestra' | 'usuarios';
+  | 'INSERT' | 'UPDATE' | 'DELETE' | 'CAMBIO_ROL' | 'EDICION' | 'DESACTIVACION' | 'REACTIVACION' | 'ELIMINACION'
+  | 'CONFIGURACION';
+export type TablaAuditoria = 'sesiones' | 'participantes' | 'evaluaciones' | 'cierres_muestra' | 'usuarios' | 'configuracion_app';
 
 export const ESTADOS_SESION: readonly EstadoSesionAdmin[] = ['esperando', 'en_progreso', 'completada', 'cancelada'];
 export const FORMATOS_SESION: readonly FormatoSesionAdmin[] = ['combinado', 'afectivo', 'descriptivo', 'extrinseca'];
-export const TABLAS_AUDITORIA: readonly TablaAuditoria[] = ['sesiones', 'participantes', 'evaluaciones', 'cierres_muestra', 'usuarios'];
+export const TABLAS_AUDITORIA: readonly TablaAuditoria[] = [
+  'sesiones', 'participantes', 'evaluaciones', 'cierres_muestra', 'usuarios', 'configuracion_app'
+];
 export const OPERACIONES_AUDITORIA: readonly OperacionAuditoria[] = [
-  'INSERT', 'UPDATE', 'DELETE', 'CAMBIO_ROL', 'EDICION', 'DESACTIVACION', 'REACTIVACION', 'ELIMINACION'
+  'INSERT', 'UPDATE', 'DELETE', 'CAMBIO_ROL', 'EDICION', 'DESACTIVACION', 'REACTIVACION', 'ELIMINACION', 'CONFIGURACION'
 ];
 
 /** Estados de sesión que el administrador puede eliminar (el resto es historial). */
@@ -94,6 +97,52 @@ export interface AdminEvento {
   datos: Record<string, unknown>;
   creadoEn: Date;
 }
+
+/* ── Uso y límites del laboratorio (tabla configuracion_app) ───────────── */
+
+/** Lo que el administrador puede cambiar. */
+export interface ConfiguracionApp {
+  /** Pausa manual inmediata. */
+  pausada: boolean;
+  /** Pausa programada: desde esta fecha la plataforma queda en pausa. */
+  pausarDesde: Date | null;
+  mensajePausa: string;
+  registrosAbiertos: boolean;
+  maxSesionesAbiertas: number;
+  /** Escaneos con IA por usuario y por hora; 0 = escáner apagado. */
+  maxEscaneosHora: number;
+  limiteBdMb: number;
+}
+
+export interface UsoApp {
+  enPausa: boolean;
+  tamanoBdBytes: number;
+  sesionesAbiertas: number;
+  escaneos24h: number;
+  usuarios: number;
+  evaluaciones: number;
+}
+
+export interface AdminConfiguracion {
+  configuracion: ConfiguracionApp;
+  actualizadoEn: Date | null;
+  uso: UsoApp;
+}
+
+export type CampoNumericoConfiguracion = 'maxSesionesAbiertas' | 'maxEscaneosHora' | 'limiteBdMb';
+
+/** Rangos permitidos (los mismos CHECK de la tabla en Supabase). */
+export const RANGOS_CONFIGURACION: Readonly<Record<CampoNumericoConfiguracion, { min: number; max: number }>> = {
+  maxSesionesAbiertas: { min: 1, max: 50 },
+  maxEscaneosHora: { min: 0, max: 100 },
+  limiteBdMb: { min: 50, max: 500 }
+};
+
+export const LARGO_MINIMO_MENSAJE_PAUSA = 5;
+export const LARGO_MAXIMO_MENSAJE_PAUSA = 300;
+
+/** Días de prueba antes de la pausa programada ("En 7 días"). */
+export const DIAS_PAUSA_PROGRAMADA = 7;
 
 /** 'desactivado': tenía historial y se conservó con el acceso bloqueado. */
 export type ResultadoEliminarUsuario = 'eliminado' | 'desactivado';

@@ -1,8 +1,9 @@
 import {
   AdminEventoDto, AdminResumenDto, AdminSesionDto, AdminUsuarioDto, PaginaDto
 } from '@core/dto/admin.dto';
+import { AdminConfiguracionDto } from '@core/dto/configuracion.dto';
 import {
-  AdminEvento, AdminResumen, AdminSesion, AdminUsuario, ESTADOS_SESION, EstadoSesionAdmin,
+  AdminConfiguracion, AdminEvento, AdminResumen, AdminSesion, AdminUsuario, ESTADOS_SESION, EstadoSesionAdmin,
   FORMATOS_SESION, FormatoSesionAdmin, Pagina
 } from '../models/admin.models';
 
@@ -91,6 +92,31 @@ export function aSesion(dto: AdminSesionDto): AdminSesion {
     catadores: numero(dto.catadores),
     listos: numero(dto.listos),
     evaluaciones: numero(dto.evaluaciones)
+  };
+}
+
+export function aConfiguracion(dto: AdminConfiguracionDto): AdminConfiguracion {
+  const c = dto.configuracion;
+  const u = dto.uso;
+  return {
+    configuracion: {
+      pausada: c.pausada === true,
+      pausarDesde: fecha(c.pausar_desde),
+      mensajePausa: c.mensaje_pausa ?? '',
+      registrosAbiertos: c.registros_abiertos !== false,
+      maxSesionesAbiertas: numero(c.max_sesiones_abiertas),
+      maxEscaneosHora: numero(c.max_escaneos_hora),
+      limiteBdMb: numero(c.limite_bd_mb)
+    },
+    actualizadoEn: fecha(c.actualizado_en),
+    uso: {
+      enPausa: u?.en_pausa === true,
+      tamanoBdBytes: numero(u?.tamano_bd_bytes),
+      sesionesAbiertas: numero(u?.sesiones_abiertas),
+      escaneos24h: numero(u?.escaneos_24h),
+      usuarios: numero(u?.usuarios),
+      evaluaciones: numero(u?.evaluaciones)
+    }
   };
 }
 

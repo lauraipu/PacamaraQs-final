@@ -135,12 +135,21 @@ export class RegistroPage {
         await this.router.navigateByUrl('/login', { replaceUrl: true });
       }
     } catch (error) {
-      await this.mostrarToast(
-        error instanceof Error ? error.message : this.t('registro.errores.generico')
-      );
+      await this.mostrarToast(this.mensajeErrorRegistro(error));
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  /**
+   * Con los registros cerrados (configuracion_app.registros_abiertos = false),
+   * el trigger de auth.users aborta el alta y Supabase Auth solo devuelve
+   * "Database error saving new user": se muestra un aviso claro.
+   */
+  private mensajeErrorRegistro(error: unknown): string {
+    const mensaje = error instanceof Error ? error.message : '';
+    if (/database error saving new user/i.test(mensaje)) return this.t('registro.errores.cerrado');
+    return mensaje || this.t('registro.errores.generico');
   }
 
   private async mostrarToast(message: string, color: 'danger' | 'success' = 'danger'): Promise<void> {

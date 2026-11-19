@@ -1,6 +1,22 @@
-import { aEvento, aPagina, aResumen, aSesion, aUsuario } from './admin.mapper';
+import { aConfiguracion, aEvento, aPagina, aResumen, aSesion, aUsuario } from './admin.mapper';
 
 describe('admin.mapper', () => {
+  it('convierte la configuración del laboratorio y sus medidores', () => {
+    const r = aConfiguracion({
+      configuracion: {
+        pausada: false, pausar_desde: '2026-11-26T12:00:00Z', mensaje_pausa: 'En pausa',
+        registros_abiertos: false, max_sesiones_abiertas: 5, max_escaneos_hora: 0, limite_bd_mb: 400,
+        actualizado_en: null, actualizado_por: null
+      },
+      uso: { en_pausa: false, tamano_bd_bytes: 2048, sesiones_abiertas: 2, escaneos_24h: 3, usuarios: 7, evaluaciones: 9 }
+    });
+    expect(r.configuracion.pausarDesde?.toISOString()).toBe('2026-11-26T12:00:00.000Z');
+    expect(r.configuracion.registrosAbiertos).toBe(false);
+    expect(r.configuracion.maxEscaneosHora).toBe(0);
+    expect(r.actualizadoEn).toBeNull();
+    expect(r.uso).toEqual({ enPausa: false, tamanoBdBytes: 2048, sesionesAbiertas: 2, escaneos24h: 3, usuarios: 7, evaluaciones: 9 });
+  });
+
   it('convierte el resumen y completa los estados que faltan con 0', () => {
     const r = aResumen({
       usuarios: 5, administradores: 1, usuarios_nuevos_7d: 2, activos_7d: 3, sesiones: 4,

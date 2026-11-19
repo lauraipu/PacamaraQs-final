@@ -73,7 +73,8 @@
       "corta": "密码至少需要 6 个字符。",
       "no_coinciden": "两次输入的密码不一致。",
       "politica": "您必须接受数据处理政策才能继续。",
-      "generico": "无法完成注册。"
+      "generico": "无法完成注册。",
+      "cerrado": "目前暂不开放新用户注册。如需账户，请发送邮件至 PacamaraQS@gmail.com。"
     }
   },
   "recuperar": {
@@ -180,7 +181,9 @@
     "ej_abc_123": "例：ABC-123",
     "unirme": "加入",
     "resultado": "个结果",
-    "resultados": "个结果"
+    "resultados": "个结果",
+    "pausa_titulo": "平台已暂停",
+    "pausa_programada": "平台将于 {{fecha}} 暂停。"
   },
   "sala": {
     "sala_de_espera": "等候室",
@@ -698,7 +701,8 @@
       "resumen": "概览",
       "usuarios": "用户",
       "sesiones": "杯测会话",
-      "auditoria": "审计"
+      "auditoria": "审计",
+      "limites": "用量与限制"
     },
     "actualizar": "刷新",
     "reintentar": "重试",
@@ -799,7 +803,8 @@
         "participantes": "参与者",
         "evaluaciones": "评估",
         "cierres_muestra": "样品关闭",
-        "usuarios": "用户"
+        "usuarios": "用户",
+        "configuracion_app": "配置"
       },
       "operaciones": {
         "INSERT": "创建",
@@ -809,7 +814,8 @@
         "EDICION": "编辑",
         "DESACTIVACION": "停用",
         "REACTIVACION": "重新启用",
-        "ELIMINACION": "删除"
+        "ELIMINACION": "删除",
+        "CONFIGURACION": "配置变更"
       },
       "sistema": "系统",
       "nota_privacidad": "为保护隐私，不显示杯测师的分数和答案。",
@@ -825,6 +831,62 @@
       "usuario_eliminado": "{{nombre}} 已删除。",
       "usuario_desactivado": "{{nombre}} 有历史记录：账户已停用，无法再登录。",
       "sesion_eliminada": "会话\"{{nombre}}\"已删除。"
+    },
+    "limites": {
+      "titulo": "免费套餐用量与实验室限制",
+      "uso": "当前用量",
+      "estado_en_pausa": "平台已暂停：用户无法创建会话、加入或扫描。",
+      "estado_programada": "预定暂停将于 {{fecha}} 开始。",
+      "base_datos": "数据库",
+      "de_limite": "上限 {{limite}}",
+      "sesiones_abiertas": "进行中的会话",
+      "por_organizador": "每位组织者最多 {{n}} 个",
+      "escaneos_24h": "扫描（24 小时）",
+      "escaner_apagado": "扫描器已关闭",
+      "por_usuario_hora": "每位用户每小时最多 {{n}} 次",
+      "usuarios_activos": "活跃用户",
+      "evaluaciones_total": "已保存 {{n}} 份评估",
+      "pausa": "平台暂停",
+      "pausar_ahora": "立即暂停",
+      "pausar_ahora_ayuda": "暂停期间，除管理员外，任何人都无法创建会话、加入或使用扫描器。已保存的数据仍可查看。",
+      "pausar_desde": "预定暂停",
+      "en_dias": "{{n}} 天后",
+      "quitar_fecha": "清除日期",
+      "pausar_desde_ayuda": "从该日期起平台将自动暂停，可用于将试用限制为一周。",
+      "mensaje": "给用户的消息",
+      "mensaje_invalido": "请输入 {{min}} 到 {{max}} 个字符。",
+      "mensaje_vista_previa": "预览：",
+      "acceso": "访问",
+      "registros_abiertos": "允许新用户注册",
+      "registros_ayuda": "关闭后，任何人都无法创建新账户（邮箱或 Google 均不可）。现有账户不受影响。",
+      "maximos": "上限",
+      "campos": {
+        "maxSesionesAbiertas": "每位组织者的进行中会话",
+        "maxEscaneosHora": "每位用户每小时扫描次数",
+        "limiteBdMb": "数据库上限（MB）"
+      },
+      "ayuda": {
+        "maxSesionesAbiertas": "{{min}} 到 {{max}}。统计每位组织者等待中或进行中的会话。",
+        "maxEscaneosHora": "{{min}} 到 {{max}}。设为 0 将关闭扫描器。",
+        "limiteBdMb": "{{min}} 到 {{max}}。达到后将无法创建新会话（免费套餐上限为 500 MB）。"
+      },
+      "fuera_de_rango": "必须是 {{min}} 到 {{max}} 之间的整数。",
+      "campos_bd": {
+        "pausada": "暂停",
+        "pausar_desde": "预定暂停",
+        "mensaje_pausa": "暂停消息",
+        "registros_abiertos": "注册",
+        "max_sesiones_abiertas": "进行中的会话",
+        "max_escaneos_hora": "每小时扫描次数",
+        "limite_bd_mb": "数据库上限"
+      },
+      "actualizado": "最近修改：{{fecha}}",
+      "descartar": "放弃",
+      "guardar": "保存更改",
+      "confirmar_titulo": "保存配置",
+      "confirmar_texto": "更改将立即对所有用户生效。",
+      "confirmar_pausa": "即将立即暂停平台。在你恢复之前，任何人都无法创建会话、加入或扫描。",
+      "guardado": "配置已保存。"
     }
   },
   "estado": {
@@ -1305,7 +1367,12 @@
     "combinado_descriptivo_afectivo_tgsuum": "综合（描述性 + 情感）",
     "reporte_sca_2o9493": "SCA 报告",
     "reporte_pacamaraqs_1wbxvwa": "PacamaraQs 报告",
-    "tu_sesion_expiro_inicia_sesion_d_a2rr34": "你的登录已过期。请重新登录；你的回答已保存在此设备上。"
+    "tu_sesion_expiro_inicia_sesion_d_a2rr34": "你的登录已过期。请重新登录；你的回答已保存在此设备上。",
+    "la_plataforma_esta_en_pausa_escr_1nnm1ah": "平台已暂停。如需访问，请发送邮件至 PacamaraQS@gmail.com。",
+    "alcanzaste_el_maximo_de_sesiones_13x1y1p": "你的进行中会话已达上限。请先结束或删除一个再创建新的。",
+    "la_base_de_datos_llego_al_limite_13yuqo4": "数据库已达到设定上限，无法创建新会话。",
+    "el_escaner_esta_desactivado_por_11mzrpg": "扫描器已被管理员关闭。",
+    "los_registros_estan_cerrados_por_17rzf5k": "管理员已关闭注册。"
   },
   "config": {
     "titulo": "设置",
@@ -1380,7 +1447,12 @@
     "servidor": "服务器出现问题，请稍后重试。",
     "inesperado": "发生意外错误。如果再次出现，请重新加载应用。",
     "banner_sin_conexion": "无网络连接。您的更改已保存在本设备上，重新连接后会自动发送。",
-    "conexion_restablecida": "网络已恢复。"
+    "conexion_restablecida": "网络已恢复。",
+    "app_en_pausa": "平台目前已暂停。",
+    "max_sesiones": "你的进行中会话已达上限。请先结束或删除一个再创建新的。",
+    "limite_bd": "已达到存储上限，无法创建新会话。",
+    "registros_cerrados": "目前暂不开放新用户注册。",
+    "dato_invalido": "请检查数据：存在不允许的值。"
   },
   "formulario": {
     "enviar_titulo": "提交评分表",

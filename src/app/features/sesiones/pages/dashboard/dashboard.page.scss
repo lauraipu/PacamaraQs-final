@@ -424,3 +424,27 @@ ion-modal {
     min-height: 0;
   }
 }
+
+/* Aviso de pausa del laboratorio (configuración del administrador). */
+.app-pausa {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--app-score-border, #fed7aa);
+  border-radius: var(--app-radius-card, 12px);
+  background: var(--app-score-bg, #fff7ed);
+  color: var(--app-score, #c2410c);
+  font-size: 0.875rem;
+
+  ion-icon { flex: none; margin-top: 1px; font-size: 1.25rem; }
+  strong { display: block; font-weight: 700; }
+  p { margin: 0; overflow-wrap: anywhere; }
+}
+
+.app-pausa--activa {
+  border-color: var(--app-error-text, #991b1b);
+  background: var(--app-error-bg, #ffe4e6);
+  color: var(--app-error-text, #991b1b);
+}

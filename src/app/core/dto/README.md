@@ -9,6 +9,7 @@ y con fechas como texto ISO. Todos los DTO de la app están en esta carpeta.
 | `admin.dto.ts` | `features/admin/data-access/` (RPC `admin_*`) |
 | `perfil.dto.ts` | `features/perfil/data-access/` (tabla `usuarios`) |
 | `resultados.dto.ts` | `features/resultados/data-access/` (RPC `get_resumen_panel`) |
+| `configuracion.dto.ts` | `core/data-access/estado-app/` (`estado_app`) y `features/admin/data-access/` (`admin_*_configuracion`) |
 
 Reglas:
 - Un DTO solo describe datos: sin funciones ni lógica.

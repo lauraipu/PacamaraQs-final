@@ -151,7 +151,8 @@ export class AdminAuditoriaComponent implements OnInit {
       case 'ELIMINACION':
       case 'DESACTIVACION': return 'ad-chip--error';
       case 'CAMBIO_ROL':
-      case 'EDICION': return 'ad-chip--oscuro';
+      case 'EDICION':
+      case 'CONFIGURACION': return 'ad-chip--oscuro';
       default: return '';
     }
   }
@@ -170,6 +171,11 @@ export class AdminAuditoriaComponent implements OnInit {
     }
     if (e.operacion === 'DESACTIVACION' || e.operacion === 'ELIMINACION') {
       return texto('nombre') ?? texto('email') ?? '';
+    }
+    if (e.operacion === 'CONFIGURACION') {
+      return this.camposCambiados(e.datos['anterior'], e.datos['nuevo'])
+        .map(campo => this.transloco.translate(`admin.limites.campos_bd.${campo}`))
+        .join(', ');
     }
     if (e.operacion === 'CAMBIO_ROL') {
       const antes = texto('rol_anterior');
@@ -190,6 +196,14 @@ export class AdminAuditoriaComponent implements OnInit {
       return [nombre, listo].filter(Boolean).join(' · ');
     }
     return '';
+  }
+
+  /** Columnas de configuracion_app que cambiaron (solo nombres, no valores). */
+  private camposCambiados(anterior: unknown, nuevo: unknown): string[] {
+    if (!anterior || !nuevo || typeof anterior !== 'object' || typeof nuevo !== 'object') return [];
+    const a = anterior as Record<string, unknown>;
+    const n = nuevo as Record<string, unknown>;
+    return Object.keys(n).filter(campo => JSON.stringify(a[campo]) !== JSON.stringify(n[campo]));
   }
 
   fecha(valor: Date): string {
