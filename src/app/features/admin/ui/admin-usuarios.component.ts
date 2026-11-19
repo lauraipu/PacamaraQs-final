@@ -36,7 +36,7 @@ type FiltroRol = 'todos' | RolAdminVista;
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./admin-comun.scss', './admin-usuarios.component.scss'],
   template: `
-    <div class="ad-filtros">
+    <div class="ad-filtros us-filtros">
       <ion-searchbar [debounce]="400" [placeholder]="'admin.buscar_usuarios' | transloco"
         [value]="busqueda()" (ionInput)="buscar($any($event).detail.value)"></ion-searchbar>
       <ion-segment [value]="rol()" (ionChange)="cambiarFiltroRol($any($event).detail.value)">

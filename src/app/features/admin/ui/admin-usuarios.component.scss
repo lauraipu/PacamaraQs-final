@@ -8,6 +8,24 @@
 }
 
 @media (min-width: 768px) {
+  .us-filtros {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .us-filtros ion-searchbar {
+    grid-column: 1 / -1;
+  }
+
+  .us-filtros ion-segment {
+    grid-column: 1;
+  }
+
+  .us-filtros ion-button {
+    grid-column: 2;
+  }
+}
+
+@media (min-width: 768px) {
   .us-cabeza { grid-template-columns: auto minmax(0, 1fr) auto; }
   .us-cabeza .ad-chips { grid-column: auto; justify-content: flex-end; }
 }
