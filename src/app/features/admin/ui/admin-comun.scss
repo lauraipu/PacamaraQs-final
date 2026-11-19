@@ -23,7 +23,22 @@
   grid-template-columns: 1fr;
   align-items: center;
 
-  ion-searchbar { --border-radius: var(--app-radius-control); padding: 0; }
+  ion-searchbar {
+    --border-radius: var(--app-radius-control);
+    --icon-color: var(--app-text-muted);
+    --search-icon-font-size: 18px;
+    min-width: 180px;
+    padding: 0;
+  }
+
+  ion-searchbar::part(searchbar-search-icon) {
+    width: 18px;
+    height: 18px;
+  }
+
+  ion-searchbar::part(searchbar-input) {
+    padding-inline-start: 44px;
+  }
   ion-select {
     min-height: 44px;
     padding: 0 12px;

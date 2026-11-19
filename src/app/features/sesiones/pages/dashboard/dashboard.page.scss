@@ -58,12 +58,22 @@ ion-toolbar {
   --placeholder-opacity: 1;
   --icon-color: var(--app-text-muted, #6b7280);
   --clear-button-color: var(--app-text-muted, #6b7280);
+  --search-icon-font-size: 18px;
   min-height: 44px;
   padding: 0;
   border: 1px solid var(--app-border, #e5e7eb);
   border-radius: 10px;
   font-size: 0.875rem;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::part(searchbar-search-icon) {
+    width: 18px;
+    height: 18px;
+  }
+
+  &::part(searchbar-input) {
+    padding-inline-start: 44px;
+  }
 
   &:focus-within {
     border-color: var(--app-primary-dark, #0f344c);
