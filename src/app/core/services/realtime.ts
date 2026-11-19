@@ -1,9 +1,9 @@
 import { effect, inject, Injectable, Signal, signal } from '@angular/core';
 import { RealtimeChannel, REALTIME_SUBSCRIBE_STATES, SupabaseClient } from '@supabase/supabase-js';
 import { Observable, Subject } from 'rxjs';
-import { AuthService } from './auth';
+import { AuthService } from '../auth/auth.service';
 import { SesionService } from './sesion';
-import { SupabaseService } from './supabase';
+import { SupabaseService } from '../supabase/supabase.client';
 
 /** Tiempo que se espera a que un catador desconectado vuelva antes de retirarlo. */
 export const GRACE_PERIOD_MS = 45_000;

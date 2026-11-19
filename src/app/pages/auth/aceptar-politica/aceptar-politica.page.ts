@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonCheckbox, IonContent, IonSpinner, ToastController } from '@ionic/angular';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService } from '@core/auth/auth.service';
 import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
 import { TextoPoliticaComponent } from '../../../shared/components/texto-politica/texto-politica.component';
 

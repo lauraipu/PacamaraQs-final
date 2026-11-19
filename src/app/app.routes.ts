@@ -1,16 +1,9 @@
 import { Routes } from '@angular/router';
-import { salidaFormularioGuard } from './core/guards/salida-formulario.guard';
-import { authGuard } from './core/guards/auth.guard';
-import { organizerGuard } from './core/guards/organizer.guard';
-import { roleGuard } from './core/guards/role.guard';
-
-/**
- * rol_global solo admite 'catador' | 'administrador' (CHECK en public.usuarios).
- * "Organizador" NO es un rol global: es una relación por sesión
- * (sesiones.organizador_id) y la valida organizerGuard.
- */
-const ROLES_APP = ['catador'];
-const ROLES_ADMIN = ['administrador'];
+import { salidaFormularioGuard } from '@core/auth/guards/salida-formulario.guard';
+import { authGuard } from '@core/auth/guards/auth.guard';
+import { organizerGuard } from '@core/auth/guards/organizer.guard';
+import { roleGuard } from '@core/auth/guards/role.guard';
+import { ROLES_ADMIN, ROLES_APP } from '@core/auth/roles';
 
 export const routes: Routes = [
   {

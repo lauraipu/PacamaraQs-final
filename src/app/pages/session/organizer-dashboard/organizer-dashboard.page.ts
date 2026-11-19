@@ -10,10 +10,10 @@ import {
   checkmarkCircle, cloudOfflineOutline, ellipseOutline, lockClosed, personCircleOutline, playForwardOutline
 } from 'ionicons/icons';
 import { Subscription } from 'rxjs';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService } from '@core/auth/auth.service';
 import { EventoSala, GRACE_PERIOD_MS, RealtimeService, SalaRealtime } from '../../../core/services/realtime';
 import { ProgresoPanel, SesionService } from '../../../core/services/sesion';
-import { mensajeDeError } from '../../../core/utils/errores';
+import { mensajeDeError } from '@core/errores/errores';
 import { ProgressTrackerComponent } from '../../../shared/components/progress-tracker/progress-tracker.component';
 
 import { TranslocoPipe } from '@jsverse/transloco';

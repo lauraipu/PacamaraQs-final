@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { TranslocoService } from '@jsverse/transloco';
-import { AuthService } from '../services/auth';
+import { AuthService } from './auth.service';
 
 /**
  * Cerrar sesión siempre pide confirmación: un toque accidental (por ejemplo,

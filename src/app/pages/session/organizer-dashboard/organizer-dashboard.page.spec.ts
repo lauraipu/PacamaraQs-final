@@ -4,7 +4,7 @@ import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angul
 import { AlertController, ToastController } from '@ionic/angular';
 import { Subject } from 'rxjs';
 import { EstadoSesion } from '@domain/sesion/sesion.model';
-import { AuthService, UsuarioActual } from '../../../core/services/auth';
+import { AuthService, UsuarioActual } from '@core/auth/auth.service';
 import { EventoSala, PresenciaUsuario, RealtimeService } from '../../../core/services/realtime';
 import { ProgresoPanel, SesionService } from '../../../core/services/sesion';
 import { OrganizerDashboardPage } from './organizer-dashboard.page';

@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService, RUTA_DOS_PASOS, RUTA_NUEVA_CONTRASENA } from '../services/auth';
+import { AuthService, RUTA_DOS_PASOS, RUTA_NUEVA_CONTRASENA } from '../auth.service';
 
 /**
  * Exige un usuario autenticado con cuenta real (no anónima).

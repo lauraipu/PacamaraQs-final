@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { SupabaseService } from './supabase';
+import { SupabaseService } from '../supabase/supabase.client';
 import {
   CupperResultSummary,
   PromedioAtributo,

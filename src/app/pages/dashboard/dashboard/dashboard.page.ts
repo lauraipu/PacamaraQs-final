@@ -25,10 +25,10 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { keyOutline, addOutline, arrowForwardOutline, barcodeOutline, qrCodeOutline, searchOutline, settingsOutline } from 'ionicons/icons';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService } from '@core/auth/auth.service';
 import { CierreSesionService } from '../../../core/auth/cierre-sesion.service';
 import { SesionConRol, SesionService } from '../../../core/services/sesion';
-import { SupabaseService } from '../../../core/services/supabase';
+import { SupabaseService } from '@core/supabase/supabase.client';
 import { EstadoSesion, getFormatoById } from '@domain/sesion/sesion.model';
 import {
   ModoEscaneo, ResultadoEscaneo, ScannerModalComponent

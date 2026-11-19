@@ -3,7 +3,7 @@ import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { NavController, ToastController } from '@ionic/angular';
 import { SampleConsolidatedResult, SessionResults } from '../../../core/models/session-results.model';
 import { ResultsService } from '../../../core/services/results';
-import { ImpresionService } from '../../../core/services/impresion';
+import { ImpresionService } from '@core/plataforma/impresion.service';
 import { clasificarPuntaje, etiquetaHedonica, ResultsPage } from './results.page';
 
 const muestra = (numeroMuestra: number, puntaje: number, cambios: Partial<SampleConsolidatedResult> = {}): SampleConsolidatedResult => ({

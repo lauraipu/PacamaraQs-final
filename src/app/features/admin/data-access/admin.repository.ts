@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { SupabaseService } from '../../../core/services/supabase';
+import { SupabaseService } from '@core/supabase/supabase.client';
 import {
   AdminEventoDto, AdminResumenDto, AdminSesionDto, AdminUsuarioDto, PaginaDto, ResultadoEliminarUsuarioDto
 } from './admin.dto';

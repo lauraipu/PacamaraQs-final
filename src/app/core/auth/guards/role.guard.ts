@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService, RolGlobal } from '../services/auth';
+import { AuthService } from '../auth.service';
+import { RolGlobal } from '../roles';
 
 /**
  * Valida public.usuarios.rol_global contra `data.roles` de la ruta.

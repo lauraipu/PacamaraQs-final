@@ -13,10 +13,10 @@ import {
 } from 'ionicons/icons';
 import { Subscription } from 'rxjs';
 import { EstadoSesion, getFormatoById, Participante, Sesion } from '@domain/sesion/sesion.model';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService } from '@core/auth/auth.service';
 import { EventoSala, GRACE_PERIOD_MS, RealtimeService, SalaRealtime } from '../../../core/services/realtime';
 import { SesionService } from '../../../core/services/sesion';
-import { mensajeDeError } from '../../../core/utils/errores';
+import { mensajeDeError } from '@core/errores/errores';
 
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { TrPipe } from '../../../core/i18n/tr';

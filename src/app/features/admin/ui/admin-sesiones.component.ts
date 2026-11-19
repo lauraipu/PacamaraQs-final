@@ -4,7 +4,7 @@ import { IonButton, IonIcon, IonSearchbar, IonSelect, IonSelectOption, IonSpinne
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { cloudOfflineOutline, refreshOutline, searchOutline, trashOutline } from 'ionicons/icons';
-import { AvisosService } from '../../../core/avisos/avisos.service';
+import { AvisosService } from '@core/errores/avisos.service';
 import { AdminRepository } from '../data-access/admin.repository';
 import {
   AdminSesion, ESTADOS_ELIMINABLES, ESTADOS_SESION, EstadoSesionAdmin, FiltroSesiones

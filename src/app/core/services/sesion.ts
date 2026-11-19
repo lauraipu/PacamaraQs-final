@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { participanteDtoToDomain, sesionDtoToDomain } from '../mappers/sesion.mapper';
 import { Participante, Sesion } from '@domain/sesion/sesion.model';
 import { ParticipanteDto, SesionDto } from '../models/sesion.dto';
-import { SupabaseService } from './supabase';
+import { SupabaseService } from '../supabase/supabase.client';
 
 export interface SesionConRol extends Sesion {
   esOrganizador: boolean;

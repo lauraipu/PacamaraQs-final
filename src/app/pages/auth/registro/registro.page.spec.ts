@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { vi } from 'vitest';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService } from '@core/auth/auth.service';
 import { RegistroPage } from './registro.page';
 
 describe('RegistroPage', () => {

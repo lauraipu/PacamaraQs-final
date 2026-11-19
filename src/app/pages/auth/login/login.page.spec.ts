@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-import { AuthService, RolGlobal } from '../../../core/services/auth';
+import { AuthService } from '@core/auth/auth.service';
+import { RolGlobal } from '@core/auth/roles';
 import { LoginPage } from './login.page';
 
 describe('LoginPage', () => {

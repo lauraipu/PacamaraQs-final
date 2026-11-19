@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { NavController, Platform } from '@ionic/angular';
-import { AuthService } from '../services/auth';
+import { AuthService } from '../auth/auth.service';
 
 /** Pantallas raíz: en ellas "atrás" minimiza la app en vez de navegar. */
 const RAICES = ['/dashboard', '/admin-dashboard', '/login'];

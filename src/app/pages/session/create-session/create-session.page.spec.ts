@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService } from '@core/auth/auth.service';
 import { SesionService } from '../../../core/services/sesion';
 import { CreateSessionPage } from './create-session.page';
 

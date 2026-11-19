@@ -1,4 +1,4 @@
-import { codigoDeError, esSinConexion, estadoHttp, mensajeDeError } from '../utils/errores';
+import { codigoDeError, esSinConexion, estadoHttp, mensajeDeError } from './errores';
 
 /**
  * Traduce cualquier error (Supabase, PostgREST, Auth o red) a una clave de

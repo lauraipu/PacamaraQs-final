@@ -23,10 +23,10 @@ import { FormatoCva, getFormatoById } from '@domain/sesion/sesion.model';
 import {
   AtributoCva, CupperResultSummary, SampleConsolidatedResult, SessionResults, ValorAtributo
 } from '../../../core/models/session-results.model';
-import { ArchivosService } from '../../../core/services/archivos';
-import { ImpresionService } from '../../../core/services/impresion';
+import { ArchivosService } from '@core/plataforma/archivos.service';
+import { ImpresionService } from '@core/plataforma/impresion.service';
 import { ResultsService } from '../../../core/services/results';
-import { codigoDeError, mensajeDeError } from '../../../core/utils/errores';
+import { codigoDeError, mensajeDeError } from '@core/errores/errores';
 import { CupperResultCardComponent } from '../../../shared/components/cupper-result-card/cupper-result-card.component';
 import {
   FormatoReporteSca, ScaReportTemplateComponent

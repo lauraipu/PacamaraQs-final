@@ -5,8 +5,8 @@ import { IonButton, IonContent, IonIcon, IonInput, IonSpinner, ToastController }
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { mailOutline } from 'ionicons/icons';
-import { AuthService } from '../../../core/services/auth';
-import { codigoDeError, esSinConexion, estadoHttp } from '../../../core/utils/errores';
+import { AuthService } from '@core/auth/auth.service';
+import { codigoDeError, esSinConexion, estadoHttp } from '@core/errores/errores';
 import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
 
 addIcons({ mailOutline });

@@ -10,8 +10,8 @@ import {
   banOutline, closeOutline, cloudOfflineOutline, createOutline, refreshOutline, searchOutline,
   shieldCheckmarkOutline, trashOutline, warningOutline
 } from 'ionicons/icons';
-import { AvisosService } from '../../../core/avisos/avisos.service';
-import { AuthService } from '../../../core/services/auth';
+import { AvisosService } from '@core/errores/avisos.service';
+import { AuthService } from '@core/auth/auth.service';
 import { AdminRepository } from '../data-access/admin.repository';
 import { AdminUsuario, FiltroUsuarios, RolAdminVista } from '../data-access/admin.models';
 import { formatearFecha, iniciales } from './formato';

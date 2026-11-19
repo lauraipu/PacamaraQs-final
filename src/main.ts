@@ -13,13 +13,19 @@ import {
   ActionSheetControllerTraducido, AlertControllerTraducido, ToastControllerTraducido
 } from './app/core/i18n/overlays-traducidos';
 
-import { ManejadorErrores } from './app/core/avisos/manejador-errores';
+import { ManejadorErrores } from './app/core/errores/manejador-errores';
+import { CARGAR_MODAL_GUIA } from './app/core/guias/cargar-modal-guia';
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     // Errores no capturados: aviso claro en vez de una app colgada.
     { provide: ErrorHandler, useClass: ManejadorErrores },
+    // La guía vive en shared/; core/ solo recibe cómo cargarla (sin importar shared/).
+    {
+      provide: CARGAR_MODAL_GUIA,
+      useValue: () => import('./app/shared/components/guia/guia-modal.component').then(m => m.GuiaModalComponent)
+    },
     // Toasts, alertas y hojas de acción se traducen al idioma activo.
     { provide: ToastController, useClass: ToastControllerTraducido },
     { provide: AlertController, useClass: AlertControllerTraducido },

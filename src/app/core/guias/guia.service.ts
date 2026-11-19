@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { AuthService } from '../services/auth';
-import { SupabaseService } from '../services/supabase';
+import { AuthService } from '../auth/auth.service';
+import { SupabaseService } from '../supabase/supabase.client';
+import { CARGAR_MODAL_GUIA } from './cargar-modal-guia';
 import { IdGuia } from './guias';
 
 const CLAVE_LOCAL = 'pacamaraqs.guias';
@@ -16,6 +17,8 @@ export class GuiaService {
   private readonly modales = inject(ModalController);
   private readonly auth = inject(AuthService);
   private readonly supabase = inject(SupabaseService);
+  /** Opcional: en pruebas unitarias no se provee y la guía simplemente no se abre. */
+  private readonly cargarModal = inject(CARGAR_MODAL_GUIA, { optional: true });
   private vistas: Set<string> | null = null;
   private abierta = false;
 
@@ -35,12 +38,12 @@ export class GuiaService {
   }
 
   async abrir(id: IdGuia): Promise<void> {
-    if (this.abierta) return;
+    if (this.abierta || !this.cargarModal) return;
     this.abierta = true;
     try {
-      const { GuiaModalComponent } = await import('../../shared/components/guia/guia-modal.component');
+      const componente = await this.cargarModal();
       const modal = await this.modales.create({
-        component: GuiaModalComponent,
+        component: componente,
         componentProps: { id },
         cssClass: 'guia-modal',
         breakpoints: [0, 1],

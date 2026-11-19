@@ -5,14 +5,14 @@ import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
-import { SupabaseService } from './supabase';
+import { SupabaseService } from '../supabase/supabase.client';
 import { VERSION_POLITICA } from '@domain/politica/politica';
+import { RolGlobal } from './roles';
 
 /** Deep link de regreso del OAuth en la APK (Supabase → Redirect URLs + AndroidManifest). */
 export const REDIRECCION_NATIVA = 'com.pacamaraqs.app://auth/callback';
 export type ErrorOAuth = 'cancelado' | 'error';
 
-export type RolGlobal = 'catador' | 'administrador';
 
 export interface UsuarioActual {
   id: string;
@@ -392,7 +392,7 @@ export class AuthService {
 
   private async avisarSesionVencida(): Promise<void> {
     const ruta = this.router.url;
-    const { AvisosService } = await import('../avisos/avisos.service');
+    const { AvisosService } = await import('../errores/avisos.service');
     void this.injector.get(AvisosService).info('errores.sesion_expirada');
     const publicas = ['/login', '/registro', '/recuperar', RUTA_NUEVA_CONTRASENA];
     if (publicas.some(p => ruta.startsWith(p))) return;

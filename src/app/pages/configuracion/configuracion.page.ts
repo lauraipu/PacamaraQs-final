@@ -12,8 +12,8 @@ import { chevronDownOutline, chevronUpOutline, pencilOutline } from 'ionicons/ic
 import { CierreSesionService } from '../../core/auth/cierre-sesion.service';
 import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '@domain/contrasena/politica-contrasena';
 import { Idioma, IDIOMAS, IdiomaService } from '../../core/i18n/idioma.service';
-import { AuthService } from '../../core/services/auth';
-import { SupabaseService } from '../../core/services/supabase';
+import { AuthService } from '@core/auth/auth.service';
+import { SupabaseService } from '@core/supabase/supabase.client';
 import { CampoContrasenaComponent } from '../../shared/components/campo-contrasena/campo-contrasena.component';
 
 import { BotonGuiaComponent } from '../../shared/components/boton-guia/boton-guia.component';

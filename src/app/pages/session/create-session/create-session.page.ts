@@ -23,7 +23,7 @@ import {
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, informationCircleOutline } from 'ionicons/icons';
 import { EstadoSesion, FormatoCva, Sesion } from '@domain/sesion/sesion.model';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService } from '@core/auth/auth.service';
 import { SesionService } from '../../../core/services/sesion';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { TrPipe } from '../../../core/i18n/tr';

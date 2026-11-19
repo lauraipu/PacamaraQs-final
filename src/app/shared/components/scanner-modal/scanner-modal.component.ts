@@ -16,10 +16,10 @@ import {
   aplicarCorrecciones, AtributoEscaneado, calcularPuntajeCva, FichaEscaneada, FORMATOS_ESCANEO, FormatoEscaneo,
   parsearNumeroEs, sanearCalidad, sanearIntensidad, sanearTazas, tituloFormatoEscaneo
 } from '@domain/escaneo/ficha-escaneada';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService } from '@core/auth/auth.service';
 import { ImagenPreparada, ScannerService } from '../../../core/services/scanner';
 import { SesionConRol, SesionService } from '../../../core/services/sesion';
-import { mensajeDeError } from '../../../core/utils/errores';
+import { mensajeDeError } from '@core/errores/errores';
 
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TrPipe } from '../../../core/i18n/tr';

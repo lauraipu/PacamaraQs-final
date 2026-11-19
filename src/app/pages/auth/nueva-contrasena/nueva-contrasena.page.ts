@@ -6,8 +6,8 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { LONGITUD_MINIMA_CONTRASENA, primerRequisitoFaltante } from '@domain/contrasena/politica-contrasena';
-import { AuthService } from '../../../core/services/auth';
-import { codigoDeError, esSinConexion } from '../../../core/utils/errores';
+import { AuthService } from '@core/auth/auth.service';
+import { codigoDeError, esSinConexion } from '@core/errores/errores';
 import { CampoContrasenaComponent } from '../../../shared/components/campo-contrasena/campo-contrasena.component';
 import { SelectorIdiomaComponent } from '../../../shared/components/selector-idioma/selector-idioma.component';
 

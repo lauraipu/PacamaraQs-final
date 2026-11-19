@@ -4,13 +4,13 @@ import { AlertController, NavController, ToastController } from '@ionic/angular'
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { EstadoSesion, getFormatoById } from '@domain/sesion/sesion.model';
-import { AuthService } from '../services/auth';
+import { AuthService } from '../auth/auth.service';
 import { EvaluacionAtributo, FichaEvaluacion, OfflineSyncService } from '../services/offline-sync';
 import { EventoSala, RealtimeService, SalaRealtime } from '../services/realtime';
 import { SesionService } from '../services/sesion';
-import { mensajeDeError } from '../utils/errores';
-import { AvisosService } from '../avisos/avisos.service';
-import { ConSalidaControlada } from '../guards/salida-formulario.guard';
+import { mensajeDeError } from '../errores/errores';
+import { AvisosService } from '../errores/avisos.service';
+import { ConSalidaControlada } from '../auth/guards/salida-formulario.guard';
 
 const ATRIBUTOS_HEDONICOS = new Set([
   'fragancia', 'aroma', 'sabor', 'saborResidual', 'acidez', 'dulzor', 'sensacionEnBoca'

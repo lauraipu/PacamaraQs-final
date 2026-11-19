@@ -4,7 +4,7 @@ import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { AlertController, ToastController } from '@ionic/angular';
 import { Subject } from 'rxjs';
 import { EstadoSesion, Participante, Sesion } from '@domain/sesion/sesion.model';
-import { AuthService, UsuarioActual } from '../../../core/services/auth';
+import { AuthService, UsuarioActual } from '@core/auth/auth.service';
 import { EventoSala, PresenciaUsuario, RealtimeService } from '../../../core/services/realtime';
 import { SesionService } from '../../../core/services/sesion';
 import { WaitingRoomPage } from './waiting-room.page';

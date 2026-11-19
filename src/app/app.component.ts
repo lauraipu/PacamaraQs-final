@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular';
-import { BotonAtrasService } from './core/navegacion/boton-atras.service';
+import { BotonAtrasService } from '@core/plataforma/boton-atras.service';
 
 import { BannerConexionComponent } from './shared/components/banner-conexion/banner-conexion.component';
 @Component({

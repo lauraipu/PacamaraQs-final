@@ -5,7 +5,7 @@ import { AlertController, NavController, ToastController } from '@ionic/angular'
 import { Subject } from 'rxjs';
 import { RUEDA_SABORES, TIPOS_DEFECTO } from '@domain/cva/cva';
 import { EstadoSesion } from '@domain/sesion/sesion.model';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService } from '@core/auth/auth.service';
 import { FichaEvaluacion, ItemCola, OfflineSyncService } from '../../../core/services/offline-sync';
 import { EventoSala, RealtimeService } from '../../../core/services/realtime';
 import { SesionService } from '../../../core/services/sesion';
