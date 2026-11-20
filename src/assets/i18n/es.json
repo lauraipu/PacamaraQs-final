@@ -494,6 +494,8 @@
     "catador": "Catador",
     "sin_datos_de_atributos": "Sin datos de atributos para esta muestra.",
     "promedio_del_panel": "Promedio del panel",
+    "cerca_del_panel": "Cerca del panel",
+    "lejos_del_panel": "Lejos del panel (alerta)",
     "sesion_cerrada_completada": "Sesión cerrada · {{p0}}% completada",
     "muestras": "Muestras",
     "catadores": "Catadores",

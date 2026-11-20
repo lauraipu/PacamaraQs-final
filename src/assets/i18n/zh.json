@@ -494,6 +494,8 @@
     "catador": "杯测师",
     "sin_datos_de_atributos": "此样品没有属性数据。",
     "promedio_del_panel": "小组平均",
+    "cerca_del_panel": "接近小组",
+    "lejos_del_panel": "远离小组（警示）",
     "sesion_cerrada_completada": "会话已关闭 · 完成 {{p0}}%",
     "muestras": "样品",
     "catadores": "杯测师",

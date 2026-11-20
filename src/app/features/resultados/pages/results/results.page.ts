@@ -101,6 +101,9 @@ export interface PuntoMedidor { x: number; y: number; }
 export interface ArcoMedidor { d: string; clase: string; }
 export type ModoExportacion = 'panel' | 'catador';
 
+/** Alerta visual del radar: qué tan cerca está el catador del promedio del panel. */
+export type DesviacionRadar = 'cerca' | 'lejos' | null;
+
 /* ── Gráficas de radar (SVG puro) ─────────────────────────────────────── */
 export interface EjeRadar { x: number; y: number; lx: number; ly: number; etiqueta: string; anchor: string; }
 export interface GraficoRadar {
@@ -111,6 +114,27 @@ export interface GraficoRadar {
   anillos: string[];
   panel: string | null;
   catador: string | null;
+  /** 'cerca' (azul) o 'lejos' (amarillo, alerta); null si no hay panel o catador para comparar. */
+  desviacion: DesviacionRadar;
+}
+
+/** Umbral de desviación promedio (0–1, normalizada por el máximo de la escala) para la alerta del radar. */
+const RADAR_UMBRAL_LEJOS = 0.18;
+
+/**
+ * Desviación promedio del catador respecto al panel, normalizada 0–1, sobre
+ * los atributos donde ambos tienen valor. `null` si no hay ninguno comparable.
+ */
+function desviacionRadar(valoresPanel: (number | null)[], valoresCatador: (number | null)[], max: number): DesviacionRadar {
+  const diferencias: number[] = [];
+  for (let i = 0; i < valoresPanel.length; i++) {
+    const p = valoresPanel[i];
+    const c = valoresCatador[i];
+    if (p !== null && c !== null) diferencias.push(Math.abs(p - c) / max);
+  }
+  if (diferencias.length === 0) return null;
+  const promedio = diferencias.reduce((t, d) => t + d, 0) / diferencias.length;
+  return promedio > RADAR_UMBRAL_LEJOS ? 'lejos' : 'cerca';
 }
 const RADAR_C = { x: 150, y: 120 };
 const RADAR_R = 82;
@@ -171,6 +195,25 @@ export function clasificarPuntaje(puntaje: number): Clasificacion {
   if (puntaje >= 75) return { etiqueta: 'Bueno', color: '#c2410c', fondo: '#fff7ed' };
   return { etiqueta: 'Regular', color: '#6c757d', fondo: '#f8f9fa' };
 }
+
+/**
+ * Categoría SCA del puntaje para el relleno del medidor: bajo el umbral de
+ * "Fair" (60) es defectuoso, bajo el umbral de especialidad (80) es regular,
+ * y de ahí en adelante es café de especialidad.
+ */
+export type CategoriaSca = 'malo' | 'regular' | 'bueno';
+export function categoriaSca(puntaje: number): CategoriaSca {
+  if (puntaje < 60) return 'malo';
+  if (puntaje < 80) return 'regular';
+  return 'bueno';
+}
+
+/** Clase CSS del arco relleno del medidor según la categoría SCA del puntaje. */
+const CLASE_MEDIDOR_POR_CATEGORIA: Readonly<Record<CategoriaSca, string>> = {
+  malo: 'rc-gauge__arc--bajo',
+  regular: 'rc-gauge__arc--medio',
+  bueno: 'rc-gauge__arc--top'
+};
 
 /** Etiqueta verbal de la escala hedónica para un promedio (redondeado al entero). */
 export function etiquetaHedonica(promedio: number | null): string {
@@ -350,14 +393,15 @@ export class ResultsPage implements OnInit {
 
   /* ── Vista Combinado ──────────────────────────────────────────────────── */
 
-  /** Arcos de color del medidor: rojo / ámbar / verde claro / verde. */
-  readonly arcosMedidor: readonly ArcoMedidor[] = [
-    arco(0, 30, 'rc-gauge__arc--bajo'),
-    arco(30, 50, 'rc-gauge__arc--medio'),
-    arco(50, 75, 'rc-gauge__arc--alto'),
-    arco(75, 100, 'rc-gauge__arc--top')
-  ];
+  /** Pista gris de fondo (0–100), fija; el arco de color se calcula por puntaje. */
+  readonly arcoPistaMedidor: ArcoMedidor = arco(0, 100, 'rc-gauge__arc--pista');
   readonly centroMedidor: PuntoMedidor = { x: MEDIDOR_CX, y: MEDIDOR_CY };
+
+  /** Arco relleno 0 → puntaje, coloreado según la categoría SCA (rojo/ámbar/verde). */
+  private arcoRelleno(valor: number): ArcoMedidor | null {
+    if (!Number.isFinite(valor) || valor <= 0) return null;
+    return arco(0, valor, CLASE_MEDIDOR_POR_CATEGORIA[categoriaSca(valor)]);
+  }
 
   /** Muestra elegida en el ranking para el segundo medidor (null = la #1). */
   private readonly muestraMedidorNumero = signal<number | null>(null);
@@ -370,6 +414,8 @@ export class ResultsPage implements OnInit {
 
   readonly agujaPanel = computed(() => puntoEnMedidor(this.promedioPanel(), AGUJA_RADIO));
   readonly agujaMuestra = computed(() => puntoEnMedidor(this.muestraEnMedidor()?.puntajePromedioPanel ?? 0, AGUJA_RADIO));
+  readonly arcoMedidorPanel = computed(() => this.arcoRelleno(this.promedioPanel()));
+  readonly arcoMedidorMuestra = computed(() => this.arcoRelleno(this.muestraEnMedidor()?.puntajePromedioPanel ?? 0));
 
   /** Catador mostrado en "Reporte de sesión individual" (null = primero con fichas enviadas). */
   private readonly catadorReporteId = signal<string | null>(null);
@@ -485,14 +531,17 @@ export class ResultsPage implements OnInit {
         return (id === 'calidad' ? p?.calidadPromedio : p?.intensidadPromedio) ?? null;
       };
       const valorCatador = (clave: AtributoCva) => ficha?.atributos[clave]?.[id] ?? null;
+      const valoresPanel = ATRIBUTOS_CVA.map(a => valorPanel(a.clave));
+      const valoresCatador = ATRIBUTOS_CVA.map(a => valorCatador(a.clave));
       return {
         id,
         titulo: id === 'calidad' ? 'Perfil de calidad (afectivo)' : 'Perfil de intensidad (descriptivo)',
         escala: id === 'calidad' ? 'Escala 1 – 9' : 'Escala 0 – 15',
         ejes,
         anillos,
-        panel: poligonoRadar(ATRIBUTOS_CVA.map(a => valorPanel(a.clave)), max),
-        catador: poligonoRadar(ATRIBUTOS_CVA.map(a => valorCatador(a.clave)), max)
+        panel: poligonoRadar(valoresPanel, max),
+        catador: poligonoRadar(valoresCatador, max),
+        desviacion: desviacionRadar(valoresPanel, valoresCatador, max)
       };
     });
   });

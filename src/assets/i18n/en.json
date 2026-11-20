@@ -494,6 +494,8 @@
     "catador": "Cupper",
     "sin_datos_de_atributos": "No attribute data for this sample.",
     "promedio_del_panel": "Panel average",
+    "cerca_del_panel": "Close to the panel",
+    "lejos_del_panel": "Far from the panel (alert)",
     "sesion_cerrada_completada": "Session closed · {{p0}}% complete",
     "muestras": "Samples",
     "catadores": "Cuppers",

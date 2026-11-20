@@ -138,7 +138,11 @@
                   <text class="rr-label" [attr.x]="e.lx" [attr.y]="e.ly" [attr.text-anchor]="e.anchor">{{ e.etiqueta | tr }}</text>
                 }
                 @if (g.panel) { <polygon class="rr-panel" [attr.points]="g.panel"></polygon> }
-                @if (g.catador) { <polygon class="rr-catador" [attr.points]="g.catador"></polygon> }
+                @if (g.catador) {
+                  <polygon class="rr-catador" [attr.points]="g.catador"
+                    [class.rr-catador--cerca]="g.desviacion === 'cerca'"
+                    [class.rr-catador--lejos]="g.desviacion === 'lejos'"></polygon>
+                }
               </svg>
               @if (!g.panel && !g.catador) { <p class="rs-muted rs-note">{{ 'resultados.sin_datos_de_atributos' | transloco }}</p> }
             </figure>
@@ -147,19 +151,23 @@
         <p class="rr-legend">
           <span><i class="rr-legend__panel"></i>{{ 'resultados.promedio_del_panel' | transloco }}</span>
           <span><i class="rr-legend__catador"></i>{{ catadorReporte()?.nombre ?? ('resultados.catador' | transloco) }}</span>
+          <span><i class="rr-legend__cerca"></i>{{ 'resultados.cerca_del_panel' | transloco }}</span>
+          <span><i class="rr-legend__lejos"></i>{{ 'resultados.lejos_del_panel' | transloco }}</span>
         </p>
       }
     </ion-card-content>
   </ion-card>
 </ng-template>
 
-<!-- Medidor semicircular reutilizable (escala 0–100) -->
-<ng-template #medidor let-valor="valor" let-aguja="aguja" let-etiqueta="etiqueta">
+<!-- Medidor semicircular reutilizable (escala 0–100): pista gris + arco relleno 0→valor
+     coloreado según la categoría SCA del puntaje (rojo malo, ámbar regular, verde especialidad) -->
+<ng-template #medidor let-valor="valor" let-aguja="aguja" let-etiqueta="etiqueta" let-arcoRelleno="arcoRelleno">
   <ion-card class="rc-card rc-gauge">
     <ion-card-content>
       <svg class="rc-gauge__svg" viewBox="0 0 200 112" role="img" [attr.aria-label]="etiqueta + ': ' + (valor | number:'1.2-2')">
-        @for (a of arcosMedidor; track a.clase) {
-          <path [attr.d]="a.d" [attr.class]="'rc-gauge__arc ' + a.clase"></path>
+        <path [attr.d]="arcoPistaMedidor.d" [attr.class]="'rc-gauge__arc ' + arcoPistaMedidor.clase"></path>
+        @if (arcoRelleno) {
+          <path [attr.d]="arcoRelleno.d" [attr.class]="'rc-gauge__arc ' + arcoRelleno.clase"></path>
         }
         <line class="rc-gauge__needle" [attr.x1]="centroMedidor.x" [attr.y1]="centroMedidor.y"
           [attr.x2]="aguja.x" [attr.y2]="aguja.y"></line>
@@ -271,12 +279,14 @@
           <ion-row>
             <ion-col size="12" size-md="6">
               <ng-container *ngTemplateOutlet="medidor; context: {
-                valor: promedioPanel(), aguja: agujaPanel(), etiqueta: 'Promedio puntaje del panel' }"></ng-container>
+                valor: promedioPanel(), aguja: agujaPanel(), arcoRelleno: arcoMedidorPanel(),
+                etiqueta: 'Promedio puntaje del panel' }"></ng-container>
             </ion-col>
             <ion-col size="12" size-md="6">
               <ng-container *ngTemplateOutlet="medidor; context: {
                 valor: muestraEnMedidor()?.puntajePromedioPanel ?? 0,
                 aguja: agujaMuestra(),
+                arcoRelleno: arcoMedidorMuestra(),
                 etiqueta: 'Promedio del panel por muestra · Muestra ' + (muestraEnMedidor()?.numeroMuestra ?? '—') }"></ng-container>
             </ion-col>
           </ion-row>

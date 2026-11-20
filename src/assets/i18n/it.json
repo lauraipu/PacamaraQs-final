@@ -494,6 +494,8 @@
     "catador": "Assaggiatore",
     "sin_datos_de_atributos": "Nessun dato sugli attributi per questo campione.",
     "promedio_del_panel": "Media del panel",
+    "cerca_del_panel": "Vicino al panel",
+    "lejos_del_panel": "Lontano dal panel (avviso)",
     "sesion_cerrada_completada": "Sessione chiusa · {{p0}}% completata",
     "muestras": "Campioni",
     "catadores": "Assaggiatori",
