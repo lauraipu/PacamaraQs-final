@@ -17,7 +17,20 @@ export class SupabaseService {
 
     this.supabaseClient = createClient(
       environment.supabaseUrl,
-      environment.supabaseKey
+      environment.supabaseKey,
+      {
+        auth: {
+          // sessionStorage en vez de localStorage (por defecto): cada pestaña
+          // queda con su propia sesión, así se puede tener un usuario distinto
+          // por pestaña (por ejemplo, organizador en una y catador en otra).
+          // Costo aceptado: la sesión no sobrevive a cerrar esa pestaña ni se
+          // sincroniza entre pestañas (antes sí, con localStorage).
+          storage: window.sessionStorage,
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
     );
     return this.supabaseClient;
   }
