@@ -32,7 +32,7 @@ Su objetivo es facilitar el trabajo coordinado de administradores, organizadores
 
 - Se registra o inicia sesión y participa en sesiones.
 - Completa formularios afectivos, descriptivos, combinados o extrínsecos.
-- Puede capturar una evaluación desde una ficha física con el escáner asistido por Gemini, revisar los datos extraídos y guardarlos.
+- Puede capturar una evaluación desde una ficha física con el escáner, revisar los datos reconocidos automáticamente y guardarlos.
 - Los envíos de evaluación utilizan un servicio de sincronización con soporte offline.
 
 ### Para todos los usuarios
@@ -57,7 +57,7 @@ Su objetivo es facilitar el trabajo coordinado de administradores, organizadores
 | Interfaz y móvil | Ionic 9, Capacitor 8 | Componentes de interfaz y empaquetado para Android. |
 | Backend y autenticación | Supabase | Autenticación, acceso a datos y funciones RPC de PostgreSQL. |
 | Base de datos | PostgreSQL en Supabase | Usuarios, sesiones, evaluaciones, atributos y resultados. |
-| Visión e interpretación de fichas | Gemini Vision (API multimodal) | Analiza una imagen de ficha y devuelve los campos reconocidos en formato JSON. |
+| Lectura de fichas físicas | Groq (modelo Qwen, de código abierto) | Analiza una imagen de ficha y devuelve los campos reconocidos en formato JSON. |
 | Reportes PDF | HTML/CSS con formato de hoja SCA; `@capgo/capacitor-printer` en Android, iframe de impresión en web | Un mismo reporte para los 4 formatos (Combinado, Afectivo, Descriptivo, Extrínseco); en Android abre el servicio de impresión del sistema, desde donde se guarda como PDF. |
 | Exportación de datos | ExcelJS, `@capacitor/filesystem`, `@capacitor/share` | Excel (.xlsx) con hojas Sesión, Resumen, Afectivo, Descriptivo y Datos crudos, o CSV de respaldo. En Android el archivo se comparte con el menú del sistema. |
 | Idiomas | Transloco (`@jsverse/transloco`) | Traducciones en `src/assets/i18n/{es,en,it,zh}.json`. |
@@ -83,7 +83,7 @@ Las migraciones versionadas en `supabase/migrations/` son incrementales; incluye
 
 ### Estado de seguridad y publicación
 
-- **Gemini:** el cliente invoca `analizar-ficha`, una Supabase Edge Function que exige un usuario autenticado no anónimo y lee `GEMINI_API_KEY` del entorno del servidor. Reintenta ante errores 503/429 y puede usar un modelo de respaldo (`GEMINI_MODEL_RESPALDO`). La clave nunca va en los archivos `environment` ni en el bundle. La función aplica un límite de 10 escaneos por usuario y por hora, guardado en la base de datos (`consumir_cuota_escaner`, migración `20261116170000_limite_escaner.sql`); se puede ajustar con el secreto `SCANNER_RATE_LIMIT`.
+- **Escáner:** el cliente invoca `analizar-ficha`, una Supabase Edge Function que exige un usuario autenticado no anónimo y lee `GROQ_API_KEY` del entorno del servidor. Reintenta ante errores 503/429 y puede usar un modelo de respaldo (`GROQ_MODEL_RESPALDO`). La clave nunca va en los archivos `environment` ni en el bundle. La función aplica un límite de 10 escaneos por usuario y por hora, guardado en la base de datos (`consumir_cuota_escaner`, migración `20261116170000_limite_escaner.sql`); se puede ajustar con el secreto `SCANNER_RATE_LIMIT`.
 - **Escritura de evaluaciones:** la app ya guarda solo mediante `registrar_evaluacion`. Queda pendiente activar el bloque "PASO 2" de su migración, que retira las políticas de escritura directa, cuando todos usen la versión nueva del APK.
 - **Pendientes del asesor de seguridad de Supabase:** desactivar el inicio de sesión anónimo en Auth, activar la protección contra contraseñas filtradas y revocar `EXECUTE` de `rls_auto_enable()` a `anon`/`authenticated`.
 - **Android:** `applicationId`, `namespace` y el paquete de `MainActivity` usan `com.pacamaraqs.app`. Las copias de seguridad automáticas están desactivadas y el código release usa minificación/obfuscación.
@@ -139,7 +139,7 @@ PacamaraQs/
 - Java 21 y Android SDK (solo para compilar el APK localmente).
 - Ionic CLI. Si no está instalado: `npm install -g @ionic/cli`.
 - Acceso a un proyecto Supabase configurado con el esquema y las políticas que requiere la aplicación.
-- Una clave de Gemini configurada como secreto en Supabase para probar el análisis real. El modo simulado se activa explícitamente mediante `escanerSimulado`; la falta de una clave no activa automáticamente ese modo.
+- Una clave de Groq configurada como secreto en Supabase para probar el análisis real. El modo simulado se activa explícitamente mediante `escanerSimulado`; la falta de una clave no activa automáticamente ese modo.
 
 ### 1. Clonar e instalar
 
@@ -162,16 +162,16 @@ export const environment = {
 };
 ```
 
-`environment.prod.ts` debe conservar `production: true`. `escanerSimulado: true` devuelve datos de ejemplo y no llama a la IA. La aplicación no consume `geminiApiKey` ni `geminiModel` desde estos archivos.
+`environment.prod.ts` debe conservar `production: true`. `escanerSimulado: true` devuelve datos de ejemplo y no llama al servicio externo. La aplicación no consume `groqApiKey` ni `groqModel` desde estos archivos.
 
 > **Seguridad de credenciales**
 >
 > - En el cliente utiliza únicamente la clave publicable de Supabase y protege las tablas con RLS. **Nunca** incluyas una clave `service_role` en `environment.ts` ni en archivos distribuidos al navegador.
-> - El escáner ya envía el formato y la imagen a la Edge Function `analizar-ficha`; la función consulta Gemini con el secreto `GEMINI_API_KEY`. No configures una clave de Gemini en el cliente.
+> - El escáner ya envía el formato y la imagen a la Edge Function `analizar-ficha`; la función consulta el servicio de análisis con el secreto `GROQ_API_KEY`. No configures esa clave en el cliente.
 > - Configura el secreto y despliega la función para el proyecto Supabase que corresponda:
 >
 >   ```bash
->   supabase secrets set GEMINI_API_KEY=<tu-clave>
+>   supabase secrets set GROQ_API_KEY=<tu-clave>
 >   supabase functions deploy analizar-ficha
 >   ```
 >
@@ -207,11 +207,11 @@ También se puede iniciar el servidor de desarrollo de Angular con:
 npm start
 ```
 
-## Escáner de fichas físicas e IA
+## Escáner de fichas físicas
 
-El escáner permite cargar o tomar una fotografía de una ficha física. La aplicación prepara la imagen y la envía, junto con el formato seleccionado, a la Edge Function `analizar-ficha`; esta construye las instrucciones y llama a Gemini Vision. El cliente procesa la respuesta estructurada. Admite fichas combinadas, descriptivas, afectivas y extrínsecas. Antes de guardar, los datos se normalizan y se presentan para revisión; la evaluación no debe considerarse verificada hasta que la persona usuaria confirme la información reconocida.
+El escáner permite cargar o tomar una fotografía de una ficha física. La aplicación prepara la imagen y la envía, junto con el formato seleccionado, a la Edge Function `analizar-ficha`, que construye las instrucciones, las procesa en el servidor (actualmente con Groq y un modelo Qwen de código abierto) y devuelve los campos reconocidos. El cliente procesa la respuesta estructurada. Admite fichas combinadas, descriptivas, afectivas y extrínsecas. Antes de guardar, los datos se normalizan y se presentan para revisión; la evaluación no debe considerarse verificada hasta que la persona usuaria confirme la información reconocida.
 
-Si `escanerSimulado` está activado, el servicio devuelve una ficha de ejemplo para probar el flujo de revisión y guardado. Si el modo simulado está desactivado y la función no tiene configurada la clave, el análisis falla con un error de configuración. Aunque la llamada a Gemini ya se realiza en backend, la función todavía requiere controles de uso y gasto antes de ofrecer el escáner en planes de pago.
+Si `escanerSimulado` está activado, el servicio devuelve una ficha de ejemplo para probar el flujo de revisión y guardado. Si el modo simulado está desactivado y la función no tiene configurada la clave, el análisis falla con un error de configuración. Aunque la llamada al servicio externo ya se realiza en backend, la función todavía requiere controles de uso y gasto antes de ofrecer el escáner en planes de pago.
 
 ## Pruebas y compilación
 
@@ -253,3 +253,7 @@ Para consultas sobre el proyecto o sobre el tratamiento de datos personales: **P
 ## Descargo de responsabilidad
 
 PacamaraQs es un software de adaptación e implementación personalizada para este proyecto. **No es un producto oficial, patrocinado ni certificado por la Specialty Coffee Association (SCA).** La referencia a la metodología CVA/SCA describe el marco de evaluación utilizado por la aplicación y no implica afiliación ni respaldo institucional. La terminología, los formularios y los resultados deben validarse frente a las fuentes y versiones oficiales aplicables antes de utilizarlos con fines comerciales, de certificación o de investigación.
+
+## Desarrollo
+
+Este proyecto se desarrolló con el apoyo de Claude (Anthropic) como asistente de programación.
