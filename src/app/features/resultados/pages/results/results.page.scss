@@ -41,7 +41,6 @@
   --rc-gauge-bajo: #e53935;
   --rc-gauge-medio: #f5b400;
   --rc-gauge-top: #12a150;
-  --rc-gauge-pista: var(--app-bg-subtle);
   --rc-row-active: #fbe9e4;
   --rc-medal-1: #ca8a04;
   --rc-medal-2: #94a3b8;
@@ -78,8 +77,7 @@
 }
 .rc-gauge__svg { width: min(100%, 220px); height: auto; overflow: visible; }
 .rc-gauge__arc { fill: none; stroke-width: 22; }
-/* Pista de fondo (0–100); el arco de color se calcula según el puntaje y su categoría SCA. */
-.rc-gauge__arc--pista { stroke: var(--rc-gauge-pista); }
+.rc-gauge__arc--pista { stroke: var(--app-bg-subtle); }
 .rc-gauge__arc--bajo { stroke: var(--rc-gauge-bajo); }
 .rc-gauge__arc--medio { stroke: var(--rc-gauge-medio); }
 .rc-gauge__arc--top { stroke: var(--rc-gauge-top); }
@@ -267,11 +265,6 @@
   }
 }
 .rc-export__go { margin: 4px 0 0; }
-
-@media (max-width: 576px) {
-  .rs-meta__stats { gap: 16px; }
-  .rc-report__score strong { font-size: clamp(1rem, 5.0vw, 1.125rem); }
-}
 
 .rc-export__hint { margin: 8px 0 0; color: var(--app-text-muted); font-size: 0.75rem; text-align: center; }
 
@@ -467,6 +460,8 @@
 .re-notes { margin: 0; color: var(--app-text-main); font-size: 0.8125rem; white-space: pre-line; }
 
 @media (max-width: 576px) {
+  .rs-meta__stats { gap: 16px; }
+  .rc-report__score strong { font-size: clamp(1rem, 5.0vw, 1.125rem); }
   .rx-bars__row, .rd-scale { grid-template-columns: minmax(84px, 38%) minmax(0, 1fr) 34px; gap: 8px; }
   .ra-dist__row { grid-template-columns: 22px 1fr 34px; }
   .ra-dist__label { display: none; }
@@ -525,15 +520,9 @@
 .rr-label { font-size: 0.75rem; fill: var(--app-text-muted, #6b7280); }
 .rr-panel { fill: rgba(156, 163, 175, 0.12); stroke: #9ca3af; stroke-width: 2; stroke-dasharray: 5 4; }
 /* Catador: azul si está cerca del panel, ámbar (alerta) si se aleja bastante. */
-.rr-catador {
-  fill: color-mix(in srgb, var(--app-primary-dark) 15%, transparent);
-  stroke: var(--app-primary-dark);
-  stroke-width: 2.5;
-  stroke-linejoin: round;
-  transition: stroke 0.25s ease, fill 0.25s ease;
-}
-.rr-catador--cerca { fill: color-mix(in srgb, #1d4ed8 15%, transparent); stroke: #1d4ed8; }
-.rr-catador--lejos { fill: color-mix(in srgb, var(--rc-gauge-medio) 18%, transparent); stroke: var(--rc-gauge-medio); }
+.rr-catador { fill: color-mix(in srgb, var(--app-primary-dark) 15%, transparent); stroke: var(--app-primary-dark); stroke-width: 2.5; stroke-linejoin: round; }
+.rr-catador--cerca { stroke: #1d4ed8; }
+.rr-catador--lejos { stroke: var(--rc-gauge-medio); }
 .rr-legend {
   display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0 0; font-size: 0.75rem;
   span { display: inline-flex; align-items: center; gap: 6px; }
