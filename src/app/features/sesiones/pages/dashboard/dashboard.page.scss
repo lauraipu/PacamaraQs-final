@@ -372,10 +372,14 @@ ion-toolbar {
   font-size: 0.8125rem;
 }
 
-/* ESTILOS DEL MODAL (BOTTOM SHEET) */
+/* ESTILOS DEL MODAL: tarjeta compacta ajustada a su contenido (ver nota
+   en el html sobre por que se quito el bottom sheet con breakpoints). */
 ion-modal {
   --background: var(--app-bg-card, #ffffff);
   --border-radius: 16px;
+  --width: min(92vw, 400px);
+  --height: fit-content;
+  --max-height: 80vh;
 }
 
 .modal-content {

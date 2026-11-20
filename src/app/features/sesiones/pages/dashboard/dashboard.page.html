@@ -180,12 +180,14 @@
     </ion-fab-button>
   </ion-fab>
 
-  <!-- MODAL INFERIOR (BOTTOM SHEET) -->
+  <!-- MODAL PARA INGRESAR CODIGO. Antes era un bottom sheet con
+       [breakpoints]; se quito porque en el APK instalado tardaba varios
+       segundos en abrir cada vez (motor de gestos del sheet recalculando
+       en cada apertura). Ahora es un modal simple, ajustado a su
+       contenido, sin ese motor. -->
   <ion-modal
     [isOpen]="isModalOpen"
-    (didDismiss)="cerrarModalUnirse()"
-    [initialBreakpoint]="0.4"
-    [breakpoints]="[0, 0.4]">
+    (didDismiss)="cerrarModalUnirse()">
     <ng-template>
       <div class="modal-content ion-padding">
         <h3>{{ 'dashboard.unirme_a_una_sesion' | transloco }}</h3>
