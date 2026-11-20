@@ -7,13 +7,13 @@ import { AuthService } from '@core/auth/auth.service';
 import { OfflineSyncService, ResultadoEnvio } from '@core/data-access/evaluaciones/cola-offline.service';
 import { SupabaseService } from '@core/supabase/supabase.client';
 
-/** Edge Function de Supabase que guarda la llave de Gemini y arma el prompt. */
+/** Edge Function de Supabase que guarda la llave de Groq y arma el prompt. */
 const FUNCION_IA = 'analizar-ficha';
 const LADO_MAXIMO_PX = 1600;
 const TAMANO_MAXIMO_BYTES = 15 * 1024 * 1024;
 
 export interface ImagenPreparada {
-  /** Base64 sin el prefijo `data:` (lo que espera Gemini en inline_data). */
+  /** Base64 sin el prefijo `data:` (lo que espera Groq como data URI). */
   base64: string;
   mimeType: 'image/jpeg';
   /** Data URL para la vista previa. */
@@ -21,14 +21,14 @@ export interface ImagenPreparada {
 }
 
 /**
- * Escáner de fichas en papel con IA (Gemini).
+ * Escáner de fichas en papel con IA (Groq · modelo Qwen-VL de pesos abiertos).
  *
  * La IA se llama SIEMPRE a través de la Edge Function `analizar-ficha`:
- *  · La llave de Gemini es el secreto GEMINI_API_KEY de Supabase; nunca viaja
+ *  · La llave de Groq es el secreto GROQ_API_KEY de Supabase; nunca viaja
  *    en el bundle ni en el APK (antes estaba en environment.ts y cualquiera
  *    podía extraerla del JavaScript compilado).
  *  · La función exige un usuario autenticado y arma el prompt en el servidor
- *    según el formato, así que no sirve como proxy abierto hacia Gemini.
+ *    según el formato, así que no sirve como proxy abierto hacia Groq.
  *
  * MODO SIMULADO: con `environment.escanerSimulado = true`, `analizarFicha()`
  *   no llama a la IA y devuelve una ficha de ejemplo (`simulada: true`).
@@ -141,7 +141,7 @@ export class ScannerService {
     }
   }
 
-  /** Llama a la Edge Function (que llama a Gemini con la llave del servidor). */
+  /** Llama a la Edge Function (que llama a Groq con la llave del servidor). */
   private async llamarIa(base64Image: string, formato: string): Promise<string> {
     const { data, error } = await this.supabase.client.functions.invoke<{ texto?: string; error?: string }>(FUNCION_IA, {
       body: { formato, imagenBase64: base64Image }
