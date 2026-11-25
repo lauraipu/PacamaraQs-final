@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#121417">
+<title>PacamaraQs · Idea de negocio</title>
+<style>
+:root{
+  --paper:#F8F8F6; --night:#121417; --ink:#1A1C1E; --accent:#C84B31;
+  --mute:#64686C; --rule:#D9D7D2; --soft:#EEECE8; --g1:#D2CCC3; --g2:#8C877F; --g3:#B7B1A8;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --head:"Space Grotesk","Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --body:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--night);overflow:hidden;font-family:var(--body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button{font:inherit;color:inherit}
+
+/* El contenedor "deck" es la referencia de todas las medidas (cqw/cqh).
+   Así la misma diapositiva se ve bien en pantalla completa y en miniatura. */
+#deck{position:fixed;inset:0;height:100vh;height:100dvh;container-type:size;container-name:deck;overflow:hidden}
+.mini{width:1280px;height:720px;container-type:size;container-name:deck;position:relative;overflow:hidden;transform-origin:top left}
+
+/* ---------- diapositiva ---------- */
+.slide{position:absolute;inset:0;background:var(--paper);color:var(--ink);
+  padding:clamp(28px,7cqh,84px) clamp(20px,7cqw,112px) clamp(76px,10cqh,100px);
+  display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;
+  opacity:0;visibility:hidden;transform:translateX(3cqw);
+  transition:opacity .7s var(--ease),transform .7s var(--ease),visibility 0s linear .7s}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .7s var(--ease),transform .7s var(--ease),visibility 0s}
+.slide.before{transform:translateX(-3cqw)}
+.slide.dark{background:var(--night);color:var(--paper)}
+.slide::-webkit-scrollbar{width:0}
+
+.kicker{font:600 clamp(11px,.95cqw,15px)/1.3 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center}
+.kicker span{color:var(--mute);letter-spacing:.06em}
+.dark .kicker span{color:#8D9196}
+h1,h2,h3{font-family:var(--head);margin:0;font-weight:600;letter-spacing:-.02em}
+h1{font-size:clamp(56px,10cqw,140px);line-height:.92;letter-spacing:-.045em}
+h2{font-size:clamp(28px,3.9cqw,60px);line-height:1.06;margin-top:clamp(12px,2.2cqh,22px);max-width:20em;text-wrap:balance}
+h3{font-size:clamp(18px,1.65cqw,26px);line-height:1.2;text-wrap:balance}
+p{margin:0}
+.lead{font-size:clamp(17px,1.45cqw,23px);line-height:1.45;color:var(--mute)}
+.dark .lead{color:#B9BCC0}
+.body{font-size:clamp(15px,1.2cqw,19px);line-height:1.5}
+.small{font-size:clamp(13px,.95cqw,15px);line-height:1.45;color:var(--mute)}
+.dark .small{color:#9A9EA3}
+.content{flex:1 0 auto;margin-top:clamp(24px,5cqh,52px)}
+.accent{color:var(--accent)}
+.big{font:600 clamp(40px,6.5cqw,112px)/1 var(--head);letter-spacing:-.04em}
+.stat{font:600 clamp(32px,3.6cqw,56px)/1 var(--head);letter-spacing:-.03em}
+.price{font:600 clamp(28px,2.9cqw,46px)/1 var(--head);letter-spacing:-.02em;white-space:nowrap}
+.price small{font:500 clamp(13px,1.05cqw,17px) var(--body);color:var(--mute);letter-spacing:0}
+.num{font:600 clamp(12px,.95cqw,15px)/1 var(--head);color:var(--accent);letter-spacing:.04em}
+.tag{display:inline-block;white-space:nowrap;font:600 clamp(11px,.85cqw,13px)/1 var(--body);letter-spacing:.08em;text-transform:uppercase;padding:7px 10px;border:1px solid currentColor;border-radius:2px}
+.box{background:var(--soft);padding:clamp(18px,2cqw,30px);border-radius:4px}
+.dark .box{background:#1C1F23}
+.rule{border-top:1px solid var(--ink);padding-top:clamp(14px,1.6cqh,20px)}
+.dark .rule{border-color:#3A3D42}
+.rule.soft{border-color:var(--rule)}
+.label{font:600 clamp(11px,.85cqw,13px)/1.2 var(--body);letter-spacing:.1em;text-transform:uppercase}
+.foot{margin-top:auto;padding-top:clamp(20px,3cqh,32px);font-size:clamp(11px,.85cqw,13px);color:var(--mute);letter-spacing:.03em}
+.dark .foot{color:#6E7277}
+.mt-s{margin-top:clamp(10px,1.4cqh,16px)}
+.mt-m{margin-top:clamp(18px,3cqh,32px)}
+.mt-l{margin-top:clamp(26px,5cqh,56px)}
+
+/* ---------- retícula de 12 columnas ---------- */
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(18px,2.6cqh,32px) clamp(16px,2cqw,32px)}
+.sp-3{grid-column:auto / span 3}.sp-4{grid-column:auto / span 4}.sp-5{grid-column:auto / span 5}.sp-6{grid-column:auto / span 6}
+.sp-7{grid-column:auto / span 7}.sp-8{grid-column:auto / span 8}.sp-12{grid-column:auto / span 12}
+.st-6{grid-column-start:6}.st-7{grid-column-start:7}.st-8{grid-column-start:8}.st-9{grid-column-start:9}.st-10{grid-column-start:10}
+.end{align-self:end}
+.row{display:flex;gap:clamp(14px,2cqw,28px);align-items:center}
+.between{justify-content:space-between}
+
+@container deck (max-width:1100px){
+  .sp-3{grid-column:auto / span 6}
+  .t-12{grid-column:1 / -1}
+}
+@container deck (max-width:760px){
+  .grid>*{grid-column:1 / -1 !important}
+  .row.wrap{flex-wrap:wrap}
+  .hide-s{display:none}
+}
+@container deck (max-height:560px) and (min-width:761px){
+  .slide{padding-top:24px}
+}
+
+/* animación de entrada */
+.reveal{opacity:0;transform:translateY(16px)}
+.slide.active .reveal{animation:rise .9s var(--ease) both;animation-delay:calc(var(--i,0) * 80ms + 120ms)}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* ---------- listas y tablas ---------- */
+.list{margin:0;padding:0;list-style:none}
+.list li{padding:clamp(10px,1.6cqh,15px) 0;border-bottom:1px solid var(--rule);font-size:clamp(15px,1.2cqw,19px);line-height:1.45;display:grid;grid-template-columns:clamp(36px,3cqw,48px) 1fr}
+.list li:first-child{border-top:1px solid var(--rule)}
+.dark .list li,.dark .list li:first-child{border-color:#2C2F34}
+.list b{font-weight:600}
+.list .n{font:600 clamp(12px,.95cqw,15px)/1.9 var(--head);color:var(--accent)}
+table{border-collapse:collapse;width:100%;font-size:clamp(14px,1.1cqw,18px)}
+td,th{padding:clamp(9px,1.4cqh,13px) 0;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+th{font:600 clamp(11px,.85cqw,13px)/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--ink)}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:16px}
+tr.t td{font-weight:600;border-bottom:1px solid var(--ink)}
+
+/* ---------- pestañas ---------- */
+.tabs{display:flex;border-bottom:1px solid var(--rule);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;background:none;border:0;padding:clamp(12px,1.8cqh,16px) clamp(12px,1.5cqw,24px) clamp(14px,2cqh,18px);font:600 clamp(14px,1.1cqw,17px)/1 var(--head);color:var(--mute);cursor:pointer;position:relative;white-space:nowrap}
+.tab::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease)}
+.tab[aria-selected="true"]{color:var(--ink)}
+.tab[aria-selected="true"]::after{transform:scaleX(1)}
+.tab:focus-visible{outline:1px solid var(--accent);outline-offset:-1px}
+.panel{display:none;padding-top:clamp(22px,4cqh,40px)}
+.panel.on{display:grid;animation:rise .55s var(--ease) both}
+
+/* ---------- gráficos (alturas en %, sirven a cualquier tamaño) ---------- */
+.chart{position:relative;height:clamp(220px,44cqh,400px);margin:clamp(28px,4cqh,40px) 0 0 44px}
+.axis{position:absolute;left:-44px;right:0;border-top:1px solid var(--rule);font:500 12px/1 var(--body);color:var(--mute)}
+.axis span{position:absolute;left:0;transform:translateY(-50%);background:var(--paper);padding-right:6px}
+.axis.zero{border-top-color:var(--ink)}
+.cols{position:absolute;inset:0;display:flex;justify-content:space-around}
+.col{position:relative;width:min(96px,14%);height:100%;display:flex;flex-direction:column-reverse}
+.seg{width:100%;flex:none;transform:scaleY(0);transform-origin:bottom;transition:transform 1s var(--ease),filter .2s}
+.slide.active .seg{transform:scaleY(1);transition-delay:calc(var(--d) * 90ms + 250ms),0s}
+.total{position:absolute;left:50%;transform:translate(-50%,-8px);font:600 clamp(11px,1cqw,16px)/1 var(--head);white-space:nowrap}
+.xl{position:absolute;top:calc(100% + 12px);left:50%;transform:translateX(-50%);font:600 clamp(12px,1cqw,16px)/1 var(--head)}
+.group{position:relative;width:min(180px,18%);height:100%}
+.gbar{position:absolute;width:30%;transform:scaleY(0);transition:transform 1s var(--ease),filter .2s}
+.gbar.pos{transform-origin:bottom}.gbar.neg{transform-origin:top}
+.slide.active .gbar{transform:scaleY(1);transition-delay:calc(var(--d) * 90ms + 250ms),0s}
+.seg:hover,.gbar:hover,.seg.hl,.gbar.hl{filter:brightness(1.15)}
+[data-tip]{cursor:pointer}
+.legend{display:flex;gap:8px 22px;flex-wrap:wrap;font-size:clamp(12px,.95cqw,15px);color:var(--mute);margin-top:48px}
+.legend i{display:inline-block;width:11px;height:11px;margin-right:7px;vertical-align:-1px;border-radius:1px}
+.splitbar{display:flex;height:20px;border-radius:2px;overflow:hidden}
+.splitbar div{transform:scaleX(0);transform-origin:left;transition:transform 1s var(--ease) .3s}
+.slide.active .splitbar div{transform:none}
+@container deck (max-width:760px){ .col{width:15%} .group{width:19%} .total{font-size:10px} }
+
+/* ---------- controles ---------- */
+#progress{position:fixed;top:0;left:0;height:2px;background:var(--accent);width:0;transition:width .6s var(--ease);z-index:20}
+#chrome{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:12px max(14px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));z-index:20;pointer-events:none}
+#counter{font:500 13px/1 var(--head);letter-spacing:.12em;color:#8D9196;font-variant-numeric:tabular-nums;pointer-events:auto}
+#counter b{color:#E9E8E4;font-weight:600}
+.ctrl{display:flex;gap:6px;pointer-events:auto}
+.ctrl button{background:rgba(18,20,23,.85);border:1px solid #3A3D42;color:#E9E8E4;height:36px;min-width:36px;padding:0 12px;border-radius:2px;cursor:pointer;font-size:13px;letter-spacing:.04em;transition:border-color .2s,color .2s}
+.ctrl button:hover,.ctrl button:focus-visible{border-color:var(--accent);outline:none}
+body[data-theme=light] #counter{color:#6B6F73}
+body[data-theme=light] #counter b{color:var(--ink)}
+body[data-theme=light] .ctrl button{background:rgba(248,248,246,.94);border-color:#D9D7D2;color:var(--ink)}
+@media (max-width:560px){ .ctrl .opt{display:none} .ctrl button{height:40px;min-width:40px} }
+@media (max-width:760px), (max-height:520px){
+  #deck{bottom:calc(64px + env(safe-area-inset-bottom));height:auto}
+  #chrome{height:calc(64px + env(safe-area-inset-bottom));background:var(--night);border-top:1px solid #2C2F34}
+  body[data-theme=light] #chrome{background:var(--paper);border-top-color:var(--rule)}
+  .slide{padding-bottom:28px}
+}
+
+#tip{position:fixed;z-index:40;pointer-events:none;background:var(--ink);color:var(--paper);font:500 14px/1.35 var(--body);padding:8px 11px;border-radius:2px;opacity:0;transform:translate(-50%,calc(-100% - 10px));transition:opacity .15s;white-space:nowrap;max-width:90vw}
+#tip b{font-family:var(--head);font-weight:600}
+#tip.on{opacity:1}
+
+/* ---------- vista general ---------- */
+#overview{position:fixed;inset:0;background:var(--night);z-index:30;overflow:auto;padding:clamp(24px,5vw,64px) clamp(16px,4vw,56px) 96px;opacity:0;visibility:hidden;transition:opacity .4s var(--ease),visibility 0s linear .4s}
+#overview.on{opacity:1;visibility:visible;transition:opacity .4s var(--ease)}
+#overview .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;color:#8D9196;font:600 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase}
+#overview .top button{background:none;border:1px solid #3A3D42;color:#E9E8E4;height:36px;padding:0 14px;border-radius:2px;cursor:pointer;letter-spacing:.04em;text-transform:none;font-weight:500}
+#thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:clamp(16px,2vw,28px)}
+.thumb{background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.thumb .frame{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;outline:1px solid #2C2F34;transition:outline-color .2s,transform .4s var(--ease)}
+.thumb:hover .frame,.thumb:focus-visible .frame{outline:2px solid var(--accent);transform:translateY(-3px)}
+.thumb.cur .frame{outline:2px solid var(--paper)}
+.thumb:focus-visible{outline:none}
+.thumb .slide{opacity:1;visibility:visible;transform:none;transition:none;overflow:hidden}
+.thumb .reveal,.thumb .panel.on{opacity:1;transform:none;animation:none!important}
+.thumb .seg,.thumb .gbar,.thumb .splitbar div{transform:none!important;transition:none!important}
+.thumb .cap{display:flex;gap:10px;margin-top:10px;font:500 14px/1.3 var(--body);color:#B9BCC0}
+.thumb .cap b{font-family:var(--head);color:var(--accent);font-weight:600}
+
+#notes{position:fixed;left:50%;bottom:64px;transform:translate(-50%,12px);width:min(860px,calc(100vw - 28px));max-height:40vh;overflow:auto;background:var(--paper);color:var(--ink);padding:16px 20px;font-size:15px;line-height:1.5;border-radius:2px;z-index:25;opacity:0;visibility:hidden;outline:1px solid var(--rule);transition:opacity .3s var(--ease),transform .3s var(--ease),visibility 0s linear .3s}
+#notes.on{opacity:1;visibility:visible;transform:translate(-50%,0);transition:opacity .3s var(--ease),transform .3s var(--ease)}
+#notes .label{color:var(--accent);margin-bottom:8px}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}.seg,.gbar,.splitbar div{transform:none}}
+</style>
+</head>
+<body data-theme="dark">
+<div id="progress" aria-hidden="true"></div>
+<main id="deck" aria-roledescription="presentación" aria-label="PacamaraQs, idea de negocio">
+
+<!-- 01 PORTADA -->
+<section class="slide dark" data-title="Portada" data-notes="Abrir con el problema: hoy la calidad del café del Huila se mide en hojas de papel y el caficultor casi nunca ve el resultado. PacamaraQs lleva esa catación al celular, a ciegas, con un escáner que no cobra por uso.">
+  <div class="kicker reveal">Idea de negocio <span>Neiva, Huila · Noviembre de 2026</span></div>
+  <div class="grid content" style="align-content:end">
+    <div class="sp-7">
+      <h1 class="reveal" style="--i:1">Pacamara<span class="accent">Qs</span></h1>
+      <p class="lead reveal mt-m" style="--i:2;color:#D6D4CF;max-width:22em">Catación de café de especialidad digital, a ciegas y al alcance del caficultor.</p>
+    </div>
+    <div class="sp-4 st-9 end reveal" style="--i:3">
+      <div class="rule">
+        <div class="big accent">86,25</div>
+        <p class="small mt-s">Un puntaje CVA calculado en el servidor, el mismo para todos los catadores de la mesa.</p>
+      </div>
+    </div>
+  </div>
+  <div class="grid mt-l reveal" style="--i:4">
+    <div class="sp-4 rule"><p class="small">Metodología</p><p class="body mt-s">SCA CVA, 4 formatos</p></div>
+    <div class="sp-4 rule"><p class="small">Plataforma</p><p class="body mt-s">Web y Android, funciona sin señal</p></div>
+    <div class="sp-4 rule"><p class="small">Escáner de fichas</p><p class="body mt-s">Modelo abierto Qwen, $0 por ficha</p></div>
+  </div>
+</section>
+
+<!-- 02 DEFINE TU IDEA -->
+<section class="slide" data-title="Define tu idea" data-notes="Cuatro preguntas de la plantilla: necesidad, qué hace, qué aporta y a quién. Resaltar el modo práctica: el caficultor aprende a catar su propio café con el protocolo SCA.">
+  <div class="kicker reveal">01 · Define tu idea <span>Necesidad, propuesta y clientes</span></div>
+  <h2 class="reveal" style="--i:1">Catar mejor, sin papel y con el caficultor en la mesa</h2>
+  <div class="grid content">
+    <div class="sp-3 rule reveal" style="--i:2"><div class="num">01</div><h3 class="mt-s">La necesidad</h3><p class="body mt-s">La calidad se mide en fichas de papel: se suma a mano, se pierde, un catador influye en otro y el caficultor casi nunca ve el resultado de su lote.</p></div>
+    <div class="sp-3 rule reveal" style="--i:3"><div class="num">02</div><h3 class="mt-s">¿Qué va a hacer?</h3><p class="body mt-s">Una app web y Android: el organizador crea la sesión, los participantes entran con un código y califican a ciegas. El puntaje se calcula en el servidor y el informe sale en PDF y Excel.</p></div>
+    <div class="sp-3 rule reveal" style="--i:4"><div class="num">03</div><h3 class="mt-s">¿Qué aporta nuevo?</h3><p class="body mt-s">Un modo práctica para que el caficultor aprenda el protocolo SCA, un escáner que lee las fichas en papel sin pagar por uso y trabajo sin señal en la finca.</p></div>
+    <div class="sp-3 rule reveal" style="--i:5"><div class="num">04</div><h3 class="mt-s">¿A quién?</h3><p class="body mt-s">Caficultores y sus asociaciones, catadores y Q-graders, tostadoras, cooperativas, laboratorios, SENA y universidades del Huila.</p></div>
+  </div>
+  <div class="box row wrap mt-m reveal" style="--i:6">
+    <span class="tag accent">Ya existe</span>
+    <p class="body">Prototipo funcional y publicado en la web: 4 formatos SCA CVA, escáner de fichas, panel de administración con límites de uso y pausa, verificación en dos pasos, 4 idiomas y política de datos según la Ley 1581 de 2012.</p>
+  </div>
+  <p class="foot">PacamaraQs · Idea de negocio</p>
+</section>
+
+<!-- 03 PRODUCTOS AL INICIO -->
+<section class="slide" data-title="Productos al inicio" data-notes="Quien puede pagar, paga; el caficultor no. La cooperativa o la asociación paga la licencia y sus productores usan la app gratis. Los talleres y la implementación se cobran: el conocimiento técnico tiene precio.">
+  <div class="kicker reveal">02 · Productos y servicios <span>Al inicio, 2027</span></div>
+  <h2 class="reveal" style="--i:1">Gratis para el caficultor; pagan quienes pueden pagar</h2>
+  <div class="grid content">
+    <div class="sp-3 rule reveal" style="--i:2"><p class="small">Caficultor</p><div class="price accent mt-s">$0</div><p class="body mt-s">Ejercicios de catación SCA guiados, entrar a sesiones, historial de su lote y escáner incluido.</p></div>
+    <div class="sp-3 rule reveal" style="--i:3"><p class="small">Profesional</p><div class="price mt-s">$19.900 <small>/mes</small></div><p class="body mt-s">Catador independiente o Q-grader: sesiones ilimitadas, reportes PDF y Excel.</p></div>
+    <div class="sp-3 rule reveal" style="--i:4"><p class="small">Asociación</p><div class="price mt-s">$69.900 <small>/mes</small></div><p class="body mt-s">Asociaciones de productores y tostadoras pequeñas: varios organizadores y gráficas por muestra.</p></div>
+    <div class="sp-3 rule reveal" style="--i:5"><p class="small">Institucional</p><div class="price mt-s">$249.900 <small>/mes</small></div><p class="body mt-s">Cooperativas, laboratorios, SENA y universidades: usuarios ilimitados para sus caficultores.</p></div>
+    <div class="sp-6 box row between wrap reveal" style="--i:6"><div><h3>Taller de catación SCA</h3><p class="small mt-s">Media jornada en finca o cooperativa</p></div><div class="price">$800.000</div></div>
+    <div class="sp-6 box row between wrap reveal" style="--i:7"><div><h3>Implementación institucional</h3><p class="small mt-s">Configuración y capacitación, pago único</p></div><div class="price">$600.000</div></div>
+  </div>
+  <p class="foot">Precios en COP. Suben 5 % al año por inflación.</p>
+</section>
+
+<!-- 04 PRODUCTOS A 5 AÑOS -->
+<section class="slide" data-title="Productos a 5 años" data-notes="El prototipo final presenta solo SCA. Después vienen los formatos de la Federación Nacional de Cafeteros, que es lo que le piden al caficultor colombiano al vender. Cacao y chocolate es un quizás: no está en las cifras.">
+  <div class="kicker reveal">03 · Productos y servicios <span>Dentro de 5 años</span></div>
+  <h2 class="reveal" style="--i:1">Un mismo motor de catación, más formatos cada año</h2>
+  <div class="content reveal" style="--i:2">
+    <div class="tabs" role="tablist" aria-label="Línea de productos">
+      <button class="tab" role="tab" aria-selected="true" aria-controls="p-sca" id="t-sca">SCA · 2027</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-fnc" id="t-fnc" tabindex="-1">Federación de Cafeteros · 2028</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-traz" id="t-traz" tabindex="-1">Trazabilidad · 2029–2031</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-cacao" id="t-cacao" tabindex="-1">Cacao · por explorar</button>
+    </div>
+    <div class="panel grid on" role="tabpanel" id="p-sca" aria-labelledby="t-sca">
+      <div class="sp-4"><span class="tag accent">Prototipo final</span><p class="lead mt-m">Lo que se presenta y se vende primero: el protocolo de la Specialty Coffee Association.</p></div>
+      <ul class="list sp-7 st-6">
+        <li><span class="n">01</span><span><b>Cuatro formatos CVA:</b> combinado, afectivo, descriptivo y extrínseco.</span></li>
+        <li><span class="n">02</span><span><b>Modo práctica</b> para que el caficultor aprenda a catar su propio café.</span></li>
+        <li><span class="n">03</span><span><b>Escáner de fichas</b> con un modelo abierto y reportes PDF y Excel.</span></li>
+        <li><span class="n">04</span><span><b>iPhone como app web</b> (PWA): sin cuenta de Apple ni Mac en el arranque.</span></li>
+      </ul>
+    </div>
+    <div class="panel grid" role="tabpanel" id="p-fnc" aria-labelledby="t-fnc">
+      <div class="sp-4"><span class="tag">Segunda línea</span><p class="lead mt-m">Los formatos con los que la Federación Nacional de Cafeteros evalúa el café colombiano.</p></div>
+      <ul class="list sp-7 st-6">
+        <li><span class="n">01</span><span><b>Análisis físico</b> del café pergamino y verde: defectos, humedad y rendimiento.</span></li>
+        <li><span class="n">02</span><span><b>Análisis sensorial FNC</b>, como en la compra de cafés especiales y sus concursos de calidad.</span></li>
+        <li><span class="n">03</span><span><b>Informe comparable</b> SCA y FNC del mismo lote, para negociar con datos.</span></li>
+        <li><span class="n">04</span><span>Se construye con los <b>formatos oficiales</b> que se obtengan de la Federación o del Comité del Huila.</span></li>
+      </ul>
+    </div>
+    <div class="panel grid" role="tabpanel" id="p-traz" aria-labelledby="t-traz">
+      <div class="sp-4"><span class="tag">Crecimiento</span><p class="lead mt-m">Cuando la calidad está medida, se puede mostrar y vender.</p></div>
+      <ul class="list sp-7 st-6">
+        <li><span class="n">2029</span><span><b>Perfil sensorial del lote</b> con código QR para el empaque y concursos regionales.</span></li>
+        <li><span class="n">2030</span><span><b>Conexión con compradores</b> y exportadores que consultan los perfiles verificados.</span></li>
+        <li><span class="n">2031</span><span><b>Latinoamérica:</b> otros países productores con los mismos formatos SCA.</span></li>
+      </ul>
+    </div>
+    <div class="panel grid" role="tabpanel" id="p-cacao" aria-labelledby="t-cacao">
+      <div class="sp-4"><span class="tag">Quizás</span><p class="lead mt-m">Una posibilidad, no un compromiso: no está incluida en las proyecciones.</p></div>
+      <ul class="list sp-7 st-6">
+        <li><span class="n">01</span><span>La sesión a ciegas con código sirve igual para <b>evaluar cacao y chocolate</b>.</span></li>
+        <li><span class="n">02</span><span>Necesita sus <b>propios protocolos</b> de evaluación sensorial y aliados que los validen.</span></li>
+        <li><span class="n">03</span><span>Se haría solo si <b>hay demanda comprobada</b> de productores de cacao.</span></li>
+      </ul>
+    </div>
+  </div>
+  <p class="foot">Toque una pestaña o use las flechas cuando esté seleccionada.</p>
+</section>
+
+<!-- 05 ESCANER -->
+<section class="slide" data-title="Escáner sin pago por uso" data-notes="El escáner ya no usa Gemini: ahora usa Groq con Qwen, un modelo de pesos abiertos, que no tiene costo de API en el plan gratuito de Groq y además responde más rápido. La llave vive solo en el servidor, solo usuarios registrados pueden escanear y el administrador controla el gasto con un límite por usuario y la opción de pausar o apagar el escáner. El catador siempre revisa los datos antes de guardar.">
+  <div class="kicker reveal">04 · Tecnología <span>Escáner de fichas</span></div>
+  <h2 class="reveal" style="--i:1">El escáner lee la ficha en papel con un modelo abierto: $0 por ficha</h2>
+  <div class="grid content">
+    <ul class="list sp-7 reveal" style="--i:2">
+      <li><span class="n">01</span><span><b>Foto de la ficha</b> desde el celular o un archivo.</span></li>
+      <li><span class="n">02</span><span><b>Servidor seguro:</b> solo usuarios registrados; la llave nunca viaja en la app.</span></li>
+      <li><span class="n">03</span><span><b>Qwen, modelo de pesos abiertos, en Groq</b> lee casillas, escalas y notas escritas a mano.</span></li>
+      <li><span class="n">04</span><span><b>Devuelve los campos</b> de la ficha (combinada, descriptiva, afectiva o extrínseca).</span></li>
+      <li><span class="n">05</span><span><b>El catador revisa y confirma</b> antes de guardar.</span></li>
+    </ul>
+    <div class="sp-4 st-9 reveal" style="--i:3">
+      <div class="rule">
+        <p class="small">Costo por ficha escaneada</p>
+        <div class="big mt-s">$0</div>
+        <p class="body mt-m">El modelo no tiene costo de API en el plan gratuito de Groq, que además responde más rápido que la opción anterior.</p>
+      </div>
+      <div class="box mt-m"><p class="small" style="color:var(--ink)"><b>Gasto bajo control:</b> límite de escaneos por usuario y por hora, y el administrador puede pausar o apagar el escáner.</p></div>
+    </div>
+  </div>
+  <p class="foot">Antes: Gemini (Google). Ahora: Groq con un modelo Qwen de pesos abiertos.</p>
+</section>
+
+<!-- 06 FILOSOFIA -->
+<section class="slide dark" data-title="Filosofía empresarial" data-notes="Misión: qué somos hoy. Visión: dónde estaremos en 10 años. Acceso para el caficultor es un valor, no un descuento: por eso su plan es gratis.">
+  <div class="kicker reveal">05 · Filosofía empresarial <span>Lo que somos y hacia dónde vamos</span></div>
+  <div class="grid content">
+    <div class="sp-6 reveal" style="--i:1">
+      <span class="tag accent">Misión · hoy</span>
+      <p class="mt-m" style="font:500 clamp(21px,2.3cqw,36px)/1.28 var(--head);letter-spacing:-.015em">Llevar la catación de café de especialidad del papel al celular para que caficultores, catadores y compradores del Huila midan la calidad a ciegas, con datos confiables, y la conviertan en mejores precios.</p>
+    </div>
+    <div class="sp-5 st-8 reveal" style="--i:2">
+      <span class="tag" style="color:#B9BCC0">Visión · 2036</span>
+      <p class="mt-m" style="font:500 clamp(19px,1.95cqw,30px)/1.32 var(--head);color:#D6D4CF">Ser la herramienta de referencia en Latinoamérica para evaluar la calidad sensorial del café, usada desde la finca hasta el comprador.</p>
+    </div>
+  </div>
+  <div class="grid mt-l reveal" style="--i:3">
+    <div class="sp-3 rule"><div class="num">Valor</div><p class="body mt-s">Imparcialidad</p></div>
+    <div class="sp-3 rule"><div class="num">Valor</div><p class="body mt-s">Rigor técnico</p></div>
+    <div class="sp-3 rule"><div class="num">Valor</div><p class="body mt-s">Acceso para el caficultor</p></div>
+    <div class="sp-3 rule"><div class="num">Valor</div><p class="body mt-s">Protección de datos</p></div>
+  </div>
+  <p class="foot">PacamaraQs · Idea de negocio</p>
+</section>
+
+<!-- 07 ESTRATEGIA DE COSTOS -->
+<section class="slide" data-title="Económico sin desvalorizar" data-notes="Ahorrar no es pagar mal. Se ahorra en tecnología, espacio y herramientas; no en salarios, ni en el valor del software, ni en el conocimiento técnico.">
+  <div class="kicker reveal">06 · Estrategia de costos <span>Lo más económico posible</span></div>
+  <h2 class="reveal" style="--i:1">Ahorrar en herramientas, no en las personas</h2>
+  <div class="grid content">
+    <div class="sp-7 reveal" style="--i:2">
+      <p class="label mt-s" style="margin-bottom:14px">Ahorramos en</p>
+      <ul class="list">
+        <li><span class="n">01</span><span><b>Escáner con modelo abierto</b> en el plan gratuito de Groq: sin pago por ficha.</span></li>
+        <li><span class="n">02</span><span><b>Aprendices SENA</b> en etapa productiva: el equipo se forma dentro de la empresa.</span></li>
+        <li><span class="n">03</span><span><b>Tecnoparque y espacios SENA</b> en lugar de oficina; consultorio jurídico universitario.</span></li>
+        <li><span class="n">04</span><span><b>App web para iPhone</b> y plan gratuito de Supabase durante el piloto.</span></li>
+        <li><span class="n">05</span><span><b>Kit de catación básico</b>; molino y laboratorio de las cooperativas aliadas.</span></li>
+      </ul>
+    </div>
+    <div class="sp-4 st-9 reveal" style="--i:3">
+      <p class="label accent mt-s" style="margin-bottom:14px">No recortamos</p>
+      <div class="box" style="display:grid;gap:18px">
+        <p class="body"><b>Salarios formales</b> con 32 % de seguridad social y parafiscales.</p>
+        <p class="body"><b>El software ya construido</b> se reconoce como aporte de $30 M.</p>
+        <p class="body"><b>Talleres e implementación</b> se cobran: el conocimiento técnico tiene precio.</p>
+      </div>
+    </div>
+  </div>
+  <p class="foot">PacamaraQs · Idea de negocio</p>
+</section>
+
+<!-- 08 EQUIPO -->
+<section class="slide" data-title="Equipo" data-notes="El equipo arranca en el primer año con aprendices del SENA y llega a tres personas en 2028. El aprendiz de software se contrata como desarrollador junior en 2029. Los aprendices en etapa productiva reciben el 100 % del salario mínimo desde la reforma laboral.">
+  <div class="kicker reveal">07 · Equipo <span>Gastos de personal</span></div>
+  <h2 class="reveal" style="--i:1">Tres personas desde 2028, formadas con el SENA</h2>
+  <div class="grid content">
+    <div class="sp-3 rule reveal" style="--i:2"><div class="num">Ene 2027</div><h3 class="mt-s">Fundador</h3><p class="body mt-s">Gerente y desarrollador.</p><p class="price mt-m" style="font-size:clamp(24px,2cqw,32px)">$2.000.000</p></div>
+    <div class="sp-3 rule reveal" style="--i:3"><div class="num">Abr 2027</div><h3 class="mt-s">Aprendiz SENA de software</h3><p class="body mt-s">Etapa productiva, 1 SMMLV.</p><p class="price mt-m" style="font-size:clamp(24px,2cqw,32px)">$1.840.000</p></div>
+    <div class="sp-3 rule reveal" style="--i:4"><div class="num">Ene 2028</div><h3 class="mt-s">Aprendiz SENA de calidad del café</h3><p class="body mt-s">Campo, talleres y soporte.</p><p class="price mt-m" style="font-size:clamp(24px,2cqw,32px)">$1.840.000</p></div>
+    <div class="sp-3 rule reveal" style="--i:5"><div class="num">2029 · 2030</div><h3 class="mt-s">Junior y asesor comercial</h3><p class="body mt-s">El aprendiz pasa a junior; en 2030 entra un asesor que sabe catar.</p><p class="price mt-m" style="font-size:clamp(24px,2cqw,32px)">$2,4 M · $2,2 M</p></div>
+  </div>
+  <div class="box grid mt-l reveal" style="--i:6">
+    <div class="sp-4"><p class="small">Carga sobre salarios</p><p class="stat mt-s">32 %</p></div>
+    <div class="sp-4"><p class="small">Aumento anual</p><p class="stat mt-s">5 %</p></div>
+    <div class="sp-4"><p class="small">Gasto de personal 2027</p><p class="stat mt-s">$53,5 M</p></div>
+  </div>
+  <p class="foot">Salarios mensuales de 2027. SMMLV 2027 estimado: SMMLV 2026 + 5 %.</p>
+</section>
+
+<!-- 09 INVERSIONES -->
+<section class="slide" data-title="Plan de inversiones" data-notes="Los activos son pocos porque la app ya existe. El 90 % del efectivo es capital de trabajo: cubre la pérdida acumulada máxima, unos $92,6 M en mayo de 2029, y los portátiles de las contrataciones de 2028 y 2030.">
+  <div class="kicker reveal">08 · Plan de inversiones <span>Cuánto y de dónde</span></div>
+  <h2 class="reveal" style="--i:1">$110,3 M en efectivo para llegar al equilibrio en junio de 2029</h2>
+  <div class="grid content">
+    <div class="sp-7 reveal" style="--i:2">
+      <table>
+        <thead><tr><th>Concepto</th><th class="r">COP</th></tr></thead>
+        <tbody>
+          <tr><td>Activos fijos: portátil del aprendiz, celular Android de pruebas, kit de catación</td><td class="r">$5.400.000</td></tr>
+          <tr><td>Preoperativos: S.A.S., marca ante la SIC, política de datos, Google Play, talleres de lanzamiento</td><td class="r">$4.900.000</td></tr>
+          <tr><td>Capital de trabajo hasta el equilibrio (incluye portátiles de 2028 y 2030)</td><td class="r">$100.000.000</td></tr>
+          <tr class="t"><td>Inversión en efectivo</td><td class="r">$110.300.000</td></tr>
+          <tr><td>Aportes en especie: software ya desarrollado ($30 M) y portátil del fundador</td><td class="r">$32.500.000</td></tr>
+          <tr class="t"><td>Inversión total</td><td class="r">$142.800.000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="sp-4 st-9 reveal" style="--i:3">
+      <p class="label">Financiación</p>
+      <div class="splitbar mt-m">
+        <div style="width:26.3%;background:var(--ink)" data-tip="<b>Recursos propios</b> · $37,5 M (26 %)"></div>
+        <div style="width:73.7%;background:var(--accent)" data-tip="<b>Fondo Emprender</b> · $105,3 M (74 %)"></div>
+      </div>
+      <div class="rule soft mt-m"><p class="small">Recursos propios · 26 %</p><p class="stat mt-s">$37,5 M</p><p class="small mt-s">Software y portátil en especie, más $5 M en efectivo.</p></div>
+      <div class="rule soft mt-m"><p class="small accent">Recursos externos · 74 %</p><p class="stat mt-s">$105,3 M</p><p class="small mt-s">Capital semilla condonable del Fondo Emprender.</p></div>
+    </div>
+  </div>
+  <p class="foot">Detalle mensual en el anexo Excel.</p>
+</section>
+
+<!-- 10 FINANCIACION -->
+<section class="slide" data-title="Financiación en Colombia" data-notes="El Fondo Emprender es la fuente principal. Tecnoparque no da dinero, pero ahorra costos de desarrollo y asesoría. Aliados del Huila dan pilotos y clientes. Si no sale la convocatoria: crédito o crecer más despacio.">
+  <div class="kicker reveal">09 · Fuentes de financiación <span>Opciones en Colombia</span></div>
+  <h2 class="reveal" style="--i:1">El SENA financia y el Huila es el primer cliente</h2>
+  <div class="content reveal" style="--i:2">
+    <div class="tabs" role="tablist" aria-label="Fuentes de financiación">
+      <button class="tab" role="tab" aria-selected="true" aria-controls="f1" id="tf1">Fondo Emprender</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="f2" id="tf2" tabindex="-1">Tecnoparque SENA</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="f3" id="tf3" tabindex="-1">iNNpulsa</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="f4" id="tf4" tabindex="-1">Aliados del Huila</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="f5" id="tf5" tabindex="-1">Plan B</button>
+    </div>
+    <div class="panel grid on" role="tabpanel" id="f1" aria-labelledby="tf1">
+      <div class="sp-4"><div class="stat accent">$105,3 M</div><p class="small mt-s">Monto que se solicita</p></div>
+      <ul class="list sp-7 st-6">
+        <li><span class="n">01</span><span><b>Capital semilla condonable:</b> no se devuelve si se cumplen los indicadores del plan.</span></li>
+        <li><span class="n">02</span><span>En 2026 abrió <b>12 convocatorias</b> con más de $282.000 millones.</span></li>
+        <li><span class="n">03</span><span>Pide <b>vínculo con el SENA</b> (aprendiz o egresado) y metas de empleo: el equipo de aprendices ayuda.</span></li>
+      </ul>
+    </div>
+    <div class="panel grid" role="tabpanel" id="f2" aria-labelledby="tf2">
+      <div class="sp-4"><div class="stat">$0</div><p class="small mt-s">Apoyo en especie, no en dinero</p></div>
+      <ul class="list sp-7 st-6">
+        <li><span class="n">01</span><span><b>Asesoría y prototipado</b> sin costo para proyectos de innovación.</span></li>
+        <li><span class="n">02</span><span>En el Huila: <b>Tecnoparque Agroecológico Yamboró</b> (Pitalito) y FabLab SENA en Neiva.</span></li>
+        <li><span class="n">03</span><span>Sirve para <b>validar el escáner libre</b> antes de pedir el capital semilla.</span></li>
+      </ul>
+    </div>
+    <div class="panel grid" role="tabpanel" id="f3" aria-labelledby="tf3">
+      <div class="sp-4"><div class="stat">Variable</div><p class="small mt-s">Según cada convocatoria</p></div>
+      <ul class="list sp-7 st-6">
+        <li><span class="n">01</span><span><b>Capital semilla no reembolsable</b> para emprendimientos de innovación.</span></li>
+        <li><span class="n">02</span><span>Complemento si el Fondo Emprender no cubre todo el plan.</span></li>
+      </ul>
+    </div>
+    <div class="panel grid" role="tabpanel" id="f4" aria-labelledby="tf4">
+      <div class="sp-4"><div class="stat">10</div><p class="small mt-s">Pilotos gratuitos por gestionar</p></div>
+      <ul class="list sp-7 st-6">
+        <li><span class="n">01</span><span><b>Cooperativas y Comité de Cafeteros del Huila:</b> pilotos, primeros clientes y acceso a caficultores.</span></li>
+        <li><span class="n">02</span><span><b>Universidad Surcolombiana:</b> consultorio jurídico y practicantes.</span></li>
+        <li><span class="n">03</span><span><b>Gobernación del Huila:</b> convocatorias de ciencia, tecnología e innovación.</span></li>
+      </ul>
+    </div>
+    <div class="panel grid" role="tabpanel" id="f5" aria-labelledby="tf5">
+      <div class="sp-4"><div class="stat">Si no sale</div><p class="small mt-s">Alternativas</p></div>
+      <ul class="list sp-7 st-6">
+        <li><span class="n">01</span><span><b>Crédito de emprendimiento</b> por una parte del capital de trabajo.</span></li>
+        <li><span class="n">02</span><span><b>Crecer más despacio:</b> el fundador solo el primer año y aprendices desde el segundo.</span></li>
+        <li><span class="n">03</span><span><b>Licencias anuales anticipadas</b> con cooperativas para financiar la operación.</span></li>
+      </ul>
+    </div>
+  </div>
+  <p class="foot">Confirmar montos y requisitos en fondoemprender.com antes de postular.</p>
+</section>
+
+<!-- 11 INGRESOS -->
+<section class="slide" data-title="Ingresos" data-notes="Pronóstico mensual: los clientes crecen mes a mes hacia la meta de cada año, ya descontadas las cancelaciones. Las asociaciones y cooperativas son la mayor fuente. La meta de 2031 es 535 clientes pagos frente a más de 103.700 fincas en el Huila.">
+  <div class="kicker reveal">10 · Ingresos <span>Pronóstico de ventas</span></div>
+  <h2 class="reveal" style="--i:1">De $25,8 M en 2027 a $385 M en 2031</h2>
+  <div class="grid content">
+    <div class="sp-8 reveal" style="--i:2">
+      <div class="chart" data-chart="ingresos" role="img" aria-label="Ingresos por año en millones de COP: 2027 25,8; 2028 80,8; 2029 162,6; 2030 264,5; 2031 385,0"></div>
+      <div class="legend" data-legend="ingresos"></div>
+    </div>
+    <div class="sp-3 st-10 reveal" style="--i:3">
+      <div class="rule"><p class="stat accent">19,65 %</p><p class="small mt-s">de la cosecha nacional de 2025 salió del Huila, con más de 103.700 fincas en 35 municipios.</p></div>
+      <div class="rule mt-m"><p class="stat">535</p><p class="small mt-s">clientes pagos en 2031: 340 profesionales, 160 asociaciones y 35 instituciones.</p></div>
+      <div class="rule mt-m"><p class="stat">7.000</p><p class="small mt-s">caficultores usando el plan gratuito en 2031.</p></div>
+    </div>
+  </div>
+  <p class="foot">Cifras del Huila: Gobernación del Huila, vía Portafolio (2026). Toque o pase el cursor sobre las barras.</p>
+</section>
+
+<!-- 12 COSTOS -->
+<section class="slide" data-title="Costos y gastos" data-notes="El costo en ventas es bajo: nube, pasarela de pagos y el transporte de los talleres, alrededor del 10 % de los ingresos. El gasto grande es el equipo. Desde junio de 2029 cada mes deja utilidad.">
+  <div class="kicker reveal">11 · Costos y gastos <span>Millones de COP por año</span></div>
+  <h2 class="reveal" style="--i:1">El costo por cliente es bajo; el gasto grande es el equipo</h2>
+  <div class="grid content">
+    <div class="sp-8 reveal" style="--i:2">
+      <div class="chart" data-chart="resultados" role="img" aria-label="Ingresos, costos y gastos, y utilidad operacional por año"></div>
+      <div class="legend" data-legend="resultados"></div>
+    </div>
+    <div class="sp-3 st-10 reveal" style="--i:3">
+      <table>
+        <thead><tr><th>2027</th><th class="r">M COP</th></tr></thead>
+        <tbody>
+          <tr><td>Costos en ventas: nube, pasarela, talleres</td><td class="r">$3,1</td></tr>
+          <tr><td>Personal con 32 % de carga</td><td class="r">$53,5</td></tr>
+          <tr><td>Contador, transporte, marketing y otros</td><td class="r">$16,0</td></tr>
+          <tr class="t"><td>Total</td><td class="r">$72,6</td></tr>
+        </tbody>
+      </table>
+      <p class="small mt-m">Margen bruto cercano al 90 %. Todo crece 5 % al año por inflación.</p>
+    </div>
+  </div>
+  <p class="foot">Cálculo mensual 2027–2031 en el anexo Excel.</p>
+</section>
+
+<!-- 13 CONCLUSIONES -->
+<section class="slide dark" data-title="Conclusiones" data-notes="Tres cifras para cerrar: equilibrio en junio de 2029, $131 millones acumulados en cinco años y 7.000 caficultores usando la app gratis. El valor social: el caficultor que conoce su puntaje negocia mejor.">
+  <div class="kicker reveal">12 · Conclusiones <span>Importancia y oportunidad</span></div>
+  <h2 class="reveal" style="--i:1">Un negocio pequeño de operar, con impacto en la finca</h2>
+  <div class="grid content" style="flex:none">
+    <div class="sp-4 rule reveal" style="--i:2"><div class="big accent" style="font-size:clamp(40px,5.2cqw,84px)">Jun 2029</div><p class="small mt-s">Punto de equilibrio: desde el mes 30 cada mes deja utilidad.</p></div>
+    <div class="sp-4 rule reveal" style="--i:3"><div class="big" style="font-size:clamp(40px,5.2cqw,84px)">$131 M</div><p class="small mt-s">Utilidad acumulada 2027–2031, ya cubiertas las pérdidas iniciales.</p></div>
+    <div class="sp-4 rule reveal" style="--i:4"><div class="big" style="font-size:clamp(40px,5.2cqw,84px)">7.000</div><p class="small mt-s">Caficultores aprendiendo a catar con el protocolo SCA, sin pagar.</p></div>
+  </div>
+  <div class="grid mt-l reveal" style="--i:5">
+    <p class="lead sp-6" style="color:#D6D4CF"><b class="accent">Importancia.</b> El Huila produce casi uno de cada cinco sacos del país; medir bien la calidad es lo que permite cobrar por ella.</p>
+    <p class="lead sp-6" style="color:#D6D4CF"><b class="accent">Oportunidad.</b> Ingresos recurrentes, margen bruto cercano al 90 % y nuevos formatos (FNC, trazabilidad) para los mismos clientes.</p>
+  </div>
+  <p class="foot">PacamaraQs · Idea de negocio</p>
+</section>
+
+<!-- 14 RECOMENDACIONES -->
+<section class="slide" data-title="Recomendaciones" data-notes="Cierre: el producto ya funciona. Falta validar precios con clientes reales, conseguir el capital semilla y vigilar el límite del plan gratuito del escáner. Notas de la plantilla aplicadas: cálculo mensual a 5 años, 5 % de inflación y 32 % de carga sobre salarios.">
+  <div class="kicker reveal">13 · Recomendaciones <span>Próximos pasos</span></div>
+  <h2 class="reveal" style="--i:1">Lo que hay que hacer antes de vender</h2>
+  <div class="grid content">
+    <ul class="list sp-6 reveal" style="--i:2">
+      <li><span class="n">01</span><span><b>Validar precios</b> con 10 pilotos gratuitos durante 3 meses.</span></li>
+      <li><span class="n">02</span><span><b>Postular al Fondo Emprender</b> y vincular el proyecto a Tecnoparque.</span></li>
+      <li><span class="n">03</span><span><b>Medir el uso del escáner</b> y definir cuándo pasar al plan de pago de Groq.</span></li>
+    </ul>
+    <ul class="list sp-6 reveal" style="--i:3">
+      <li><span class="n">04</span><span><b>Formalizar:</b> S.A.S., marca ante la SIC y pendientes de seguridad.</span></li>
+      <li><span class="n">05</span><span><b>Conseguir los formatos oficiales</b> de la FNC; cacao solo con demanda.</span></li>
+      <li><span class="n">06</span><span><b>Aclarar</b> que aplica la metodología CVA, pero no es un producto oficial de la SCA.</span></li>
+    </ul>
+  </div>
+  <div class="box row wrap mt-m reveal" style="--i:4">
+    <span class="tag accent">Notas</span>
+    <p class="body">Cálculo mensual de 2027 a 2031 con 5 % de inflación anual y 32 % de seguridad social y parafiscales sobre salarios.</p>
+  </div>
+  <p class="foot">PacamaraQs · Idea de negocio</p>
+</section>
+
+</main>
+
+<div id="tip" role="tooltip"></div>
+<nav id="chrome" aria-label="Controles de la presentación">
+  <div id="counter" aria-live="polite"><b>01</b> / 14</div>
+  <div class="ctrl">
+    <button id="bNotes" class="opt" type="button" title="Notas del orador (N)">Notas</button>
+    <button id="bGrid" type="button" title="Vista general (G)">Índice</button>
+    <button id="bPrev" type="button" aria-label="Diapositiva anterior">&#8592;</button>
+    <button id="bNext" type="button" aria-label="Diapositiva siguiente">&#8594;</button>
+  </div>
+</nav>
+<aside id="notes" aria-live="polite"><div class="label">Notas del orador</div><div id="notesText"></div></aside>
+<div id="overview" role="dialog" aria-modal="true" aria-label="Vista general" aria-hidden="true">
+  <div class="top"><span>Vista general</span><button type="button" id="bClose">Cerrar (Esc)</button></div>
+  <div id="thumbs"></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var deck = document.getElementById('deck');
+  var slides = Array.prototype.slice.call(deck.querySelectorAll(':scope > .slide'));
+  var N = slides.length, cur = 0;
+  var $ = function (id) { return document.getElementById(id); };
+  var progress = $('progress'), counter = $('counter'), overview = $('overview'), notes = $('notes'), tip = $('tip');
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+
+  /* ---------- navegación ---------- */
+  function go(i, keepHash) {
+    i = Math.max(0, Math.min(N - 1, i));
+    slides.forEach(function (s, k) {
+      s.classList.toggle('active', k === i);
+      s.classList.toggle('before', k < i);
+      s.setAttribute('aria-hidden', k === i ? 'false' : 'true');
+      if ('inert' in s) s.inert = k !== i;
+    });
+    cur = i;
+    slides[i].scrollTop = 0;
+    document.body.setAttribute('data-theme', slides[i].classList.contains('dark') ? 'dark' : 'light');
+    progress.style.width = ((i + 1) / N * 100) + '%';
+    counter.innerHTML = '<b>' + pad(i + 1) + '</b> / ' + pad(N);
+    $('notesText').textContent = slides[i].getAttribute('data-notes') || '';
+    hideTip();
+    if (!keepHash) { try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) { /* vista previa sin historial */ } }
+  }
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+  $('bNext').addEventListener('click', next);
+  $('bPrev').addEventListener('click', prev);
+  $('bNotes').addEventListener('click', function () { notes.classList.toggle('on'); });
+
+  document.addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (overview.classList.contains('on')) {
+      if (k === 'Escape' || k === 'g' || k === 'G') toggleOverview(false);
+      return;
+    }
+    var role = e.target && e.target.getAttribute && e.target.getAttribute('role');
+    if (role === 'tab' && (k === 'ArrowLeft' || k === 'ArrowRight')) return;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Spacebar') { e.preventDefault(); next(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); prev(); }
+    else if (k === 'Home') { e.preventDefault(); go(0); }
+    else if (k === 'End') { e.preventDefault(); go(N - 1); }
+    else if (k === 'g' || k === 'G') toggleOverview(true);
+    else if (k === 'n' || k === 'N') notes.classList.toggle('on');
+    else if (k === 'Escape') notes.classList.remove('on');
+  });
+
+  /* rueda con debounce; si la diapositiva tiene scroll, primero se recorre */
+  var lastWheel = 0;
+  deck.addEventListener('wheel', function (e) {
+    if (Math.abs(e.deltaY) < 10 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    var s = slides[cur];
+    var scrollable = s.scrollHeight - s.clientHeight > 4;
+    if (scrollable) {
+      var atBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 2;
+      var atTop = s.scrollTop <= 1;
+      if ((e.deltaY > 0 && !atBottom) || (e.deltaY < 0 && !atTop)) { lastWheel = Date.now(); return; }
+    }
+    var now = Date.now();
+    if (now - lastWheel < 900) return;
+    lastWheel = now;
+    if (e.deltaY > 0) next(); else prev();
+  }, { passive: true });
+
+  /* deslizar en pantallas táctiles (solo horizontal; el vertical desplaza la diapositiva) */
+  var tx = 0, ty = 0, tt = 0;
+  deck.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; tt = Date.now(); }, { passive: true });
+  deck.addEventListener('touchend', function (e) {
+    var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Date.now() - tt < 700 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      if (e.target.closest && e.target.closest('.tabs')) return;
+      if (dx < 0) next(); else prev();
+    }
+  }, { passive: true });
+
+  /* ---------- pestañas ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('[role=tablist]'), function (list) {
+    var tabs = Array.prototype.slice.call(list.querySelectorAll('[role=tab]'));
+    function select(t) {
+      tabs.forEach(function (x) {
+        var on = x === t;
+        x.setAttribute('aria-selected', on ? 'true' : 'false');
+        x.tabIndex = on ? 0 : -1;
+        document.getElementById(x.getAttribute('aria-controls')).classList.toggle('on', on);
+      });
+      if (t.scrollIntoView) t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+    tabs.forEach(function (t, k) {
+      t.addEventListener('click', function () { select(t); });
+      t.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          var n = tabs[(k + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+          select(n); n.focus();
+        }
+      });
+    });
+  });
+
+  /* ---------- tooltip (mouse y toque) ---------- */
+  var tipEl = null;
+  function showTip(el) {
+    var r = el.getBoundingClientRect();
+    tip.innerHTML = el.getAttribute('data-tip');
+    var x = Math.min(Math.max(r.left + r.width / 2, 90), window.innerWidth - 90);
+    tip.style.left = x + 'px';
+    tip.style.top = Math.max(r.top, 44) + 'px';
+    tip.classList.add('on');
+    if (tipEl) tipEl.classList.remove('hl');
+    tipEl = el; el.classList.add('hl');
+  }
+  function hideTip() { tip.classList.remove('on'); if (tipEl) { tipEl.classList.remove('hl'); tipEl = null; } }
+  deck.addEventListener('mouseover', function (e) { var el = e.target.closest('[data-tip]'); if (el) showTip(el); });
+  deck.addEventListener('mouseout', function (e) { if (e.target.closest('[data-tip]')) hideTip(); });
+  deck.addEventListener('click', function (e) { var el = e.target.closest('[data-tip]'); if (el) showTip(el); else hideTip(); });
+  deck.addEventListener('scroll', hideTip, true);
+
+  /* ---------- gráficos (alturas en %) ---------- */
+  var YRS = ['2027', '2028', '2029', '2030', '2031'];
+  function fmt(v) {
+    var s = Math.abs(v).toFixed(1).replace('.', ',');
+    return (v < 0 ? '−' : '') + '$' + s + ' M';
+  }
+  function el(tag, cls) { var n = document.createElement(tag); if (cls) n.className = cls; return n; }
+  function axis(box, ticks, min, max) {
+    ticks.forEach(function (t) {
+      var a = el('div', 'axis' + (t === 0 ? ' zero' : ''));
+      a.style.top = ((max - t) / (max - min) * 100) + '%';
+      a.innerHTML = '<span>' + t + '</span>';
+      box.appendChild(a);
+    });
+  }
+  function legend(name, series) {
+    deck.querySelector('[data-legend="' + name + '"]').innerHTML = series.map(function (s) {
+      return '<span><i style="background:' + s.c + '"></i>' + s.n + '</span>';
+    }).join('');
+  }
+
+  (function stacked() {
+    var box = deck.querySelector('[data-chart="ingresos"]'), MAX = 400;
+    var S = [
+      { n: 'Profesional', c: '#D2CCC3', v: [5.17, 18.18, 37.67, 61.64, 88.09] },
+      { n: 'Asociación', c: '#C84B31', v: [6.92, 25.18, 54.59, 93.84, 142.29] },
+      { n: 'Institucional', c: '#1A1C1E', v: [6.50, 23.62, 47.39, 77.53, 113.01] },
+      { n: 'Talleres e implementación', c: '#8C877F', v: [7.20, 13.86, 22.93, 31.49, 41.57] }
+    ];
+    var TOT = [25.79, 80.84, 162.57, 264.50, 384.96];
+    axis(box, [0, 100, 200, 300, 400], 0, MAX);
+    var cols = el('div', 'cols'); box.appendChild(cols);
+    YRS.forEach(function (y, j) {
+      var c = el('div', 'col');
+      S.forEach(function (s) {
+        var g = el('div', 'seg');
+        g.style.height = (s.v[j] / MAX * 100) + '%';
+        g.style.background = s.c;
+        g.style.setProperty('--d', j);
+        g.setAttribute('data-tip', '<b>' + y + ' · ' + s.n + '</b> ' + fmt(s.v[j]));
+        c.appendChild(g);
+      });
+      var t = el('div', 'total'); t.style.bottom = (TOT[j] / MAX * 100) + '%'; t.textContent = fmt(TOT[j]);
+      var x = el('div', 'xl'); x.textContent = y;
+      c.appendChild(t); c.appendChild(x); cols.appendChild(c);
+    });
+    legend('ingresos', S);
+  })();
+
+  (function grouped() {
+    var box = deck.querySelector('[data-chart="resultados"]'), MAX = 400, MIN = -100, R = MAX - MIN;
+    var S = [
+      { n: 'Ingresos', c: '#1A1C1E', v: [25.79, 80.84, 162.57, 264.50, 384.96] },
+      { n: 'Costos en ventas + gastos operacionales', c: '#B7B1A8', v: [72.56, 123.11, 149.30, 209.17, 233.06] },
+      { n: 'Utilidad operacional', c: '#C84B31', v: [-46.77, -42.27, 13.27, 55.34, 151.90] }
+    ];
+    axis(box, [-100, 0, 100, 200, 300, 400], MIN, MAX);
+    var zero = MAX / R * 100;
+    var cols = el('div', 'cols'); box.appendChild(cols);
+    YRS.forEach(function (y, j) {
+      var g = el('div', 'group');
+      S.forEach(function (s, i) {
+        var v = s.v[j], b = el('div', 'gbar ' + (v >= 0 ? 'pos' : 'neg'));
+        b.style.left = (i * 35) + '%';
+        b.style.background = s.c;
+        b.style.height = (Math.abs(v) / R * 100) + '%';
+        b.style.top = (v >= 0 ? zero - v / R * 100 : zero) + '%';
+        b.style.setProperty('--d', j);
+        b.setAttribute('data-tip', '<b>' + y + ' · ' + s.n + '</b> ' + fmt(v));
+        g.appendChild(b);
+      });
+      var x = el('div', 'xl'); x.textContent = y; g.appendChild(x);
+      cols.appendChild(g);
+    });
+    legend('resultados', S);
+  })();
+
+  /* ---------- vista general ---------- */
+  var thumbs = $('thumbs');
+  function layoutThumbs() {
+    Array.prototype.forEach.call(thumbs.querySelectorAll('.frame'), function (f) {
+      f.firstChild.style.transform = 'scale(' + (f.clientWidth / 1280) + ')';
+    });
+  }
+  function buildThumbs() {
+    thumbs.innerHTML = '';
+    slides.forEach(function (s, i) {
+      var b = el('button', 'thumb' + (i === cur ? ' cur' : ''));
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Ir a la diapositiva ' + (i + 1) + ': ' + s.getAttribute('data-title'));
+      var f = el('div', 'frame'), m = el('div', 'mini');
+      var c = s.cloneNode(true);
+      c.removeAttribute('aria-hidden');
+      c.classList.add('active'); c.classList.remove('before');
+      Array.prototype.forEach.call(c.querySelectorAll('[id]'), function (n) { n.removeAttribute('id'); });
+      Array.prototype.forEach.call(c.querySelectorAll('button'), function (n) { n.tabIndex = -1; });
+      if ('inert' in c) c.inert = true;
+      m.appendChild(c); f.appendChild(m);
+      var cap = el('div', 'cap'); cap.innerHTML = '<b>' + pad(i + 1) + '</b>' + s.getAttribute('data-title');
+      b.appendChild(f); b.appendChild(cap);
+      b.addEventListener('click', function () { go(i); toggleOverview(false); });
+      thumbs.appendChild(b);
+    });
+    requestAnimationFrame(layoutThumbs);
+  }
+  function toggleOverview(on) {
+    if (on) buildThumbs();
+    hideTip();
+    overview.classList.toggle('on', on);
+    overview.setAttribute('aria-hidden', on ? 'false' : 'true');
+    if (on) setTimeout(function () { var c = thumbs.querySelector('.cur'); if (c) { c.focus(); c.scrollIntoView({ block: 'center' }); } }, 60);
+    else $('bGrid').focus();
+  }
+  $('bGrid').addEventListener('click', function () { toggleOverview(true); });
+  $('bClose').addEventListener('click', function () { toggleOverview(false); });
+  window.addEventListener('resize', function () { hideTip(); if (overview.classList.contains('on')) layoutThumbs(); });
+
+  var h = parseInt((location.hash || '').slice(1), 10);
+  go(isFinite(h) && h > 0 ? h - 1 : 0, true);
+})();
+</script>
+</body>
+</html>
