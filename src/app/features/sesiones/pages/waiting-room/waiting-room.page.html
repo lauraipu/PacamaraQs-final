@@ -47,7 +47,7 @@
       <section class="cupping-card metrics-card">
         <div class="metric-item">
           <span class="metric-label">{{ 'sala.formato' | transloco }}</span>
-          <span class="metric-value">{{ s.formato | tr }}</span>
+          <span class="metric-value">{{ tituloFormato() | tr }}</span>
         </div>
         <div class="metric-item">
           <span class="metric-label">{{ 'sala.muestras' | transloco }}</span>
@@ -57,6 +57,42 @@
           <span class="metric-label">{{ 'sala.catadores' | transloco }}</span>
           <span class="metric-value">{{ participantes().length }} / {{ s.catadoresObjetivo }}</span>
         </div>
+      </section>
+
+      <section class="cupping-card summary-card">
+        <div class="summary-card__head">
+          <h3 class="section-title">{{ 'crear.resumen_de_la_sesion' | transloco }}</h3>
+          @if (puedeEditar()) {
+            <ion-button fill="outline" size="small" class="edit-session-btn" [disabled]="editando()" (click)="editarSesion()">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              {{ 'sala.editar_sesion' | transloco }}
+            </ion-button>
+          }
+        </div>
+        <div class="summary-row"><span>{{ 'crear.nombre' | transloco }}</span><strong>{{ s.nombre }}</strong></div>
+        <div class="summary-row"><span>{{ 'crear.formato_cva' | transloco }}</span><strong>{{ tituloFormato() | tr }}</strong></div>
+        <div class="summary-row"><span>{{ 'crear.muestras' | transloco }}</span><strong>{{ s.numeroMuestras }}</strong></div>
+        <div class="summary-row"><span>{{ 'crear.catadores_objetivo' | transloco }}</span><strong>{{ s.catadoresObjetivo }}</strong></div>
+        <div class="summary-row">
+          <span>{{ 'crear.organizador_catador' | transloco }}</span>
+          <strong>{{ s.organizadorParticipa ? ('crear.si' | transloco) : ('crear.no' | transloco) }}</strong>
+        </div>
+        @if (s.notas) {
+          <div class="summary-row summary-row--block">
+            <span>{{ 'crear.notas_adicionales' | transloco }}</span>
+            <p class="session-notes">{{ s.notas }}</p>
+          </div>
+        }
+        @if (listaNombresMuestras().length > 0) {
+          <div class="summary-row summary-row--block">
+            <span>{{ 'crear.nombres_de_las_muestras' | transloco }}</span>
+            <ol class="sample-names">
+              @for (m of listaNombresMuestras(); track m.numero) {
+                <li><span class="sample-names__num">{{ m.numero }}</span> {{ m.nombre }}</li>
+              }
+            </ol>
+          </div>
+        }
       </section>
 
       @if (esOrganizador()) {
@@ -78,7 +114,7 @@
           <h3 class="section-title">
             <ion-icon name="people-outline" aria-hidden="true"></ion-icon> {{ 'sala.catadores_conectados' | transloco }}
           </h3>
-          <span class="list-subtitle">{{ 'sala.listos_min_para_iniciar' | transloco: { p0: (participantesListos()), p1: (MINIMO_CATADORES) } }}</span>
+          <span class="list-subtitle">{{ 'sala.listos_recomendado' | transloco: { p0: (participantesListos()), p1: (CATADORES_RECOMENDADOS) } }}</span>
         </div>
 
         @if (participantesEnSala().length > 0) {
@@ -117,7 +153,7 @@
           </ion-list>
         } @else {
           <div class="empty-state">
-            {{ 'sala.esperando_que_se_unan' | transloco: { p0: (MINIMO_CATADORES) } }}
+            {{ 'sala.esperando_que_se_unan' | transloco: { p0: (CATADORES_RECOMENDADOS) } }}
           </div>
         }
       </section>
@@ -159,6 +195,12 @@
 
       @if (esOrganizador() && s.estado === EstadoSesion.EN_ESPERA) {
         <div class="start-button-container">
+          @if (faltanListos() === 0 && !panelRecomendado()) {
+            <p class="recommendation-hint" role="note">
+              <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+              {{ 'sala.recomendacion_panel' | transloco }}
+            </p>
+          }
           <ion-button expand="block" class="primary-btn" (click)="iniciarCata()" [disabled]="!puedeIniciar()">
             @if (iniciando()) {
               {{ 'sala.iniciando' | transloco }}

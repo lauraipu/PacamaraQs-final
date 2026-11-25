@@ -33,7 +33,7 @@
           </div>
           <div class="od-stepper">
             <ion-button fill="outline" size="small" [disabled]="muestraGuiada() <= 1" (click)="guiarPanel(-1)">←</ion-button>
-            <span class="od-stepper__value">{{ 'monitoreo.muestra' | transloco: { p0: (muestraGuiada()) } }}</span>
+            <span class="od-stepper__value">{{ nombresMuestras().get(muestraGuiada()) || ('monitoreo.muestra' | transloco: { p0: (muestraGuiada()) }) }}</span>
             <ion-button fill="outline" size="small" [disabled]="muestraGuiada() >= numeroMuestras()" (click)="guiarPanel(1)">
               <ion-icon name="play-forward-outline" [attr.aria-label]="'monitoreo.siguiente_muestra' | transloco"></ion-icon>
             </ion-button>
@@ -49,7 +49,10 @@
               <tr>
                 <th scope="col">{{ 'monitoreo.catador' | transloco }}</th>
                 @for (n of muestras(); track n) {
-                  <th scope="col">M{{ n }}</th>
+                  <th scope="col" [attr.title]="nombresMuestras().get(n) || null">
+                    M{{ n }}
+                    @if (nombresMuestras().get(n); as nombre) { <span class="od-sample-name">{{ nombre }}</span> }
+                  </th>
                 }
               </tr>
             </thead>

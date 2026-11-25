@@ -47,3 +47,15 @@
   .od-table th, .od-table td { padding: 6px 4px; }
   .od-guide > * { flex: 1 1 100%; }
 }
+
+.od-sample-name {
+  display: block;
+  max-width: 96px;
+  margin: 2px auto 0;
+  overflow: hidden;
+  color: var(--app-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

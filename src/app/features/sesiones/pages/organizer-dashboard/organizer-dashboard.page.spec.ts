@@ -70,7 +70,10 @@ describe('OrganizerDashboardPage', () => {
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ id: 'session-id' }) } } },
         {
           provide: SesionesRepository,
-          useValue: { obtenerSesionPorId, obtenerProgresoPanel, forzarCierreMuestra, finalizarSesionForzado }
+          useValue: {
+            obtenerSesionPorId, obtenerProgresoPanel, forzarCierreMuestra, finalizarSesionForzado,
+            obtenerNombresMuestras: vi.fn().mockResolvedValue(new Map())
+          }
         },
         { provide: AuthService, useValue: { usuario, asegurarInicializado: vi.fn().mockResolvedValue(undefined) } },
         { provide: RealtimeService, useValue: { abrirSala, liberarSala } },

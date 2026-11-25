@@ -209,7 +209,7 @@
     "desconectado_2": "Desconectado · {{p0}}",
     "listo": "Listo",
     "conectado": "Conectado",
-    "esperando_que_se_unan": "Esperando que se unan al menos {{p0}} catadores.",
+    "esperando_que_se_unan": "Esperando que se unan catadores (se recomiendan al menos {{p0}}).",
     "evaluacion_100_ciega": "Evaluación 100% ciega.",
     "no_veras_puntajes_ni": "No verás puntajes ni evaluaciones de otros catadores. El panel se cierra automáticamente cuando el último catador termina.",
     "estoy_listo_tocar_para": "Estoy listo · tocar para cancelar",
@@ -219,7 +219,10 @@
     "iniciando": "Iniciando…",
     "faltan_catador_es_listo": "Faltan {{p0}} catador(es) listo(s)",
     "iniciar_cata_catadores_listos": "Iniciar cata · {{p0}} catadores listos",
-    "iniciar_y_monitorear_catadores": "Iniciar y monitorear · {{p0}} catadores listos"
+    "iniciar_y_monitorear_catadores": "Iniciar y monitorear · {{p0}} catadores listos",
+    "editar_sesion": "Editar sesión",
+    "listos_recomendado": "{{p0}} listos · se recomiendan {{p1}} o más (impar)",
+    "recomendacion_panel": "Se recomienda un panel de al menos 3 catadores y en número impar. Puedes iniciar igual."
   },
   "crear": {
     "crear_sesion": "Crear sesión",
@@ -242,7 +245,7 @@
     "participaras_como_catador": "¿Participarás como catador?",
     "tu_evaluacion_contara_igual": "Tu evaluación contará igual en el promedio recortado del panel.",
     "participar_como_catador": "Participar como catador",
-    "la_sesion_requiere_minimo": "La sesión requiere mínimo 3 catadores para iniciar. El código expira cuando el organizador inicia la cata.",
+    "la_sesion_requiere_minimo": "Se recomienda un panel de al menos 3 catadores y en número impar; la cata puede iniciar desde 1 catador listo. El código expira cuando el organizador inicia la cata.",
     "evaluacion_individual": "Evaluación individual",
     "el_formato_extrinseco_no": "El formato extrínseco no usa código de acceso: registras tú mismo la ficha técnica del café (origen, proceso y comercialización). Al enviarla, la sesión se cierra y puedes ver o exportar la ficha.",
     "codigo_de_sesion": "Código de sesión",
@@ -263,7 +266,12 @@
     "generar_codigo_de_acceso": "Generar código de acceso →",
     "salir": "Salir",
     "ir_a_la_evaluacion": "Ir a la evaluación →",
-    "ir_a_sala_de": "Ir a sala de espera →"
+    "ir_a_sala_de": "Ir a sala de espera →",
+    "recomendacion_catadores": "Recomendado: al menos 3 catadores y en número impar (3, 5, 7…) para evitar empates. Puedes iniciar desde 1.",
+    "nombres_de_las_muestras": "Nombres de las muestras (opcional)",
+    "nombres_muestras_ayuda": "Dale a cada muestra el nombre que quieras (lote, finca, código…). Si lo dejas vacío se mostrará como \"Muestra N\".",
+    "cata_individual_sin_sala": "Serás el único catador: la cata iniciará de inmediato, sin sala de espera ni código.",
+    "crear_e_iniciar_cata": "Crear e iniciar cata →"
   },
   "afectivo": {
     "volver": "Volver",
@@ -1374,7 +1382,20 @@
     "alcanzaste_el_maximo_de_sesiones_13x1y1p": "Alcanzaste el máximo de sesiones abiertas. Termina o elimina una antes de crear otra.",
     "la_base_de_datos_llego_al_limite_13yuqo4": "La base de datos llegó al límite configurado. No se pueden crear sesiones nuevas.",
     "el_escaner_esta_desactivado_por_11mzrpg": "El escáner está desactivado por el administrador.",
-    "los_registros_estan_cerrados_por_17rzf5k": "Los registros están cerrados por el administrador."
+    "los_registros_estan_cerrados_por_17rzf5k": "Los registros están cerrados por el administrador.",
+    "muestra_guardada_como_borrador_p_1kbdsqk": "Muestra guardada como borrador. Puedes completarla cuando quieras.",
+    "sesion_actualizada_1jbqfbr": "Sesión actualizada.",
+    "panel_fuera_de_lo_recomendado_14z3sxf": "Panel fuera de lo recomendado",
+    "esperar_e7gusr": "Esperar",
+    "iniciar_430v7q": "Iniciar",
+    "hay_p0_catador_es_listo_s_se_rec_1j2qjo3": "Hay {{p0}} catador(es) listo(s). Se recomienda un panel de al menos 3 catadores y en número impar (3, 5, 7…). ¿Iniciar de todos modos?",
+    "se_necesita_al_menos_1_catador_l_1k5lbdx": "Se necesita al menos 1 catador listo para iniciar.",
+    "no_se_pudo_guardar_la_sesion_phv90s": "No se pudo guardar la sesión.",
+    "nombre_8fqbls": "Nombre",
+    "la_sesion_ya_inicio_no_se_puede_hudrcv": "La sesión ya inició: no se puede editar.",
+    "solo_el_organizador_puede_editar_11yp6jb": "Solo el organizador puede editar la sesión.",
+    "los_catadores_objetivo_deben_ser_mor2wv": "Los catadores objetivo deben ser al menos 1.",
+    "el_formato_y_el_numero_de_muestr_1a3z42i": "El formato y el número de muestras solo se pueden cambiar desde la sala de espera, antes de iniciar."
   },
   "config": {
     "titulo": "Configuración",
@@ -1462,7 +1483,10 @@
     "enviar": "Enviar",
     "salir_titulo": "¿Salir de la evaluación?",
     "salir_mensaje": "Tu avance queda guardado en este dispositivo y podrás continuar después.",
-    "salir": "Salir"
+    "salir": "Salir",
+    "muestras": "Muestras",
+    "muestra_n": "Muestra {{p0}}",
+    "nombre_de_la_muestra_n": "Nombre de la muestra {{p0}}"
   },
   "guias": {
     "comun": {
@@ -1563,5 +1587,12 @@
         "texto": "Elige el idioma, el tamaño del texto, el alto contraste y reduce las animaciones si lo necesitas."
       }
     }
+  },
+  "editar": {
+    "titulo": "Editar sesión",
+    "cancelar": "Cancelar",
+    "guardar": "Guardar cambios",
+    "aviso_formato": "Al cambiar el formato, todos los catadores usarán el nuevo formulario al iniciar.",
+    "individual_iniciar": "Serás el único catador: puedes iniciar la cata en cuanto guardes."
   }
 }

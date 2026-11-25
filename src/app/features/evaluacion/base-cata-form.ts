@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { EstadoSesion, getFormatoById } from '@domain/sesion/sesion.model';
+import { EstadoSesion, getFormatoById, nombreDeMuestra } from '@domain/sesion/sesion.model';
 import { AuthService } from '@core/auth/auth.service';
 import { EvaluacionAtributo, FichaEvaluacion, OfflineSyncService } from '@core/data-access/evaluaciones/cola-offline.service';
 import { EventoSala, RealtimeService, SalaRealtime } from '@core/realtime/sala-realtime.service';
@@ -22,8 +22,11 @@ const ATRIBUTOS_HEDONICOS = new Set([
  * Offline-first:
  *  · Cada cambio (input, slider, botón) se guarda al instante en localStorage
  *    bajo `borrador_sesion_{id}_{muestra}`.
- *  · "Siguiente" envía la ficha de la muestra por OfflineSyncService (UPSERT
- *    idempotente). Sin red: "Guardado localmente. Reintentando…" + backoff.
+ *  · Las muestras se pueden llenar en cualquier orden (selector de muestras).
+ *    "Siguiente" envía la ficha si está completa (UPSERT idempotente por
+ *    OfflineSyncService); si no, la deja como borrador y avanza. Solo
+ *    "Terminar" exige que todas las muestras abiertas estén completas.
+ *    Sin red: "Guardado localmente. Reintentando…" + backoff.
  *  · Al reabrir (o en otro dispositivo) se restaura: borrador local > ficha
  *    ya enviada (columna `notas`) > formulario vacío.
  *
@@ -60,6 +63,11 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
   readonly muestrasCerradas = signal<ReadonlySet<number>>(new Set());
   readonly muestrasEnviadas = signal<ReadonlySet<number>>(new Set());
   readonly esperandoSincronizacion = signal(false);
+  /** Nombres que el organizador dio a las muestras (número → nombre). */
+  readonly nombresMuestras = signal<ReadonlyMap<number, string>>(new Map());
+  /** Muestras con todos los atributos obligatorios (enviadas o no). */
+  readonly muestrasCompletas = signal<ReadonlySet<number>>(new Set());
+  readonly nombreMuestraActual = computed(() => nombreDeMuestra(this.nombresMuestras(), this.muestraActual()));
 
   private readonly sesionIdActual = signal('');
 
@@ -150,14 +158,16 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
       }
 
       const total = Math.max(1, sesion.numeroMuestras);
-      const [cerradas, enviadas] = await Promise.all([
+      const [cerradas, enviadas, nombres] = await Promise.all([
         this.sesionService.obtenerMuestrasCerradas(this.sesionId),
         this.offlineSync.obtenerFichasEnviadas(this.sesionId).catch(error => {
           console.warn('[CVA] No se pudieron leer las fichas enviadas:', error);
           return [];
-        })
+        }),
+        this.sesionService.obtenerNombresMuestras(this.sesionId)
       ]);
       if (this.destruido) return;
+      this.nombresMuestras.set(nombres);
 
       const notasPorMuestra = new Map(enviadas.map(f => [f.numeroMuestra, f.notas]));
       this.totalMuestras.set(total);
@@ -166,6 +176,7 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
       this.respuestas = Array.from({ length: total }, (_, indice) =>
         this.restaurarRespuesta(indice + 1, notasPorMuestra.get(indice + 1) ?? null)
       );
+      this.refrescarCompletas();
 
       const primeraAbierta = Array.from({ length: total }, (_, i) => i + 1)
         .find(n => !this.muestrasEnviadas().has(n) && !this.muestrasCerradas().has(n)) ?? 1;
@@ -195,25 +206,30 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
   // Navegación entre muestras
   // ---------------------------------------------------------------------------
 
+  /**
+   * Avanza a la siguiente muestra. No obliga a terminar la actual: si está
+   * completa se envía; si no, queda en borrador para completarla después.
+   */
   async irAMuestraSiguiente(): Promise<void> {
     if (this.guardando()) return;
     const actual = this.muestraActual();
+    const siguiente = this.siguienteMuestraAbierta(actual);
 
     if (!this.muestrasCerradas().has(actual)) {
-      if (!this.esRespuestaCompleta(this.formulario)) {
-        await this.mostrarAvisoCalificacionIncompleta();
-        return;
-      }
-      this.guardando.set(true);
-      try {
-        const resultado = await this.enviarMuestra(actual);
-        if (resultado === 'rechazada') return;
-      } finally {
-        this.guardando.set(false);
+      if (this.esRespuestaCompleta(this.formulario)) {
+        this.guardando.set(true);
+        try {
+          const resultado = await this.enviarMuestra(actual);
+          if (resultado === 'rechazada') return;
+        } finally {
+          this.guardando.set(false);
+        }
+      } else if (siguiente !== null) {
+        this.guardarBorradorActual();
+        await this.mostrarToast('Muestra guardada como borrador. Puedes completarla cuando quieras.', 'dark');
       }
     }
 
-    const siguiente = this.siguienteMuestraAbierta(actual);
     if (siguiente === null) {
       await this.finalizarCata();
       return;
@@ -226,6 +242,19 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
     if (actual <= 1) return;
     this.guardarBorradorActual();
     this.mostrarMuestra(actual - 1);
+  }
+
+  /** Salta directo a cualquier muestra (selector de muestras). */
+  irAMuestra(numeroMuestra: number): void {
+    if (this.guardando() || numeroMuestra === this.muestraActual()) return;
+    if (numeroMuestra < 1 || numeroMuestra > this.totalMuestras()) return;
+    this.guardarBorradorActual();
+    this.mostrarMuestra(numeroMuestra);
+  }
+
+  /** "Muestra 3" o el nombre que le dio el organizador. */
+  nombreMuestra(numeroMuestra: number): string | null {
+    return nombreDeMuestra(this.nombresMuestras(), numeroMuestra);
   }
 
   async finalizarCata(): Promise<void> {
@@ -413,12 +442,14 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
 
   private async resincronizar(): Promise<void> {
     try {
-      const [sesion, cerradas] = await Promise.all([
+      const [sesion, cerradas, nombres] = await Promise.all([
         this.sesionService.obtenerSesionPorId(this.sesionId),
-        this.sesionService.obtenerMuestrasCerradas(this.sesionId)
+        this.sesionService.obtenerMuestrasCerradas(this.sesionId),
+        this.sesionService.obtenerNombresMuestras(this.sesionId)
       ]);
       if (this.destruido) return;
       this.muestrasCerradas.set(new Set(cerradas));
+      this.nombresMuestras.set(nombres);
 
       if (!sesion || sesion.estado === EstadoSesion.FINALIZADA || sesion.estado === EstadoSesion.CANCELADA) {
         this.guardarBorradorActual();
@@ -457,6 +488,18 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
   private guardarBorradorActual(): void {
     if (!this.sesionId || this.cargando() || this.muestrasCerradas().has(this.muestraActual())) return;
     this.offlineSync.guardarBorrador(this.sesionId, this.muestraActual(), this.formulario);
+    this.refrescarCompletas();
+  }
+
+  private refrescarCompletas(): void {
+    const completas = new Set<number>();
+    this.respuestas.forEach((respuesta, indice) => {
+      if (respuesta && this.esRespuestaCompleta(respuesta)) completas.add(indice + 1);
+    });
+    const previas = this.muestrasCompletas();
+    if (completas.size !== previas.size || [...completas].some(n => !previas.has(n))) {
+      this.muestrasCompletas.set(completas);
+    }
   }
 
   private restaurarRespuesta(numeroMuestra: number, notasServidor: string | null): T {

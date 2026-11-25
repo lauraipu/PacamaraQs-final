@@ -21,20 +21,27 @@ import {
   ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { checkmarkCircle, informationCircleOutline } from 'ionicons/icons';
-import { EstadoSesion, FormatoCva, Sesion } from '@domain/sesion/sesion.model';
+import { checkmarkCircle, informationCircleOutline, warningOutline } from 'ionicons/icons';
+import { catadoresSonRecomendados, EstadoSesion, FormatoCva, normalizarNombresMuestras, Sesion } from '@domain/sesion/sesion.model';
+import { NombresMuestrasComponent } from '../../ui/nombres-muestras/nombres-muestras.component';
 import { AuthService } from '@core/auth/auth.service';
 import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { TrPipe } from '@core/i18n/tr';
-addIcons({ checkmarkCircle, informationCircleOutline });
+addIcons({ checkmarkCircle, informationCircleOutline, warningOutline });
+
+const RUTAS_FORMULARIO: Readonly<Record<string, string>> = {
+  combinado: 'combined-form',
+  afectivo: 'affective-form',
+  descriptivo: 'descriptive-form'
+};
 
 @Component({
   selector: 'app-create-session',
   templateUrl: './create-session.page.html',
   styleUrls: ['./create-session.page.scss'],
   standalone: true,
-  imports: [TrPipe, TranslocoPipe, 
+  imports: [TrPipe, TranslocoPipe, NombresMuestrasComponent,
     IonBackButton,
     IonButton,
     IonButtons,
@@ -65,6 +72,8 @@ export class CreateSessionPage {
   numeroMuestras = 6;
   catadoresObjetivo = 5;
   participaComoCatador = true;
+  /** Nombre opcional de cada muestra (índice 0 = muestra 1). */
+  nombresMuestras: string[] = Array.from({ length: 20 }, () => '');
   codigoGenerado = '';
   sesionIdGenerado = '';
   copiado = false;
@@ -102,6 +111,25 @@ export class CreateSessionPage {
   private readonly toastController = inject(ToastController);
   private readonly transloco = inject(TranslocoService);
 
+  /** 3 o más e impar: se recomienda, pero se puede iniciar desde 1. */
+  catadoresRecomendados(): boolean {
+    return catadoresSonRecomendados(this.catadoresObjetivo);
+  }
+
+  nombresConfigurados(): string[] {
+    return normalizarNombresMuestras(this.nombresMuestras, this.numeroMuestras).filter(n => n);
+  }
+
+  /**
+   * Un solo catador y es el propio organizador: no hay a quién esperar, así
+   * que la cata se inicia al crearla y se abre el formulario directamente.
+   */
+  esCataIndividual(): boolean {
+    return this.formatoSeleccionado !== FormatoCva.EXTRINSECA.id
+      && this.catadoresObjetivo === 1
+      && this.participaComoCatador;
+  }
+
   getTituloFormato(): string {
     return this.formatosList.find(formato => formato.id === this.formatoSeleccionado)?.titulo ?? '';
   }
@@ -126,15 +154,18 @@ export class CreateSessionPage {
         notas: this.notasSesion.trim(),
         formato: this.formatoSeleccionado,
         numeroMuestras: esExtrinseco ? 1 : this.numeroMuestras,
-        catadoresObjetivo: esExtrinseco ? 3 : this.catadoresObjetivo,
+        catadoresObjetivo: esExtrinseco ? 1 : this.catadoresObjetivo,
         organizadorId: user.id, // informativo: el servidor usa auth.uid()
         organizadorParticipa: esExtrinseco ? false : this.participaComoCatador,
-        estado: EstadoSesion.EN_ESPERA
+        estado: EstadoSesion.EN_ESPERA,
+        nombresMuestras: esExtrinseco ? [] : normalizarNombresMuestras(this.nombresMuestras, this.numeroMuestras)
       };
 
       const creada = await this.sesionService.crearSesion(nuevaSesion);
       this.codigoGenerado = creada.codigoAcceso;
       this.sesionIdGenerado = creada.id;
+
+      if (!esExtrinseco && this.esCataIndividual() && await this.iniciarCataIndividual(creada)) return;
       this.pasoActual = 2;
       this.changeDetector.detectChanges();
 
@@ -146,6 +177,20 @@ export class CreateSessionPage {
     } finally {
       this.isLoading = false;
       this.changeDetector.detectChanges();
+    }
+  }
+
+  /** Devuelve true si la cata quedó iniciada y se abrió el formulario. */
+  private async iniciarCataIndividual(sesion: Sesion): Promise<boolean> {
+    try {
+      await this.sesionService.iniciarSesion(sesion.id);
+      const ruta = RUTAS_FORMULARIO[sesion.formato] ?? RUTAS_FORMULARIO['combinado'];
+      return await this.router.navigateByUrl(`/${ruta}/${sesion.id}`, { replaceUrl: true });
+    } catch (error) {
+      // La sesión ya existe: se sigue al paso 2 y se puede iniciar desde la sala de espera.
+      console.warn('[CrearSesion] No se pudo iniciar la cata individual:', error);
+      this.error = this.mensajeError(error);
+      return false;
     }
   }
 

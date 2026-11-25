@@ -10,6 +10,7 @@ describe('CreateSessionPage', () => {
   let fixture: ComponentFixture<CreateSessionPage>;
   const crearSesion = vi.fn();
   const getUser = vi.fn();
+  const iniciarSesion = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -19,7 +20,7 @@ describe('CreateSessionPage', () => {
         provideRouter([]),
         { provide: ToastController, useValue: { create: vi.fn().mockResolvedValue({ present: vi.fn() }) } },
         { provide: AuthService, useValue: { getUser } },
-        { provide: SesionesRepository, useValue: { crearSesion } }
+        { provide: SesionesRepository, useValue: { crearSesion, iniciarSesion } }
       ]
     });
     fixture = TestBed.createComponent(CreateSessionPage);
@@ -69,6 +70,57 @@ describe('CreateSessionPage', () => {
     expect(component.error).toBeNull();
   });
 
+  it('sends the sample names and allows a single target cupper', async () => {
+    getUser.mockResolvedValue({ user: { id: 'user-id', email: 'organizer@example.com', user_metadata: {} } });
+    crearSesion.mockImplementation(async session => ({ ...session, id: 'session-id', codigoAcceso: 'AB12-3C4' }));
+
+    component.nombreSesion = 'Cosecha';
+    component.numeroMuestras = 2;
+    component.catadoresObjetivo = 1;
+    component.participaComoCatador = false;
+    component.nombresMuestras[0] = '  Pacamara Huila ';
+    expect(component.catadoresRecomendados()).toBe(false);
+
+    await component.generarCodigo();
+
+    expect(crearSesion).toHaveBeenCalledWith(expect.objectContaining({
+      numeroMuestras: 2,
+      catadoresObjetivo: 1,
+      nombresMuestras: ['Pacamara Huila', '']
+    }));
+  });
+
+  it('skips the waiting room when the organizer is the only cupper', async () => {
+    getUser.mockResolvedValue({ user: { id: 'user-id', email: 'organizer@example.com', user_metadata: {} } });
+    crearSesion.mockImplementation(async session => ({ ...session, id: 'session-id', codigoAcceso: 'AB12-3C4' }));
+    iniciarSesion.mockResolvedValue(undefined);
+    const navigateByUrl = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+
+    component.nombreSesion = 'Cata personal';
+    component.formatoSeleccionado = 'afectivo';
+    component.catadoresObjetivo = 1;
+    component.participaComoCatador = true;
+    expect(component.esCataIndividual()).toBe(true);
+
+    await component.generarCodigo();
+
+    expect(iniciarSesion).toHaveBeenCalledWith('session-id');
+    expect(navigateByUrl).toHaveBeenCalledWith('/affective-form/session-id', { replaceUrl: true });
+  });
+
+  it('keeps the waiting room when the single cupper is someone else', async () => {
+    getUser.mockResolvedValue({ user: { id: 'user-id', email: 'organizer@example.com', user_metadata: {} } });
+    crearSesion.mockImplementation(async session => ({ ...session, id: 'session-id', codigoAcceso: 'AB12-3C4' }));
+
+    component.nombreSesion = 'Cata';
+    component.catadoresObjetivo = 1;
+    component.participaComoCatador = false;
+    await component.generarCodigo();
+
+    expect(iniciarSesion).not.toHaveBeenCalled();
+    expect(component.pasoActual).toBe(2);
+  });
+
   it('creates extrinsic sessions with valid defaults', async () => {
     getUser.mockResolvedValue({ user: { id: 'user-id', email: 'organizer@example.com', user_metadata: {} } });
     crearSesion.mockImplementation(async session => ({ ...session, id: 'session-id', codigoAcceso: 'AB12-3C4' }));
@@ -84,7 +136,7 @@ describe('CreateSessionPage', () => {
     expect(crearSesion).toHaveBeenCalledWith(expect.objectContaining({
       formato: 'extrinseca',
       numeroMuestras: 1,
-      catadoresObjetivo: 3,
+      catadoresObjetivo: 1,
       organizadorParticipa: false
     }));
   });

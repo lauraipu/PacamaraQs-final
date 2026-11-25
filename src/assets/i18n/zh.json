@@ -209,7 +209,7 @@
     "desconectado_2": "已断开 · {{p0}}",
     "listo": "就绪",
     "conectado": "已连接",
-    "esperando_que_se_unan": "等待至少 {{p0}} 名杯测师加入。",
+    "esperando_que_se_unan": "等待杯测师加入（建议至少 {{p0}} 人）。",
     "evaluacion_100_ciega": "100% 盲评。",
     "no_veras_puntajes_ni": "你不会看到其他杯测师的分数或评估。最后一位杯测师完成后，小组会自动关闭。",
     "estoy_listo_tocar_para": "已就绪 · 点按取消",
@@ -219,7 +219,10 @@
     "iniciando": "正在开始…",
     "faltan_catador_es_listo": "还需 {{p0}} 名杯测师就绪",
     "iniciar_cata_catadores_listos": "开始杯测 · {{p0}} 人就绪",
-    "iniciar_y_monitorear_catadores": "开始并监控 · {{p0}} 人就绪"
+    "iniciar_y_monitorear_catadores": "开始并监控 · {{p0}} 人就绪",
+    "editar_sesion": "编辑会话",
+    "listos_recomendado": "{{p0}} 人就绪 · 建议 {{p1}} 人或以上（奇数）",
+    "recomendacion_panel": "建议杯测小组至少 3 人且为奇数。仍可直接开始。"
   },
   "crear": {
     "crear_sesion": "创建会话",
@@ -242,7 +245,7 @@
     "participaras_como_catador": "你会作为杯测师参与吗？",
     "tu_evaluacion_contara_igual": "你的评估将同等计入小组的截尾平均值。",
     "participar_como_catador": "作为杯测师参与",
-    "la_sesion_requiere_minimo": "会话至少需要 3 名杯测师才能开始。组织者开始杯测后代码将失效。",
+    "la_sesion_requiere_minimo": "建议杯测小组至少 3 人且为奇数；只要有 1 名杯测师准备就绪即可开始。组织者开始杯测后代码失效。",
     "evaluacion_individual": "个人评估",
     "el_formato_extrinseco_no": "外在格式不使用访问代码：由你本人记录咖啡的技术资料（产地、处理和贸易）。提交后会话关闭，你可以查看或导出该资料。",
     "codigo_de_sesion": "会话代码",
@@ -263,7 +266,12 @@
     "generar_codigo_de_acceso": "生成访问代码 →",
     "salir": "退出",
     "ir_a_la_evaluacion": "前往评估 →",
-    "ir_a_sala_de": "前往等候室 →"
+    "ir_a_sala_de": "前往等候室 →",
+    "recomendacion_catadores": "建议：至少 3 名杯测师，且为奇数（3、5、7…）以避免平局。最少 1 名即可开始。",
+    "nombres_de_las_muestras": "样品名称（可选）",
+    "nombres_muestras_ayuda": "可为每个样品命名（批次、庄园、编号…）。留空则显示为“样品 N”。",
+    "cata_individual_sin_sala": "你将是唯一的杯测师：杯测会立即开始，无需等候室和代码。",
+    "crear_e_iniciar_cata": "创建并开始杯测 →"
   },
   "afectivo": {
     "volver": "返回",
@@ -1374,7 +1382,20 @@
     "alcanzaste_el_maximo_de_sesiones_13x1y1p": "你的进行中会话已达上限。请先结束或删除一个再创建新的。",
     "la_base_de_datos_llego_al_limite_13yuqo4": "数据库已达到设定上限，无法创建新会话。",
     "el_escaner_esta_desactivado_por_11mzrpg": "扫描器已被管理员关闭。",
-    "los_registros_estan_cerrados_por_17rzf5k": "管理员已关闭注册。"
+    "los_registros_estan_cerrados_por_17rzf5k": "管理员已关闭注册。",
+    "muestra_guardada_como_borrador_p_1kbdsqk": "样品已保存为草稿，可随时继续填写。",
+    "sesion_actualizada_1jbqfbr": "会话已更新。",
+    "panel_fuera_de_lo_recomendado_14z3sxf": "杯测小组人数不在建议范围内",
+    "esperar_e7gusr": "等待",
+    "iniciar_430v7q": "开始",
+    "hay_p0_catador_es_listo_s_se_rec_1j2qjo3": "已有 {{p0}} 名杯测师就绪。建议杯测小组至少 3 人且为奇数（3、5、7…）。仍要开始吗？",
+    "se_necesita_al_menos_1_catador_l_1k5lbdx": "至少需要 1 名就绪的杯测师才能开始。",
+    "no_se_pudo_guardar_la_sesion_phv90s": "无法保存会话。",
+    "nombre_8fqbls": "名称",
+    "la_sesion_ya_inicio_no_se_puede_hudrcv": "会话已开始，无法编辑。",
+    "solo_el_organizador_puede_editar_11yp6jb": "只有组织者可以编辑会话。",
+    "los_catadores_objetivo_deben_ser_mor2wv": "目标杯测师人数至少为 1。",
+    "el_formato_y_el_numero_de_muestr_1a3z42i": "格式和样品数量只能在开始前于等候室中修改。"
   },
   "config": {
     "titulo": "设置",
@@ -1462,7 +1483,10 @@
     "enviar": "提交",
     "salir_titulo": "要退出评估吗？",
     "salir_mensaje": "您的进度已保存在本设备上，可以稍后继续。",
-    "salir": "退出"
+    "salir": "退出",
+    "muestras": "样品",
+    "muestra_n": "样品 {{p0}}",
+    "nombre_de_la_muestra_n": "样品 {{p0}} 的名称"
   },
   "guias": {
     "comun": {
@@ -1563,5 +1587,12 @@
         "texto": "选择语言、文字大小、高对比度，并按需减少动画。"
       }
     }
+  },
+  "editar": {
+    "titulo": "编辑会话",
+    "cancelar": "取消",
+    "guardar": "保存更改",
+    "aviso_formato": "更改格式后，开始时所有杯测师都将使用新表单。",
+    "individual_iniciar": "你将是唯一的杯测师：保存后即可开始杯测。"
   }
 }

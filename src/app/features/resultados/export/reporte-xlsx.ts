@@ -140,6 +140,7 @@ function hojaResumen(libro: Workbook, r: SessionResults, fichas: Fila[], formato
   const h = libro.addWorksheet(tr('Resumen por muestra'));
   h.columns = [
     { header: tr('Muestra'), key: 'muestra', width: 9 },
+    { header: tr('Nombre'), key: 'nombreMuestra', width: 22 },
     { header: tr('Nivel de tueste'), key: 'tueste', width: 15 },
     { header: tr('Promedio panel'), key: 'promedio', width: 15, style: { numFmt: '0.00' } },
     { header: tr('Desv. estándar'), key: 'desv', width: 14, style: { numFmt: '0.00' } },
@@ -167,6 +168,7 @@ function hojaResumen(libro: Workbook, r: SessionResults, fichas: Fila[], formato
 
     h.addRow({
       muestra: m.numeroMuestra,
+      nombreMuestra: r.nombresMuestras?.[m.numeroMuestra] ?? '',
       tueste: m.nivelTueste ?? '',
       promedio: usaPuntaje ? m.puntajePromedioPanel : null,
       desv: usaPuntaje ? m.desviacionEstandar : null,

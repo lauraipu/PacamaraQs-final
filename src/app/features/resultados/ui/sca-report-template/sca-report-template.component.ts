@@ -39,6 +39,8 @@ export class ScaReportTemplateComponent {
   @Input() fichasTecnicas: readonly FichaTecnica[] = [];
   @Input() objetivo = '';
   @Input() fecha = '';
+  /** Nombre que el organizador dio a cada muestra (número → nombre). */
+  @Input() nombresMuestras: Record<number, string> = {};
 
   readonly escala9 = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
   readonly descriptoresSca = DESCRIPTORES_SCA;

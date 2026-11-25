@@ -29,6 +29,27 @@ export interface Sesion {
   organizadorParticipa: boolean;
   estado: EstadoSesion;
   creadaEn?: string;
+  /** Solo al crear/editar: nombre libre de cada muestra (índice 0 = muestra 1). */
+  nombresMuestras?: string[];
+}
+
+/** Recomendación (no regla): paneles de 3 o más catadores y en número impar. */
+export const CATADORES_RECOMENDADOS = 3;
+export const MAX_LARGO_NOMBRE_MUESTRA = 60;
+
+export function catadoresSonRecomendados(cantidad: number): boolean {
+  return cantidad >= CATADORES_RECOMENDADOS && cantidad % 2 === 1;
+}
+
+/** Nombre que el organizador dio a la muestra, o null si no tiene. */
+export function nombreDeMuestra(nombres: ReadonlyMap<number, string>, numeroMuestra: number): string | null {
+  const nombre = nombres.get(numeroMuestra)?.trim();
+  return nombre ? nombre : null;
+}
+
+/** Normaliza la lista de nombres: recorta, limita largo y rellena hasta `total`. */
+export function normalizarNombresMuestras(nombres: readonly (string | null | undefined)[], total: number): string[] {
+  return Array.from({ length: total }, (_, i) => (nombres[i] ?? '').trim().slice(0, MAX_LARGO_NOMBRE_MUESTRA));
 }
 
 export interface Participante {

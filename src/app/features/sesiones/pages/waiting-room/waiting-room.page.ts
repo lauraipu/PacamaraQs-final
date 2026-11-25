@@ -4,15 +4,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Clipboard } from '@capacitor/clipboard';
 import {
   AlertController, IonBackButton, IonBadge, IonButton, IonButtons, IonContent, IonHeader,
-  IonIcon, IonItem, IonLabel, IonList, IonSpinner, IonTitle, IonToolbar, ToastController
+  IonIcon, IonItem, IonLabel, IonList, IonSpinner, IonTitle, IonToolbar, ModalController, ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
-  checkmarkCircleOutline, cloudOfflineOutline, copyOutline, exitOutline, lockClosedOutline,
-  peopleOutline, refreshOutline
+  checkmarkCircleOutline, cloudOfflineOutline, copyOutline, createOutline, exitOutline, lockClosedOutline,
+  peopleOutline, refreshOutline, warningOutline
 } from 'ionicons/icons';
 import { Subscription } from 'rxjs';
-import { EstadoSesion, getFormatoById, Participante, Sesion } from '@domain/sesion/sesion.model';
+import {
+  CATADORES_RECOMENDADOS, catadoresSonRecomendados, EstadoSesion, getFormatoById, Participante, Sesion
+} from '@domain/sesion/sesion.model';
+import { EditarSesionModalComponent, ResultadoEdicionSesion } from '../../ui/editar-sesion/editar-sesion-modal.component';
 import { AuthService } from '@core/auth/auth.service';
 import { EventoSala, GRACE_PERIOD_MS, RealtimeService, SalaRealtime } from '@core/realtime/sala-realtime.service';
 import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
@@ -21,7 +24,8 @@ import { mensajeDeError } from '@core/errores/errores';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { TrPipe } from '@core/i18n/tr';
 import { BotonGuiaComponent } from '@shared/components/boton-guia/boton-guia.component';
-const MINIMO_CATADORES = 3;
+/** Mínimo para iniciar. 3 o más (e impar) es solo una recomendación. */
+const MINIMO_CATADORES = 1;
 const TIEMPO_MAXIMO_CARGA_MS = 15_000;
 const SONDEO_SIN_SOCKET_MS = 10_000;
 
@@ -73,6 +77,7 @@ function conTiempoLimite<T>(promesa: Promise<T>, ms: number): Promise<T> {
 })
 export class WaitingRoomPage implements OnDestroy {
   readonly MINIMO_CATADORES = MINIMO_CATADORES;
+  readonly CATADORES_RECOMENDADOS = CATADORES_RECOMENDADOS;
   readonly EstadoSesion = EstadoSesion;
 
   private readonly route = inject(ActivatedRoute);
@@ -82,10 +87,13 @@ export class WaitingRoomPage implements OnDestroy {
   private readonly realtimeService = inject(RealtimeService);
   private readonly toastController = inject(ToastController);
   private readonly alertController = inject(AlertController);
+  private readonly modalController = inject(ModalController);
   private readonly transloco = inject(TranslocoService);
 
   readonly sesion = signal<Sesion | null>(null);
   readonly participantes = signal<Participante[]>([]);
+  readonly nombresMuestras = signal<ReadonlyMap<number, string>>(new Map());
+  readonly editando = signal(false);
   readonly cargando = signal(true);
   readonly iniciando = signal(false);
   readonly cambiandoListo = signal(false);
@@ -133,6 +141,19 @@ export class WaitingRoomPage implements OnDestroy {
   readonly participantesListos = computed(() => this.participantes().filter(p => p.listo).length);
   readonly faltanListos = computed(() => Math.max(0, MINIMO_CATADORES - this.participantesListos()));
   readonly puedeIniciar = computed(() => this.faltanListos() === 0 && !this.iniciando());
+  /** Panel recomendado: al menos 3 listos y en número impar. */
+  readonly panelRecomendado = computed(() => catadoresSonRecomendados(this.participantesListos()));
+  readonly puedeEditar = computed(() => {
+    const s = this.sesion();
+    return this.esOrganizador() && s?.estado === EstadoSesion.EN_ESPERA && getFormatoById(s.formato).id !== 'extrinseca';
+  });
+  readonly tituloFormato = computed(() => {
+    const s = this.sesion();
+    return s ? getFormatoById(s.formato).titulo : '';
+  });
+  readonly listaNombresMuestras = computed(() =>
+    [...this.nombresMuestras().entries()].sort(([a], [b]) => a - b).map(([numero, nombre]) => ({ numero, nombre }))
+  );
   readonly organizadorParticipaComoCatador = computed(() => this.esOrganizador() && this.miParticipacion() !== null);
   readonly hayInestables = computed(() => this.participantesEnSala().some(p => p.conexion === 'inestable'));
 
@@ -148,8 +169,8 @@ export class WaitingRoomPage implements OnDestroy {
 
   constructor() {
     addIcons({
-      checkmarkCircleOutline, cloudOfflineOutline, copyOutline, exitOutline,
-      lockClosedOutline, peopleOutline, refreshOutline
+      checkmarkCircleOutline, cloudOfflineOutline, copyOutline, createOutline, exitOutline,
+      lockClosedOutline, peopleOutline, refreshOutline, warningOutline
     });
   }
 
@@ -181,6 +202,7 @@ export class WaitingRoomPage implements OnDestroy {
     this.redirigiendo = false;
     this.sesion.set(null);
     this.participantes.set([]);
+    this.nombresMuestras.set(new Map());
     this.error.set(null);
     this.iniciando.set(false);
     this.cargando.set(true);
@@ -197,10 +219,11 @@ export class WaitingRoomPage implements OnDestroy {
       if (!vigente()) return;
       if (!usuario) throw new Error(this.transloco.translate('txt.debes_iniciar_sesion_para_ver_es_dfbyqh'));
 
-      const [sesion, participantes] = await conTiempoLimite(
+      const [sesion, participantes, nombres] = await conTiempoLimite(
         Promise.all([
           this.sesionService.obtenerSesionPorId(this.sesionId),
-          this.sesionService.obtenerParticipantes(this.sesionId)
+          this.sesionService.obtenerParticipantes(this.sesionId),
+          this.sesionService.obtenerNombresMuestras(this.sesionId)
         ]),
         TIEMPO_MAXIMO_CARGA_MS
       );
@@ -208,6 +231,7 @@ export class WaitingRoomPage implements OnDestroy {
       if (!sesion) throw new Error(this.transloco.translate('txt.no_se_encontro_la_sesion_o_no_pe_1e33yn'));
       this.sesion.set(sesion);
       this.participantes.set(participantes);
+      this.nombresMuestras.set(nombres);
 
       if (getFormatoById(sesion.formato).id === 'extrinseca') {
         await this.navegar(`/extrinsic-form/${sesion.id}`);
@@ -290,9 +314,10 @@ export class WaitingRoomPage implements OnDestroy {
   private async resincronizar(version: number): Promise<void> {
     const solicitud = ++this.resincronizacion;
     try {
-      const [sesion, participantes] = await Promise.all([
+      const [sesion, participantes, nombres] = await Promise.all([
         this.sesionService.obtenerSesionPorId(this.sesionId),
-        this.sesionService.obtenerParticipantes(this.sesionId)
+        this.sesionService.obtenerParticipantes(this.sesionId),
+        this.sesionService.obtenerNombresMuestras(this.sesionId)
       ]);
       if (version !== this.version || solicitud !== this.resincronizacion) return;
       if (!sesion) {
@@ -302,6 +327,7 @@ export class WaitingRoomPage implements OnDestroy {
 
       this.sesion.set(sesion);
       this.participantes.set(participantes);
+      this.nombresMuestras.set(nombres);
 
       const uid = this.usuarioActualId();
       if (!this.esOrganizador() && uid && !participantes.some(p => p.usuarioId === uid)) {
@@ -351,9 +377,50 @@ export class WaitingRoomPage implements OnDestroy {
     }
   }
 
+  /** Abre el editor de la sesión (nombre, notas, formato, muestras, catadores). */
+  async editarSesion(): Promise<void> {
+    const sesion = this.sesion();
+    if (!sesion || !this.puedeEditar() || this.editando()) return;
+
+    this.editando.set(true);
+    try {
+      const modal = await this.modalController.create({
+        component: EditarSesionModalComponent,
+        componentProps: { sesion, nombresActuales: this.nombresMuestras() }
+      });
+      await modal.present();
+      const { data, role } = await modal.onWillDismiss<ResultadoEdicionSesion>();
+      if (role !== 'guardado' || !data) return;
+
+      this.sesion.set(data.sesion);
+      this.nombresMuestras.set(data.nombresMuestras);
+      // Si cambió la participación del organizador, su fila en participantes también.
+      this.participantes.set(await this.sesionService.obtenerParticipantes(this.sesionId));
+      // Los demás reciben el cambio por postgres_changes (UPDATE de sesiones → RESYNC).
+      const toast = await this.toastController.create({ message: 'Sesión actualizada.', duration: 2000, color: 'success' });
+      await toast.present();
+    } finally {
+      this.editando.set(false);
+    }
+  }
+
   async iniciarCata(): Promise<void> {
     const sesion = this.sesion();
     if (!this.esOrganizador() || !sesion || !this.puedeIniciar()) return;
+
+    if (!this.panelRecomendado()) {
+      const alerta = await this.alertController.create({
+        header: 'Panel fuera de lo recomendado',
+        message: `Hay ${this.participantesListos()} catador(es) listo(s). Se recomienda un panel de al menos 3 catadores y en número impar (3, 5, 7…). ¿Iniciar de todos modos?`,
+        buttons: [
+          { text: 'Esperar', role: 'cancel' },
+          { text: 'Iniciar', role: 'confirm' }
+        ]
+      });
+      await alerta.present();
+      const { role } = await alerta.onDidDismiss();
+      if (role !== 'confirm') return;
+    }
 
     this.iniciando.set(true);
     this.error.set(null);

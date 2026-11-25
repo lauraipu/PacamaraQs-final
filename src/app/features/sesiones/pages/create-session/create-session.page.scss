@@ -1,3 +1,17 @@
 ion-back-button {
   --color: #0f344c;
 }
+
+.recomendacion-catadores {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 8px 0 0;
+  color: var(--app-text-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+
+  ion-icon { flex: none; margin-top: 1px; font-size: 1rem; }
+}
+
+.recomendacion-catadores--aviso { color: #92400e; }

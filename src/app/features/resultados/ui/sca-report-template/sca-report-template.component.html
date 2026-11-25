@@ -73,7 +73,7 @@
             <div class="sca-field sca-field--wide"><span>{{ 'hoja.nombre' | transloco }}</span><b>{{ f.registradaPor || '' }}</b></div>
             <div class="sca-field"><span>{{ 'hoja.fecha' | transloco }}</span><b>{{ f.registradaEn ? (f.registradaEn | date:'dd/MM/yyyy') : fecha }}</b></div>
             <div class="sca-field sca-field--wide"><span>{{ 'hoja.objetivo' | transloco }}</span><b>{{ objetivo }}</b></div>
-            <div class="sca-field"><span>{{ 'hoja.n_de_muestra' | transloco }}</span><b>{{ f.numeroMuestra }}</b></div>
+            <div class="sca-field"><span>{{ 'hoja.n_de_muestra' | transloco }}</span><b>{{ f.numeroMuestra }}@if (nombresMuestras[f.numeroMuestra]; as nm) { · {{ nm }} }</b></div>
           </div>
         </div>
       </header>
@@ -120,7 +120,7 @@
               <div class="sca-field sca-field--wide"><span>{{ 'hoja.nombre' | transloco }}</span><b>{{ h.nombre | tr }}</b></div>
               <div class="sca-field"><span>{{ 'hoja.fecha' | transloco }}</span><b>{{ h.fecha }}</b></div>
               <div class="sca-field sca-field--wide"><span>{{ 'hoja.objetivo' | transloco }}</span><b>{{ h.objetivo }}</b></div>
-              <div class="sca-field"><span>{{ 'hoja.n_de_muestra' | transloco }}</span><b>{{ h.numeroMuestra }}</b></div>
+              <div class="sca-field"><span>{{ 'hoja.n_de_muestra' | transloco }}</span><b>{{ h.numeroMuestra }}@if (nombresMuestras[h.numeroMuestra]; as nm) { · {{ nm }} }</b></div>
             </div>
           </div>
           @if (h.formato !== 'descriptivo') {
@@ -244,7 +244,7 @@
         } @else if (h.formato === 'afectivo') {
           <!-- ══════ FORMATO AFECTIVO (hoja SCA: Parte 2 · Evaluación afectiva) ══════ -->
           <div class="sca-bars sca-bars--desc">
-            <span class="sca-bar sca-bar--muestra">{{ 'hoja.n_de_muestra_2' | transloco }} <em>{{ h.numeroMuestra }}</em></span>
+            <span class="sca-bar sca-bar--muestra">{{ 'hoja.n_de_muestra_2' | transloco }} <em>{{ h.numeroMuestra }}@if (nombresMuestras[h.numeroMuestra]; as nm) { · {{ nm }} }</em></span>
             <span class="sca-bar">{{ 'hoja.nivel_de_tueste' | transloco }}</span>
             <span class="sca-roast"><em>{{ h.nivelTueste || '' }}</em></span>
           </div>
@@ -277,7 +277,7 @@
         } @else {
           <!-- ══════ FORMATO DESCRIPTIVO ══════ -->
           <div class="sca-bars sca-bars--desc">
-            <span class="sca-bar sca-bar--muestra">{{ 'hoja.n_de_muestra_2' | transloco }} <em>{{ h.numeroMuestra }}</em></span>
+            <span class="sca-bar sca-bar--muestra">{{ 'hoja.n_de_muestra_2' | transloco }} <em>{{ h.numeroMuestra }}@if (nombresMuestras[h.numeroMuestra]; as nm) { · {{ nm }} }</em></span>
             <span class="sca-bar">{{ 'hoja.nivel_de_tueste' | transloco }}</span>
             <span class="sca-roast"><em>{{ h.nivelTueste || '' }}</em></span>
           </div>

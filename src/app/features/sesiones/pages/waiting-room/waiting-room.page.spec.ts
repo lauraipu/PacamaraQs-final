@@ -85,7 +85,10 @@ describe('WaitingRoomPage', () => {
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => 'session-id' } } } },
         {
           provide: SesionesRepository,
-          useValue: { obtenerSesionPorId, obtenerParticipantes, iniciarSesion, marcarComoListo, abandonarSesion }
+          useValue: {
+            obtenerSesionPorId, obtenerParticipantes, iniciarSesion, marcarComoListo, abandonarSesion,
+            obtenerNombresMuestras: vi.fn().mockResolvedValue(new Map())
+          }
         },
         { provide: AuthService, useValue: { usuario, asegurarInicializado: vi.fn().mockResolvedValue(undefined) } },
         { provide: RealtimeService, useValue: { abrirSala, liberarSala } },
@@ -136,15 +139,34 @@ describe('WaitingRoomPage', () => {
     expect(fila?.segundosGracia).toBeGreaterThan(40);
   });
 
-  it('requires three ready participants before enabling the start action', async () => {
+  it('allows starting with a single ready cupper', async () => {
+    await crear('user-id', sesionBase({ organizadorParticipa: false }), [participante('user-2', false)]);
+    expect(component.puedeIniciar()).toBe(false);
+
+    eventos.next({ tipo: 'LISTO', usuarioId: 'user-2', listo: true });
+    await fixture.whenStable();
+    expect(component.puedeIniciar()).toBe(true);
+    expect(component.panelRecomendado()).toBe(false);
+  });
+
+  it('recommends an odd panel of at least three cuppers', async () => {
     await crear('user-id', sesionBase(), [
       participante('user-id', true, true), participante('user-2', true), participante('user-3', false)
     ]);
-    expect(component.puedeIniciar()).toBe(false);
+    expect(component.puedeIniciar()).toBe(true);
+    expect(component.panelRecomendado()).toBe(false);
 
     eventos.next({ tipo: 'LISTO', usuarioId: 'user-3', listo: true });
     await fixture.whenStable();
-    expect(component.puedeIniciar()).toBe(true);
+    expect(component.panelRecomendado()).toBe(true);
+  });
+
+  it('lets only the organizer edit the session while waiting', async () => {
+    await crear('user-id', sesionBase(), [participante('user-id', true, true)]);
+    expect(component.puedeEditar()).toBe(true);
+
+    await crear('user-2', sesionBase(), [participante('user-id', true, true), participante('user-2', false)]);
+    expect(component.puedeEditar()).toBe(false);
   });
 
   it('starts the session, broadcasts INICIAR_CATA and opens the matching form', async () => {

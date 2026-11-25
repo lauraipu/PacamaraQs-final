@@ -700,7 +700,7 @@ export class ResultsPage implements OnInit {
     const partes = [tr(this.esExtrinseco() ? 'Ficha técnica' : 'Reporte SCA'), r.nombreSesion, tr(this.tituloFormato())];
     if (this.formatoHoja()) {
       const muestra = this.muestraHoja();
-      if (muestra) partes.push(`${tr('Muestra')} ${muestra}`);
+      if (muestra) partes.push(r.nombresMuestras?.[muestra] ?? `${tr('Muestra')} ${muestra}`);
       if (this.modoExportacion() === 'catador') {
         if (this.catadorExportar()) partes.push(this.catadorExportar()!.nombre);
       } else {
@@ -715,6 +715,11 @@ export class ResultsPage implements OnInit {
       checkmarkCircleOutline, closeOutline, documentTextOutline, downloadOutline, gridOutline, hourglassOutline, lockClosedOutline,
       medalOutline, ribbonOutline, trophyOutline
     });
+  }
+
+  /** Nombre que el organizador dio a la muestra, o "Muestra N". */
+  etiquetaMuestra(numeroMuestra: number): string {
+    return this.resultados()?.nombresMuestras?.[numeroMuestra] ?? tr('Muestra {{p0}}', { p0: numeroMuestra });
   }
 
   async ngOnInit(): Promise<void> {

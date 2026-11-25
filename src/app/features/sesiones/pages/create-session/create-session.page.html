@@ -111,13 +111,20 @@
       <ion-range
         [(ngModel)]="catadoresObjetivo"
         [attr.aria-label]="'crear.catadores_objetivo' | transloco"
-        [min]="3"
+        [min]="1"
         [max]="15"
         [step]="1"
       ></ion-range>
       <div class="slider-limits">
-        <span>{{ 'crear.t_3_min' | transloco }}</span><span>15</span>
+        <span>1</span><span>15</span>
       </div>
+      <p class="recomendacion-catadores" [class.recomendacion-catadores--aviso]="!catadoresRecomendados()" role="note">
+        <ion-icon
+          [name]="catadoresRecomendados() ? 'information-circle-outline' : 'warning-outline'"
+          aria-hidden="true"
+        ></ion-icon>
+        <span>{{ 'crear.recomendacion_catadores' | transloco }}</span>
+      </p>
       <hr class="divider" />
       <div class="participar-container">
         <div class="participar-text">
@@ -134,6 +141,12 @@
           [attr.aria-label]="'crear.participar_como_catador' | transloco"
         ></ion-toggle>
       </div>
+      @if (esCataIndividual()) {
+      <p class="recomendacion-catadores" role="note">
+        <ion-icon name="information-circle-outline" aria-hidden="true"></ion-icon>
+        <span>{{ 'crear.cata_individual_sin_sala' | transloco }}</span>
+      </p>
+      }
       <div class="info-box" role="note">
         <ion-icon
           name="information-circle-outline"
@@ -144,6 +157,17 @@
           {{ 'crear.la_sesion_requiere_minimo' | transloco }}
         </span>
       </div>
+    </section>
+
+    <section class="cupping-card">
+      <h2 class="section-title">
+        {{ 'crear.nombres_de_las_muestras' | transloco }}
+      </h2>
+      <p class="help-text">{{ 'crear.nombres_muestras_ayuda' | transloco }}</p>
+      <app-nombres-muestras
+        [total]="numeroMuestras"
+        [(nombres)]="nombresMuestras"
+      ></app-nombres-muestras>
     </section>
     } } @else { @if (formatoSeleccionado === 'extrinseca') {
     <!-- Extrínseco: evaluación individual, sin código ni sala de espera. -->
@@ -205,6 +229,13 @@
         <strong>{{ 'crear.individual_sin_codigo' | transloco }}</strong>
       </div>
       } @else {
+      @if (nombresConfigurados().length > 0) {
+      <div class="summary-row">
+        <span>{{ 'crear.nombres_de_las_muestras' | transloco }}</span>
+        <strong>{{ nombresConfigurados().join(', ') }}</strong>
+      </div>
+      <hr />
+      }
       <div class="summary-row">
         <span>{{ 'crear.catadores_objetivo' | transloco }}</span>
         <strong>{{ catadoresObjetivo }}</strong>
@@ -233,7 +264,8 @@
   >
     @if (isLoading) {
     <ion-spinner name="crescent"></ion-spinner>
-    } @else { {{ formatoSeleccionado === 'extrinseca' ? ('crear.crear_sesion_2'
+    } @else if (esCataIndividual()) { {{ 'crear.crear_e_iniciar_cata' |
+    transloco }} } @else { {{ formatoSeleccionado === 'extrinseca' ? ('crear.crear_sesion_2'
     | transloco) : ('crear.generar_codigo_de_acceso' | transloco) }} }
   </ion-button>
   } @else {

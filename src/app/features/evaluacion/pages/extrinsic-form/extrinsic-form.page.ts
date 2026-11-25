@@ -13,6 +13,7 @@ import { OpcionBuscable, SelectorBuscableComponent } from '@shared/components/se
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TrPipe } from '@core/i18n/tr';
 import { BotonGuiaComponent } from '@shared/components/boton-guia/boton-guia.component';
+import { SelectorMuestrasComponent } from '@shared/components/selector-muestras/selector-muestras.component';
 /** Campos numéricos del bloque de comercio. */
 type CampoNumerico = 'farmPrice' | 'lotSizeKg';
 
@@ -72,7 +73,7 @@ interface FormularioExtrinseco {
   templateUrl: './extrinsic-form.page.html',
   styleUrls: ['./extrinsic-form.page.scss'],
   standalone: true,
-  imports: [BotonGuiaComponent, TrPipe, TranslocoPipe, IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, SelectorBuscableComponent]
+  imports: [BotonGuiaComponent, SelectorMuestrasComponent, TrPipe, TranslocoPipe, IonContent, IonIcon, CommonModule, FormsModule, EstadoFichaComponent, SelectorBuscableComponent]
 })
 export class ExtrinsicFormPage extends BaseCataForm<FormularioExtrinseco> {
   override formulario: FormularioExtrinseco = this.crearFormularioVacio();

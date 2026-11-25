@@ -72,6 +72,8 @@ export interface SessionResults {
   /** Fecha de creación de la sesión (ISO). */
   creadaEn?: string;
   totalMuestras: number;
+  /** Nombre que el organizador dio a cada muestra (número → nombre). */
+  nombresMuestras?: Record<number, string>;
   totalCatadores: number;
   muestras: SampleConsolidatedResult[];
   catadores: CupperResultSummary[];

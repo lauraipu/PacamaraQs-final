@@ -50,7 +50,7 @@
                   @for (ficha of fichasReporte(); track ficha.numeroMuestra) {
                     <ion-accordion [value]="cat.cupperId + '-' + ficha.numeroMuestra" class="rc-ficha">
                       <ion-item slot="header" lines="none" class="rc-ficha__header">
-                        <ion-label>{{ 'resultados.muestra' | transloco: { p0: (ficha.numeroMuestra) } }}</ion-label>
+                        <ion-label>{{ etiquetaMuestra(ficha.numeroMuestra) }}</ion-label>
                         @if (!ficha.sinPuntaje) {
                           <ion-badge slot="end" class="rc-chip" [style.--background]="ficha.clasificacion.fondo" [style.--color]="ficha.clasificacion.color">
                             {{ ficha.clasificacion.etiqueta | tr }}
@@ -118,7 +118,7 @@
         <div class="rr-filtros">
           <ion-select interface="popover" [label]="'resultados.muestra_2' | transloco" labelPlacement="stacked" fill="outline"
             [value]="muestraRadar()" (ionChange)="seleccionarMuestraRadar($event.detail.value)">
-            @for (n of numerosMuestra(); track n) { <ion-select-option [value]="n">{{ 'resultados.muestra' | transloco: { p0: (n) } }}</ion-select-option> }
+            @for (n of numerosMuestra(); track n) { <ion-select-option [value]="n">{{ etiquetaMuestra(n) }}</ion-select-option> }
           </ion-select>
           @if (catadoresConFichas().length > 0) {
             <ion-select interface="popover" [label]="'resultados.catador' | transloco" labelPlacement="stacked" fill="outline"
@@ -227,7 +227,7 @@
 <ng-template #selectorMuestra let-actual="actual">
   <ion-segment class="rx-samples" scrollable="true" [value]="actual" (ionChange)="seleccionarMuestraDetalle($event.detail.value)">
     @for (n of numerosMuestra(); track n) {
-      <ion-segment-button [value]="n"><ion-label>{{ 'resultados.muestra' | transloco: { p0: (n) } }}</ion-label></ion-segment-button>
+      <ion-segment-button [value]="n"><ion-label>{{ etiquetaMuestra(n) }}</ion-label></ion-segment-button>
     }
   </ion-segment>
 </ng-template>
@@ -328,7 +328,7 @@
                         #{{ fila.posicion }}
                       </td>
                       <td>
-                        <span class="rc-ranking__name">{{ 'resultados.muestra' | transloco: { p0: (fila.numeroMuestra) } }}</span>
+                        <span class="rc-ranking__name">{{ etiquetaMuestra(fila.numeroMuestra) }}</span>
                         @if (activa) { <ion-badge class="rc-chip rc-chip--live">{{ 'resultados.en_el_medidor' | transloco }}</ion-badge> }
                         @if (fila.cerradaForzada) { <span class="rs-tag">{{ 'resultados.cerrada' | transloco }}</span> }
                       </td>
@@ -430,7 +430,7 @@
                       (keydown.enter)="seleccionarMuestraDetalle(fila.numeroMuestra)"
                       (keydown.space)="$event.preventDefault(); seleccionarMuestraDetalle(fila.numeroMuestra)">
                       <td class="rs-rank">{{ fila.posicion ? '#' + fila.posicion : '—' }}</td>
-                      <td><span class="rc-ranking__name">{{ 'resultados.muestra' | transloco: { p0: (fila.numeroMuestra) } }}</span></td>
+                      <td><span class="rc-ranking__name">{{ etiquetaMuestra(fila.numeroMuestra) }}</span></td>
                       <td>{{ fila.totalVotos }}</td>
                       <td class="ra-col-bar">
                         <div class="rx-bar-line">
@@ -555,7 +555,7 @@
                   <tr>
                     <th scope="col">{{ 'resultados.atributo' | transloco }}</th>
                     @for (p of perfilesDescriptivos(); track p.numeroMuestra) {
-                      <th scope="col" class="rd-matrix__num">M{{ p.numeroMuestra }}</th>
+                      <th scope="col" class="rd-matrix__num" [attr.title]="etiquetaMuestra(p.numeroMuestra)">M{{ p.numeroMuestra }}</th>
                     }
                   </tr>
                 </thead>
@@ -707,7 +707,7 @@
                       #{{ fila.posicion }}
                     </td>
                     <td>
-                      {{ 'resultados.muestra' | transloco: { p0: (fila.numeroMuestra) } }}
+                      {{ etiquetaMuestra(fila.numeroMuestra) }}
                       @if (fila.cerradaForzada) { <span class="rs-tag">{{ 'resultados.cerrada' | transloco }}</span> }
                     </td>
                     <td>{{ fila.evaluacionesRecibidas }} / {{ fila.evaluacionesEsperadas }}</td>
@@ -795,7 +795,7 @@
           <ion-select id="rc-export-muestra" class="rc-export__select" interface="popover" [placeholder]="'resultados.selecciona_una_muestra' | transloco"
             [value]="muestraHoja()" (ionChange)="cambiarMuestraExportar($event.detail.value)">
             @for (n of numerosMuestra(); track n) {
-              <ion-select-option [value]="n">{{ 'resultados.muestra' | transloco: { p0: (n) } }}</ion-select-option>
+              <ion-select-option [value]="n">{{ etiquetaMuestra(n) }}</ion-select-option>
             }
           </ion-select>
 
@@ -852,7 +852,8 @@
   @if (resultados(); as r) {
     <div #reporteImprimible hidden aria-hidden="true">
       <app-sca-report-template [formato]="formatoReporte()" [hoja]="hojaSca()" [fichasTecnicas]="fichasTecnicas()"
-        [objetivo]="r.nombreSesion" [fecha]="fechaTextoReporte()"></app-sca-report-template>
+        [objetivo]="r.nombreSesion" [fecha]="fechaTextoReporte()"
+        [nombresMuestras]="r.nombresMuestras ?? {}"></app-sca-report-template>
     </div>
   }
 </ion-content>

@@ -1,8 +1,18 @@
 import { inject, Injectable } from '@angular/core';
 import { participanteDtoToDomain, sesionDtoToDomain } from './sesion.mapper';
-import { Participante, Sesion } from '@domain/sesion/sesion.model';
+import { normalizarNombresMuestras, Participante, Sesion } from '@domain/sesion/sesion.model';
 import { ParticipanteDto, SesionDto } from '../../dto/sesion.dto';
 import { SupabaseService } from '../../supabase/supabase.client';
+
+export interface EdicionSesion {
+  nombre: string;
+  notas?: string;
+  formato: string;
+  numeroMuestras: number;
+  catadoresObjetivo: number;
+  nombresMuestras: string[];
+  organizadorParticipa: boolean;
+}
 
 export interface SesionConRol extends Sesion {
   esOrganizador: boolean;
@@ -64,18 +74,66 @@ export class SesionesRepository {
       throw new Error('El nombre de la sesión no puede estar vacío');
     }
 
+    const nombres = normalizarNombresMuestras(sesion.nombresMuestras ?? [], sesion.numeroMuestras);
     const { data, error } = await this.supabase.client.rpc('crear_sesion', {
       p_nombre: sesion.nombre.trim(),
       p_formato: sesion.formato.toLowerCase(),
       p_numero_muestras: sesion.numeroMuestras,
       p_catadores_objetivo: sesion.catadoresObjetivo,
       p_organizador_participa: sesion.organizadorParticipa,
-      p_notas: sesion.notas?.trim() || null
+      p_notas: sesion.notas?.trim() || null,
+      // Solo se envía si hay algún nombre: así la llamada sigue siendo
+      // compatible con la firma anterior de crear_sesion.
+      ...(nombres.some(n => n) ? { p_nombres_muestras: nombres } : {})
     });
 
     if (error) throw error;
     if (!data) throw new Error('Supabase no devolvió la sesión creada.');
     return sesionDtoToDomain(data as SesionDto);
+  }
+
+  /**
+   * Corrige la sesión desde la sala de espera (solo organizador, solo en
+   * estado 'esperando'). El servidor ajusta las filas de `muestras`.
+   */
+  async editarSesion(sesionId: string, cambios: EdicionSesion): Promise<Sesion> {
+    if (!cambios.nombre.trim()) throw new Error('El nombre de la sesión no puede estar vacío');
+
+    const { data, error } = await this.supabase.client.rpc('editar_sesion', {
+      p_sesion_id: sesionId,
+      p_nombre: cambios.nombre.trim(),
+      p_notas: cambios.notas?.trim() || null,
+      p_formato: cambios.formato.toLowerCase(),
+      p_numero_muestras: cambios.numeroMuestras,
+      p_catadores_objetivo: cambios.catadoresObjetivo,
+      p_nombres_muestras: normalizarNombresMuestras(cambios.nombresMuestras, cambios.numeroMuestras),
+      p_organizador_participa: cambios.organizadorParticipa
+    });
+    if (error) throw error;
+    if (!data) throw new Error('Supabase no devolvió la sesión editada.');
+    return sesionDtoToDomain(data as SesionDto);
+  }
+
+  /**
+   * Nombres que el organizador dio a las muestras (número → nombre).
+   * Si la columna aún no existe en la BD, devuelve un mapa vacío.
+   */
+  async obtenerNombresMuestras(sesionId: string): Promise<Map<number, string>> {
+    const { data, error } = await this.supabase.client
+      .from('muestras')
+      .select('numero_muestra, nombre')
+      .eq('sesion_id', sesionId);
+
+    if (error) {
+      console.warn('[Sesiones] No se pudieron leer los nombres de muestra:', error);
+      return new Map();
+    }
+    const nombres = new Map<number, string>();
+    for (const fila of (data ?? []) as { numero_muestra: number; nombre: string | null }[]) {
+      const nombre = fila.nombre?.trim();
+      if (nombre) nombres.set(Number(fila.numero_muestra), nombre);
+    }
+    return nombres;
   }
 
   async obtenerSesionPorId(sesionId: string): Promise<Sesion | null> {

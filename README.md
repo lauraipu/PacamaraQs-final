@@ -44,7 +44,10 @@ Su objetivo es facilitar el trabajo coordinado de administradores, organizadores
 
 ### Reglas de negocio
 
-- Mínimo **3 catadores en estado "listo"** para iniciar una catación.
+- Se puede iniciar una catación desde **1 catador en estado "listo"**; se recomienda un panel de **3 o más catadores en número impar** (la app lo advierte, pero no lo bloquea).
+- Cada muestra puede tener un **nombre libre** (lote, finca, código…); si no se nombra se muestra como "Muestra N".
+- Los catadores pueden llenar las muestras **en cualquier orden**; solo al terminar se exige que todas estén completas.
+- Mientras la sesión está en sala de espera, el organizador puede **editarla** (nombre, notas, formato, número de muestras, catadores objetivo y nombres de muestra) con el RPC `editar_sesion`.
 - **Evaluación ciega:** el catador nunca ve los resultados de otros.
 - El formato **Extrínseco** es individual y no pasa por sala de espera.
 - El puntaje CVA se calcula en el servidor: `S = 0,65625 × (Σ calidades + impresión global) + 52,75 − 2u − 4d`, redondeado a 0,25.
@@ -73,7 +76,7 @@ La aplicación utiliza Supabase como cliente de la base de datos. El modelo refe
 - `evaluaciones`: respuestas y puntajes de cada catador y muestra.
 - `evaluacion_atributos`: atributos sensoriales registrados para las evaluaciones.
 
-Las rutas de la aplicación comprueban la autenticación y los roles, pero la protección real está en la base de datos: las tablas tienen RLS activado y las operaciones sensibles pasan por funciones RPC `SECURITY DEFINER` que validan `auth.uid()` (por ejemplo `crear_sesion`, `unirse_sesion`, `marcar_listo`, `iniciar_sesion`, `registrar_evaluacion`, `aceptar_politica`). Un trigger (`trg_validar_estado_sesion`) controla la máquina de estados de la sesión: `esperando → en_progreso` (requiere 3 catadores listos) `→ completada`.
+Las rutas de la aplicación comprueban la autenticación y los roles, pero la protección real está en la base de datos: las tablas tienen RLS activado y las operaciones sensibles pasan por funciones RPC `SECURITY DEFINER` que validan `auth.uid()` (por ejemplo `crear_sesion`, `unirse_sesion`, `marcar_listo`, `iniciar_sesion`, `registrar_evaluacion`, `aceptar_politica`). Un trigger (`trg_validar_estado_sesion`) controla la máquina de estados de la sesión: `esperando → en_progreso` (requiere al menos 1 catador listo) `→ completada`.
 
 `registrar_evaluacion` guarda la evaluación y sus atributos en **una sola transacción** y calcula el puntaje en el servidor; así se evita que el cierre automático de la sesión deje una ficha sin atributos y que un cliente envíe un puntaje inventado.
 

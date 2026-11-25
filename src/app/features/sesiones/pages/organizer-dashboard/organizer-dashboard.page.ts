@@ -64,6 +64,7 @@ export class OrganizerDashboardPage implements OnDestroy {
 
   readonly nombreSesion = signal('');
   readonly progreso = signal<ProgresoPanel | null>(null);
+  readonly nombresMuestras = signal<ReadonlyMap<number, string>>(new Map());
   readonly cargando = signal(true);
   readonly accionEnCurso = signal<string | null>(null);
   readonly error = signal<string | null>(null);
@@ -123,6 +124,7 @@ export class OrganizerDashboardPage implements OnDestroy {
   );
 
   private sesionId = '';
+  private nombresCargadosDe = '';
   private eventosSub?: Subscription;
   private sondeoId?: ReturnType<typeof setInterval>;
   private sondeoRapidoId?: ReturnType<typeof setInterval>;
@@ -222,9 +224,17 @@ export class OrganizerDashboardPage implements OnDestroy {
   private async actualizarProgreso(): Promise<void> {
     if (!this.activo) return;
     try {
-      const progreso = await this.sesionService.obtenerProgresoPanel(this.sesionId);
+      // Los nombres de muestra no cambian con la cata iniciada: se leen una vez.
+      const [progreso, nombres] = await Promise.all([
+        this.sesionService.obtenerProgresoPanel(this.sesionId),
+        this.nombresCargadosDe === this.sesionId ? Promise.resolve(null) : this.sesionService.obtenerNombresMuestras(this.sesionId)
+      ]);
       if (!this.activo) return;
       this.progreso.set(progreso);
+      if (nombres) {
+        this.nombresMuestras.set(nombres);
+        this.nombresCargadosDe = this.sesionId;
+      }
       this.error.set(null);
     } catch (error) {
       console.error('No se pudo actualizar el progreso del panel:', error);

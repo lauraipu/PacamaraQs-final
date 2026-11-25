@@ -209,7 +209,7 @@
     "desconectado_2": "Disconnected · {{p0}}",
     "listo": "Ready",
     "conectado": "Connected",
-    "esperando_que_se_unan": "Waiting for at least {{p0}} cuppers to join.",
+    "esperando_que_se_unan": "Waiting for cuppers to join (at least {{p0}} recommended).",
     "evaluacion_100_ciega": "100% blind evaluation.",
     "no_veras_puntajes_ni": "You won't see other cuppers' scores or evaluations. The panel closes automatically when the last cupper finishes.",
     "estoy_listo_tocar_para": "I'm ready · tap to cancel",
@@ -219,7 +219,10 @@
     "iniciando": "Starting…",
     "faltan_catador_es_listo": "{{p0}} more cupper(s) need to be ready",
     "iniciar_cata_catadores_listos": "Start cupping · {{p0}} cuppers ready",
-    "iniciar_y_monitorear_catadores": "Start and monitor · {{p0}} cuppers ready"
+    "iniciar_y_monitorear_catadores": "Start and monitor · {{p0}} cuppers ready",
+    "editar_sesion": "Edit session",
+    "listos_recomendado": "{{p0}} ready · {{p1}} or more recommended (odd)",
+    "recomendacion_panel": "A panel of at least 3 cuppers and an odd number is recommended. You can still start."
   },
   "crear": {
     "crear_sesion": "Create session",
@@ -242,7 +245,7 @@
     "participaras_como_catador": "Will you take part as a cupper?",
     "tu_evaluacion_contara_igual": "Your evaluation will count equally in the panel's trimmed mean.",
     "participar_como_catador": "Take part as a cupper",
-    "la_sesion_requiere_minimo": "The session needs at least 3 cuppers to start. The code expires when the organizer starts the cupping.",
+    "la_sesion_requiere_minimo": "A panel of at least 3 cuppers and an odd number is recommended; cupping can start with 1 ready cupper. The code expires when the organizer starts the cupping.",
     "evaluacion_individual": "Individual evaluation",
     "el_formato_extrinseco_no": "The extrinsic format doesn't use an access code: you record the coffee's technical sheet yourself (origin, process and trading). Once submitted, the session closes and you can view or export the sheet.",
     "codigo_de_sesion": "Session code",
@@ -263,7 +266,12 @@
     "generar_codigo_de_acceso": "Generate access code →",
     "salir": "Exit",
     "ir_a_la_evaluacion": "Go to evaluation →",
-    "ir_a_sala_de": "Go to waiting room →"
+    "ir_a_sala_de": "Go to waiting room →",
+    "recomendacion_catadores": "Recommended: at least 3 cuppers and an odd number (3, 5, 7…) to avoid ties. You can start with 1.",
+    "nombres_de_las_muestras": "Sample names (optional)",
+    "nombres_muestras_ayuda": "Give each sample any name you like (lot, farm, code…). If left empty it will show as \"Sample N\".",
+    "cata_individual_sin_sala": "You will be the only cupper: the cupping starts right away, with no waiting room or code.",
+    "crear_e_iniciar_cata": "Create and start cupping →"
   },
   "afectivo": {
     "volver": "Back",
@@ -1374,7 +1382,20 @@
     "alcanzaste_el_maximo_de_sesiones_13x1y1p": "You reached the maximum of open sessions. Finish or delete one before creating another.",
     "la_base_de_datos_llego_al_limite_13yuqo4": "The database reached its configured limit. New sessions cannot be created.",
     "el_escaner_esta_desactivado_por_11mzrpg": "The scanner was turned off by the administrator.",
-    "los_registros_estan_cerrados_por_17rzf5k": "Sign-ups were closed by the administrator."
+    "los_registros_estan_cerrados_por_17rzf5k": "Sign-ups were closed by the administrator.",
+    "muestra_guardada_como_borrador_p_1kbdsqk": "Sample saved as a draft. You can finish it whenever you like.",
+    "sesion_actualizada_1jbqfbr": "Session updated.",
+    "panel_fuera_de_lo_recomendado_14z3sxf": "Panel outside the recommendation",
+    "esperar_e7gusr": "Wait",
+    "iniciar_430v7q": "Start",
+    "hay_p0_catador_es_listo_s_se_rec_1j2qjo3": "{{p0}} cupper(s) ready. A panel of at least 3 cuppers and an odd number (3, 5, 7…) is recommended. Start anyway?",
+    "se_necesita_al_menos_1_catador_l_1k5lbdx": "At least 1 ready cupper is needed to start.",
+    "no_se_pudo_guardar_la_sesion_phv90s": "The session could not be saved.",
+    "nombre_8fqbls": "Name",
+    "la_sesion_ya_inicio_no_se_puede_hudrcv": "The session has already started: it can no longer be edited.",
+    "solo_el_organizador_puede_editar_11yp6jb": "Only the organizer can edit the session.",
+    "los_catadores_objetivo_deben_ser_mor2wv": "Target cuppers must be at least 1.",
+    "el_formato_y_el_numero_de_muestr_1a3z42i": "The format and number of samples can only be changed from the waiting room, before starting."
   },
   "config": {
     "titulo": "Settings",
@@ -1462,7 +1483,10 @@
     "enviar": "Submit",
     "salir_titulo": "Leave the evaluation?",
     "salir_mensaje": "Your progress is saved on this device and you can continue later.",
-    "salir": "Leave"
+    "salir": "Leave",
+    "muestras": "Samples",
+    "muestra_n": "Sample {{p0}}",
+    "nombre_de_la_muestra_n": "Name of sample {{p0}}"
   },
   "guias": {
     "comun": {
@@ -1563,5 +1587,12 @@
         "texto": "Choose the language, text size, high contrast and reduce motion if you need it."
       }
     }
+  },
+  "editar": {
+    "titulo": "Edit session",
+    "cancelar": "Cancel",
+    "guardar": "Save changes",
+    "aviso_formato": "If you change the format, all cuppers will use the new form when the cupping starts.",
+    "individual_iniciar": "You will be the only cupper: you can start the cupping as soon as you save."
   }
 }

@@ -70,7 +70,13 @@ describe('CombinedFormPage', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => 'session-id' } } } },
-        { provide: SesionesRepository, useValue: { obtenerSesionPorId, obtenerMuestrasCerradas, esOrganizadorDeSesion } },
+        {
+          provide: SesionesRepository,
+          useValue: {
+            obtenerSesionPorId, obtenerMuestrasCerradas, esOrganizadorDeSesion,
+            obtenerNombresMuestras: vi.fn().mockResolvedValue(new Map([[2, 'Pacamara Huila']]))
+          }
+        },
         {
           provide: AuthService,
           useValue: {
@@ -174,13 +180,29 @@ describe('CombinedFormPage', () => {
     expect(component.respuestas[1].impresionGlobal).toBe(7);
   });
 
-  it('requires a complete sample before advancing and sends it when complete', async () => {
+  it('lets the taster move on from an incomplete sample, keeping it as a draft', async () => {
     component.seleccionarCalidad('fragancia', 8);
     await component.irAMuestraSiguiente();
-    expect(component.muestraActual()).toBe(1);
+    expect(component.muestraActual()).toBe(2);
     expect(enviar).not.toHaveBeenCalled();
-    expect(createToast).toHaveBeenCalledWith(expect.objectContaining({ color: 'warning' }));
+    expect(guardarBorrador).toHaveBeenCalledWith('session-id', 1, component.respuestas[0]);
+  });
 
+  it('allows jumping to any sample in any order', async () => {
+    component.irAMuestra(3);
+    expect(component.muestraActual()).toBe(3);
+    component.irAMuestra(1);
+    expect(component.muestraActual()).toBe(1);
+  });
+
+  it('exposes the sample names set by the organizer', async () => {
+    expect(component.nombreMuestra(2)).toBe('Pacamara Huila');
+    expect(component.nombreMuestra(1)).toBeNull();
+    component.irAMuestra(2);
+    expect(component.nombreMuestraActual()).toBe('Pacamara Huila');
+  });
+
+  it('sends a complete sample when advancing', async () => {
     calificar(5);
     await component.irAMuestraSiguiente();
     expect(enviar).toHaveBeenCalledWith(expect.objectContaining({

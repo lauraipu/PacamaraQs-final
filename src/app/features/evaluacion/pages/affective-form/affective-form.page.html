@@ -25,6 +25,9 @@
             {{ 'afectivo.evaluacion_afectiva' | transloco }}
           </p>
           <p class="cva-header__sample-label">
+            @if (nombreMuestraActual(); as nombre) {
+            <strong class="cva-header__sample-name">{{ nombre }}</strong> ·
+            }
             {{ 'afectivo.muestra' | transloco: { p0: (muestraActual()) } }}
             <span
               >{{ 'afectivo.de' | transloco: { p0: (totalMuestras()) } }}</span
@@ -58,6 +61,15 @@
         ></div>
       </div>
     </div>
+    <app-selector-muestras
+      [total]="totalMuestras()"
+      [actual]="muestraActual()"
+      [nombres]="nombresMuestras()"
+      [enviadas]="muestrasEnviadas()"
+      [completas]="muestrasCompletas()"
+      [cerradas]="muestrasCerradas()"
+      (seleccionar)="irAMuestra($event)"
+    ></app-selector-muestras>
   </header>
 
   <main class="cva-main">

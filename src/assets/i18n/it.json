@@ -209,7 +209,7 @@
     "desconectado_2": "Disconnesso · {{p0}}",
     "listo": "Pronto",
     "conectado": "Connesso",
-    "esperando_que_se_unan": "In attesa che si uniscano almeno {{p0}} assaggiatori.",
+    "esperando_que_se_unan": "In attesa che si uniscano gli assaggiatori (consigliati almeno {{p0}}).",
     "evaluacion_100_ciega": "Valutazione 100% alla cieca.",
     "no_veras_puntajes_ni": "Non vedrai punteggi né valutazioni degli altri assaggiatori. Il panel si chiude automaticamente quando l'ultimo assaggiatore termina.",
     "estoy_listo_tocar_para": "Sono pronto · tocca per annullare",
@@ -219,7 +219,10 @@
     "iniciando": "Avvio…",
     "faltan_catador_es_listo": "Mancano {{p0}} assaggiatore/i pronto/i",
     "iniciar_cata_catadores_listos": "Avvia assaggio · {{p0}} assaggiatori pronti",
-    "iniciar_y_monitorear_catadores": "Avvia e monitora · {{p0}} assaggiatori pronti"
+    "iniciar_y_monitorear_catadores": "Avvia e monitora · {{p0}} assaggiatori pronti",
+    "editar_sesion": "Modifica sessione",
+    "listos_recomendado": "{{p0}} pronti · consigliati {{p1}} o più (dispari)",
+    "recomendacion_panel": "Si consiglia un panel di almeno 3 assaggiatori e in numero dispari. Puoi comunque iniziare."
   },
   "crear": {
     "crear_sesion": "Crea sessione",
@@ -242,7 +245,7 @@
     "participaras_como_catador": "Parteciperai come assaggiatore?",
     "tu_evaluacion_contara_igual": "La tua valutazione conterà allo stesso modo nella media ridotta del panel.",
     "participar_como_catador": "Partecipa come assaggiatore",
-    "la_sesion_requiere_minimo": "La sessione richiede almeno 3 assaggiatori per iniziare. Il codice scade quando l'organizzatore avvia l'assaggio.",
+    "la_sesion_requiere_minimo": "Si consiglia un panel di almeno 3 assaggiatori e in numero dispari; l'assaggio può iniziare anche con 1 assaggiatore pronto. Il codice scade quando l'organizzatore avvia l'assaggio.",
     "evaluacion_individual": "Valutazione individuale",
     "el_formato_extrinseco_no": "Il formato estrinseco non usa un codice di accesso: registri tu stesso la scheda tecnica del caffè (origine, processo e commercio). All'invio, la sessione si chiude e puoi vedere o esportare la scheda.",
     "codigo_de_sesion": "Codice sessione",
@@ -263,7 +266,12 @@
     "generar_codigo_de_acceso": "Genera codice di accesso →",
     "salir": "Esci",
     "ir_a_la_evaluacion": "Vai alla valutazione →",
-    "ir_a_sala_de": "Vai alla sala d'attesa →"
+    "ir_a_sala_de": "Vai alla sala d'attesa →",
+    "recomendacion_catadores": "Consigliato: almeno 3 assaggiatori e in numero dispari (3, 5, 7…) per evitare pareggi. Puoi iniziare anche con 1.",
+    "nombres_de_las_muestras": "Nomi dei campioni (facoltativo)",
+    "nombres_muestras_ayuda": "Dai a ogni campione il nome che preferisci (lotto, azienda, codice…). Se lo lasci vuoto verrà mostrato come \"Campione N\".",
+    "cata_individual_sin_sala": "Sarai l'unico assaggiatore: l'assaggio inizierà subito, senza sala d'attesa né codice.",
+    "crear_e_iniciar_cata": "Crea e avvia l'assaggio →"
   },
   "afectivo": {
     "volver": "Indietro",
@@ -1374,7 +1382,20 @@
     "alcanzaste_el_maximo_de_sesiones_13x1y1p": "Hai raggiunto il massimo di sessioni aperte. Concludine o eliminane una prima di crearne un’altra.",
     "la_base_de_datos_llego_al_limite_13yuqo4": "Il database ha raggiunto il limite configurato. Non si possono creare nuove sessioni.",
     "el_escaner_esta_desactivado_por_11mzrpg": "Lo scanner è stato disattivato dall’amministratore.",
-    "los_registros_estan_cerrados_por_17rzf5k": "Le registrazioni sono state chiuse dall’amministratore."
+    "los_registros_estan_cerrados_por_17rzf5k": "Le registrazioni sono state chiuse dall’amministratore.",
+    "muestra_guardada_como_borrador_p_1kbdsqk": "Campione salvato come bozza. Puoi completarlo quando vuoi.",
+    "sesion_actualizada_1jbqfbr": "Sessione aggiornata.",
+    "panel_fuera_de_lo_recomendado_14z3sxf": "Panel fuori dal consigliato",
+    "esperar_e7gusr": "Attendi",
+    "iniciar_430v7q": "Avvia",
+    "hay_p0_catador_es_listo_s_se_rec_1j2qjo3": "{{p0}} assaggiatore/i pronto/i. Si consiglia un panel di almeno 3 assaggiatori e in numero dispari (3, 5, 7…). Avviare comunque?",
+    "se_necesita_al_menos_1_catador_l_1k5lbdx": "Serve almeno 1 assaggiatore pronto per iniziare.",
+    "no_se_pudo_guardar_la_sesion_phv90s": "Impossibile salvare la sessione.",
+    "nombre_8fqbls": "Nome",
+    "la_sesion_ya_inicio_no_se_puede_hudrcv": "La sessione è già iniziata: non può essere modificata.",
+    "solo_el_organizador_puede_editar_11yp6jb": "Solo l'organizzatore può modificare la sessione.",
+    "los_catadores_objetivo_deben_ser_mor2wv": "Gli assaggiatori previsti devono essere almeno 1.",
+    "el_formato_y_el_numero_de_muestr_1a3z42i": "Il formato e il numero di campioni si possono cambiare solo dalla sala d'attesa, prima di iniziare."
   },
   "config": {
     "titulo": "Impostazioni",
@@ -1462,7 +1483,10 @@
     "enviar": "Invia",
     "salir_titulo": "Uscire dalla valutazione?",
     "salir_mensaje": "I tuoi progressi sono salvati su questo dispositivo e potrai continuare più tardi.",
-    "salir": "Esci"
+    "salir": "Esci",
+    "muestras": "Campioni",
+    "muestra_n": "Campione {{p0}}",
+    "nombre_de_la_muestra_n": "Nome del campione {{p0}}"
   },
   "guias": {
     "comun": {
@@ -1563,5 +1587,12 @@
         "texto": "Scegli la lingua, la dimensione del testo, l’alto contrasto e riduci le animazioni se ti serve."
       }
     }
+  },
+  "editar": {
+    "titulo": "Modifica sessione",
+    "cancelar": "Annulla",
+    "guardar": "Salva modifiche",
+    "aviso_formato": "Cambiando il formato, tutti gli assaggiatori useranno il nuovo modulo all'avvio.",
+    "individual_iniciar": "Sarai l'unico assaggiatore: puoi avviare l'assaggio appena salvi."
   }
 }
