@@ -1395,7 +1395,9 @@
     "la_sesion_ya_inicio_no_se_puede_hudrcv": "会话已开始，无法编辑。",
     "solo_el_organizador_puede_editar_11yp6jb": "只有组织者可以编辑会话。",
     "los_catadores_objetivo_deben_ser_mor2wv": "目标杯测师人数至少为 1。",
-    "el_formato_y_el_numero_de_muestr_1a3z42i": "格式和样品数量只能在开始前于等候室中修改。"
+    "el_formato_y_el_numero_de_muestr_1a3z42i": "格式和样品数量只能在开始前于等候室中修改。",
+    "para_terminar_la_cata_completa_p_8c1ozy": "要完成杯测，请填写“{{p0}}”。",
+    "para_terminar_la_cata_completa_l_1uvwe2": "要完成杯测，请填写样品 {{p0}}。"
   },
   "config": {
     "titulo": "设置",

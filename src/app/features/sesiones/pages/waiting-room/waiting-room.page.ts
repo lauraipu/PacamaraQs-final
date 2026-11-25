@@ -431,8 +431,12 @@ export class WaitingRoomPage implements OnDestroy {
       this.sesion.set(iniciada);
       await this.redirigirSegunEstado(iniciada);
     } catch (error) {
-      this.error.set(mensajeDeError(error, 'No se pudo iniciar la cata.'));
+      const mensaje = mensajeDeError(error, 'No se pudo iniciar la cata.');
+      this.error.set(mensaje);
       this.iniciando.set(false);
+      // El aviso de arriba puede quedar fuera de la vista: también se muestra como toast.
+      const toast = await this.toastController.create({ message: mensaje, duration: 4000, color: 'danger' });
+      await toast.present();
     }
   }
 

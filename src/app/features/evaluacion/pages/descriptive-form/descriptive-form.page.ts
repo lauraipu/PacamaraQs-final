@@ -72,6 +72,19 @@ export class DescriptiveFormPage extends BaseCataForm<FormularioDescriptivo> {
     };
   }
 
+  /** Para terminar la cata, cada atributo debe tener su intensidad marcada. */
+  protected override esRespuestaCompleta(respuesta: FormularioDescriptivo): boolean {
+    return [
+      respuesta.fragancia.intensidad,
+      respuesta.aroma.intensidad,
+      respuesta.sabor.intensidad,
+      respuesta.saborResidual.intensidad,
+      respuesta.acidez.intensidad,
+      respuesta.dulzor.intensidad,
+      respuesta.sensacionEnBoca.intensidad
+    ].every(valor => typeof valor === 'number' && Number.isFinite(valor));
+  }
+
   /** Guarda la selección (máx. 2) en el JSON del formulario. */
   cambiarGustos(gustos: string[]): void {
     this.formulario.gustosPredominantes = gustos.slice(0, 2);

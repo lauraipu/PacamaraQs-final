@@ -1395,7 +1395,9 @@
     "la_sesion_ya_inicio_no_se_puede_hudrcv": "The session has already started: it can no longer be edited.",
     "solo_el_organizador_puede_editar_11yp6jb": "Only the organizer can edit the session.",
     "los_catadores_objetivo_deben_ser_mor2wv": "Target cuppers must be at least 1.",
-    "el_formato_y_el_numero_de_muestr_1a3z42i": "The format and number of samples can only be changed from the waiting room, before starting."
+    "el_formato_y_el_numero_de_muestr_1a3z42i": "The format and number of samples can only be changed from the waiting room, before starting.",
+    "para_terminar_la_cata_completa_p_8c1ozy": "To finish the cupping, complete \"{{p0}}\".",
+    "para_terminar_la_cata_completa_l_1uvwe2": "To finish the cupping, complete sample {{p0}}."
   },
   "config": {
     "titulo": "Settings",

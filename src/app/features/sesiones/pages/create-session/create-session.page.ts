@@ -28,6 +28,7 @@ import { AuthService } from '@core/auth/auth.service';
 import { SesionesRepository } from '@core/data-access/sesiones/sesiones.repository';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { TrPipe } from '@core/i18n/tr';
+import { mensajeDeError } from '@core/errores/errores';
 addIcons({ checkmarkCircle, informationCircleOutline, warningOutline });
 
 const RUTAS_FORMULARIO: Readonly<Record<string, string>> = {
@@ -236,7 +237,8 @@ export class CreateSessionPage {
     await this.router.navigateByUrl(ruta, { replaceUrl: true });
   }
 
+  /** PostgrestError no es `instanceof Error`: se lee su `message` por forma. */
   private mensajeError(error: unknown): string {
-    return error instanceof Error ? error.message : this.transloco.translate('txt.ocurrio_un_error_inesperado_ps7ccd');
+    return mensajeDeError(error, this.transloco.translate('txt.ocurrio_un_error_inesperado_ps7ccd'));
   }
 }

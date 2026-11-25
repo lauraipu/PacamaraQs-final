@@ -1395,7 +1395,9 @@
     "la_sesion_ya_inicio_no_se_puede_hudrcv": "La sesión ya inició: no se puede editar.",
     "solo_el_organizador_puede_editar_11yp6jb": "Solo el organizador puede editar la sesión.",
     "los_catadores_objetivo_deben_ser_mor2wv": "Los catadores objetivo deben ser al menos 1.",
-    "el_formato_y_el_numero_de_muestr_1a3z42i": "El formato y el número de muestras solo se pueden cambiar desde la sala de espera, antes de iniciar."
+    "el_formato_y_el_numero_de_muestr_1a3z42i": "El formato y el número de muestras solo se pueden cambiar desde la sala de espera, antes de iniciar.",
+    "para_terminar_la_cata_completa_p_8c1ozy": "Para terminar la cata completa \"{{p0}}\".",
+    "para_terminar_la_cata_completa_l_1uvwe2": "Para terminar la cata completa la muestra {{p0}}."
   },
   "config": {
     "titulo": "Configuración",

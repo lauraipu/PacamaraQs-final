@@ -1395,7 +1395,9 @@
     "la_sesion_ya_inicio_no_se_puede_hudrcv": "La sessione è già iniziata: non può essere modificata.",
     "solo_el_organizador_puede_editar_11yp6jb": "Solo l'organizzatore può modificare la sessione.",
     "los_catadores_objetivo_deben_ser_mor2wv": "Gli assaggiatori previsti devono essere almeno 1.",
-    "el_formato_y_el_numero_de_muestr_1a3z42i": "Il formato e il numero di campioni si possono cambiare solo dalla sala d'attesa, prima di iniziare."
+    "el_formato_y_el_numero_de_muestr_1a3z42i": "Il formato e il numero di campioni si possono cambiare solo dalla sala d'attesa, prima di iniziare.",
+    "para_terminar_la_cata_completa_p_8c1ozy": "Per terminare l'assaggio completa \"{{p0}}\".",
+    "para_terminar_la_cata_completa_l_1uvwe2": "Per terminare l'assaggio completa il campione {{p0}}."
   },
   "config": {
     "titulo": "Impostazioni",

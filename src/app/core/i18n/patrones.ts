@@ -28,6 +28,8 @@ export const PATRONES: readonly string[] = [
   'Atributo desconocido: {{p0}}',
   'Formato CVA inválido: {{p0}}',
   'Se necesitan al menos 3 catadores listos para iniciar (hay {{p0}}).',
+  'Para terminar la cata completa "{{p0}}".',
+  'Para terminar la cata completa la muestra {{p0}}.',
   'Hay {{p0}} catador(es) listo(s). Se recomienda un panel de al menos 3 catadores y en número impar (3, 5, 7…). ¿Iniciar de todos modos?',
   'Transición de estado no permitida: {{p0}} → {{p1}}.',
   'Valores fuera de rango en {{p0}}.',

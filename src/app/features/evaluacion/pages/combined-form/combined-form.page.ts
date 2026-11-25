@@ -219,10 +219,13 @@ export class CombinedFormPage extends BaseCataForm<FormularioCombinado> {
 
   override async finalizarCata(): Promise<void> {
     // Las muestras cerradas por el organizador no se exigen.
-    const incompletas = this.respuestas.filter(
-      (respuesta, indice) => !this.muestrasCerradas().has(indice + 1) && !this.esRespuestaCompleta(respuesta)
-    ).length;
+    const pendientes = this.respuestas
+      .map((respuesta, indice) => ({ respuesta, numero: indice + 1 }))
+      .filter(({ respuesta, numero }) => !this.muestrasCerradas().has(numero) && !this.esRespuestaCompleta(respuesta));
+    const incompletas = pendientes.length;
     if (incompletas > 0) {
+      // Abre la primera muestra pendiente para que el catador la complete.
+      this.irAMuestra(pendientes[0].numero);
       const alert = await this.alertCtrl.create({
         header: 'Cata incompleta',
         message: `Aún tienes ${incompletas} muestra(s) sin calificar todos los atributos. Revisa todas las muestras antes de terminar.`,

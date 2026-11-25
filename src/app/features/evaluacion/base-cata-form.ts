@@ -22,10 +22,11 @@ const ATRIBUTOS_HEDONICOS = new Set([
  * Offline-first:
  *  · Cada cambio (input, slider, botón) se guarda al instante en localStorage
  *    bajo `borrador_sesion_{id}_{muestra}`.
- *  · Las muestras se pueden llenar en cualquier orden (selector de muestras).
- *    "Siguiente" envía la ficha si está completa (UPSERT idempotente por
- *    OfflineSyncService); si no, la deja como borrador y avanza. Solo
- *    "Terminar" exige que todas las muestras abiertas estén completas.
+ *  · Las muestras se recorren como un libro: Anterior / Siguiente / selector
+ *    llevan a cualquier muestra sin exigir que la actual esté terminada.
+ *    Al salir de una muestra completa (y tocada) su ficha se envía en segundo
+ *    plano (UPSERT idempotente por OfflineSyncService). Solo "Terminar cata"
+ *    exige que todas las muestras abiertas estén completas.
  *    Sin red: "Guardado localmente. Reintentando…" + backoff.
  *  · Al reabrir (o en otro dispositivo) se restaura: borrador local > ficha
  *    ya enviada (columna `notas`) > formulario vacío.
@@ -99,6 +100,8 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
   protected sesionId = '';
 
   private sala: SalaRealtime | null = null;
+  /** Último contenido enviado por muestra (evita reenvíos idénticos). */
+  private readonly ultimoEnvio = new Map<number, string>();
   private eventosSub?: Subscription;
   private sincronizadasSub?: Subscription;
   private destruido = false;
@@ -207,49 +210,55 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
   // ---------------------------------------------------------------------------
 
   /**
-   * Avanza a la siguiente muestra. No obliga a terminar la actual: si está
-   * completa se envía; si no, queda en borrador para completarla después.
+   * Pasa a la siguiente muestra como la página de un libro: no exige terminar
+   * la actual. En la última muestra, "Siguiente" es "Terminar cata".
    */
   async irAMuestraSiguiente(): Promise<void> {
     if (this.guardando()) return;
     const actual = this.muestraActual();
-    const siguiente = this.siguienteMuestraAbierta(actual);
-
-    if (!this.muestrasCerradas().has(actual)) {
-      if (this.esRespuestaCompleta(this.formulario)) {
-        this.guardando.set(true);
-        try {
-          const resultado = await this.enviarMuestra(actual);
-          if (resultado === 'rechazada') return;
-        } finally {
-          this.guardando.set(false);
-        }
-      } else if (siguiente !== null) {
-        this.guardarBorradorActual();
-        await this.mostrarToast('Muestra guardada como borrador. Puedes completarla cuando quieras.', 'dark');
-      }
-    }
-
-    if (siguiente === null) {
+    if (actual >= this.totalMuestras()) {
       await this.finalizarCata();
       return;
     }
-    this.mostrarMuestra(siguiente);
+    this.cambiarDeMuestra(actual + 1);
   }
 
   irAMuestraAnterior(): void {
     const actual = this.muestraActual();
-    if (actual <= 1) return;
-    this.guardarBorradorActual();
-    this.mostrarMuestra(actual - 1);
+    if (actual <= 1 || this.guardando()) return;
+    this.cambiarDeMuestra(actual - 1);
   }
 
   /** Salta directo a cualquier muestra (selector de muestras). */
   irAMuestra(numeroMuestra: number): void {
     if (this.guardando() || numeroMuestra === this.muestraActual()) return;
     if (numeroMuestra < 1 || numeroMuestra > this.totalMuestras()) return;
+    this.cambiarDeMuestra(numeroMuestra);
+  }
+
+  private cambiarDeMuestra(destino: number): void {
+    const saliente = this.muestraActual();
     this.guardarBorradorActual();
-    this.mostrarMuestra(numeroMuestra);
+    this.entregarSiCompleta(saliente);
+    this.mostrarMuestra(destino);
+  }
+
+  /**
+   * Envía en segundo plano la ficha de una muestra que el catador ya llenó,
+   * para que el organizador vea el avance. No bloquea la navegación y no envía
+   * formularios sin tocar ni repite un envío idéntico.
+   */
+  private entregarSiCompleta(numeroMuestra: number): void {
+    if (this.muestrasCerradas().has(numeroMuestra)) return;
+    const respuesta = this.respuestas[numeroMuestra - 1];
+    if (!respuesta || !this.esRespuestaCompleta(respuesta)) return;
+    const contenido = JSON.stringify(respuesta);
+    if (contenido === JSON.stringify(this.crearFormularioVacio())) return;
+    if (this.ultimoEnvio.get(numeroMuestra) === contenido) return;
+    this.ultimoEnvio.set(numeroMuestra, contenido);
+    void this.enviarMuestra(numeroMuestra).then(resultado => {
+      if (resultado === 'rechazada') this.ultimoEnvio.delete(numeroMuestra);
+    });
   }
 
   /** "Muestra 3" o el nombre que le dio el organizador. */
@@ -260,20 +269,21 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
   async finalizarCata(): Promise<void> {
     if (this.guardando()) return;
     this.guardarBorradorActual();
+    const abiertas = Array.from({ length: this.totalMuestras() }, (_, i) => i + 1)
+      .filter(n => !this.muestrasCerradas().has(n));
+    const incompleta = abiertas.find(n => !this.esRespuestaCompleta(this.respuestas[n - 1]));
+    if (incompleta !== undefined) {
+      // Para terminar sí hay que llenar todas las muestras: se abre la que falta.
+      this.mostrarMuestra(incompleta);
+      await this.mostrarAvisoMuestraPendiente(incompleta);
+      return;
+    }
+
     if (this.confirmarAntesDeEnviar && !(await this.avisos.confirmar({
       titulo: 'formulario.enviar_titulo',
       mensaje: 'formulario.enviar_mensaje',
       confirmar: 'formulario.enviar'
     }))) return;
-
-    const abiertas = Array.from({ length: this.totalMuestras() }, (_, i) => i + 1)
-      .filter(n => !this.muestrasCerradas().has(n));
-    const incompleta = abiertas.find(n => !this.esRespuestaCompleta(this.respuestas[n - 1]));
-    if (incompleta !== undefined) {
-      this.mostrarMuestra(incompleta);
-      await this.mostrarAvisoCalificacionIncompleta();
-      return;
-    }
 
     this.guardando.set(true);
     this.error.set(null);
@@ -522,6 +532,16 @@ export abstract class BaseCataForm<T extends object> implements OnInit, OnDestro
     if (this.navegandoFuera) return;
     this.navegandoFuera = true;
     await this.navCtrl.navigateRoot(url);
+  }
+
+  protected async mostrarAvisoMuestraPendiente(numeroMuestra: number): Promise<void> {
+    const nombre = this.nombreMuestra(numeroMuestra);
+    await this.mostrarToast(
+      nombre
+        ? `Para terminar la cata completa "${nombre}".`
+        : `Para terminar la cata completa la muestra ${numeroMuestra}.`,
+      'warning'
+    );
   }
 
   protected async mostrarAvisoCalificacionIncompleta(): Promise<void> {
